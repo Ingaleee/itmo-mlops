@@ -1,0 +1,230 @@
+name: ITMO MLOps labs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deploy both labs to the teaching cluster using KUBE_CONFIG_B64
+        type: boolean
+        default: false
+      demonstrate_rollback:
+        description: Demonstrate semantic failure and rollback, then restore the same digest
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mlops-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  HELM_DRIVER: configmap
+  KUBE_NAMESPACE: mlops-students
+  RELEASE_PREFIX: esolovev
+  IRIS_IMAGE: ghcr.io/ingaleee/esolovev-iris
+  SEARCH_IMAGE: ghcr.io/ingaleee/esolovev-search
+  PYTHONUTF8: '1'
+
+jobs:
+  test-quality:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: '3.12'
+      - run: pip install -r lab2/requirements.txt pyyaml==6.0.3
+      - name: Train Iris and verify API contract
+        working-directory: lab1
+        run: |
+          python train.py
+          python scripts/check_api.py
+      - name: Build retrieval index and test API
+        working-directory: lab2
+        run: |
+          python scripts/build_index.py --output artifacts
+          python -m pytest -q
+          python scripts/check_quality.py
+      - name: Install verified Helm and kubectl
+        run: bash scripts/install_ci_tools.sh
+      - name: Check immutable chart and runtime protections
+        working-directory: lab2
+        run: python scripts/check_chart.py
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: quality-and-contracts
+          path: |
+            lab1/evidence/
+            lab2/evidence/
+            lab2/artifacts/metadata.json
+
+  build-images:
+    needs: test-quality
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      iris_digest: ${{ steps.iris.outputs.digest }}
+      search_digest: ${{ steps.search.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: docker/setup-buildx-action@v4.4.1
+      - uses: docker/login-action@v4.6.0
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish Iris
+        id: iris
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: lab1
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: |
+            ${{ env.IRIS_IMAGE }}:${{ github.sha }}
+            ${{ env.IRIS_IMAGE }}:v1
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+      - name: Build and publish Runbook Search
+        id: search
+        uses: docker/build-push-action@v7.4.0
+        with:
+          context: lab2
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ env.SEARCH_IMAGE }}:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+      - name: Save immutable release identifiers
+        if: github.event_name != 'pull_request'
+        env:
+          IRIS_DIGEST: ${{ steps.iris.outputs.digest }}
+          SEARCH_DIGEST: ${{ steps.search.outputs.digest }}
+        run: |
+          mkdir release
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          Path('release/images.json').write_text(json.dumps({
+              'build_revision': os.environ['GITHUB_SHA'],
+              'iris': {'repository': os.environ['IRIS_IMAGE'], 'digest': os.environ['IRIS_DIGEST']},
+              'search': {'repository': os.environ['SEARCH_IMAGE'], 'digest': os.environ['SEARCH_DIGEST']},
+          }, indent=2) + '\n')
+          PY
+      - uses: actions/upload-artifact@v7.0.2
+        if: github.event_name != 'pull_request'
+        with:
+          name: immutable-images
+          path: release/images.json
+
+  deploy-staging:
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy
+    needs: build-images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: staging
+    concurrency:
+      group: esolovev-teaching-cluster-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: '3.12'
+      - run: bash scripts/install_ci_tools.sh
+      - name: Load masked kubeconfig
+        env:
+          KUBE_CONFIG_B64: ${{ secrets.KUBE_CONFIG_B64 }}
+        run: bash scripts/prepare_kubeconfig.sh
+      - name: Deploy and verify Iris
+        env:
+          IRIS_DIGEST: ${{ needs.build-images.outputs.iris_digest }}
+        run: bash scripts/deploy_iris.sh
+      - name: Deploy and verify staging by digest
+        working-directory: lab2
+        env:
+          IMAGE_REPOSITORY: ${{ env.SEARCH_IMAGE }}
+          IMAGE_DIGEST: ${{ needs.build-images.outputs.search_digest }}
+          BUILD_REVISION: ${{ github.sha }}
+        run: bash scripts/deploy_release.sh esolovev-search-staging staging normal
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: staging-and-iris-evidence
+          path: |
+            lab1/evidence/
+            lab2/evidence/
+      - name: Remove temporary credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/mlops-students.kubeconfig"
+
+  promote-production:
+    needs: [build-images, deploy-staging]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: production
+    concurrency:
+      group: esolovev-teaching-cluster-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: '3.12'
+      - run: bash scripts/install_ci_tools.sh
+      - name: Load masked kubeconfig
+        env:
+          KUBE_CONFIG_B64: ${{ secrets.KUBE_CONFIG_B64 }}
+        run: bash scripts/prepare_kubeconfig.sh
+      - name: Promote the staging digest
+        working-directory: lab2
+        env:
+          IMAGE_REPOSITORY: ${{ env.SEARCH_IMAGE }}
+          IMAGE_DIGEST: ${{ needs.build-images.outputs.search_digest }}
+          BUILD_REVISION: ${{ github.sha }}
+        run: bash scripts/deploy_release.sh esolovev-search-prod production normal
+      - name: Demonstrate semantic failure and verified rollback
+        if: inputs.demonstrate_rollback
+        working-directory: lab2
+        env:
+          IMAGE_REPOSITORY: ${{ env.SEARCH_IMAGE }}
+          IMAGE_DIGEST: ${{ needs.build-images.outputs.search_digest }}
+          BUILD_REVISION: ${{ github.sha }}
+        run: |
+          if bash scripts/deploy_release.sh esolovev-search-prod production reverse; then
+            echo 'ERROR: reverse ranking passed semantic smoke'
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('evidence/esolovev-search-prod/reverse/rollback.json').read_text())
+          assert result['failure_stage'] == 'semantic_smoke_failed' and result['rollback_verified'], result
+          PY
+          bash scripts/deploy_release.sh esolovev-search-prod production normal
+      - name: Retrieve staging metadata and prove identical promotion
+        working-directory: lab2
+        env:
+          IMAGE_DIGEST: ${{ needs.build-images.outputs.search_digest }}
+        run: |
+          python scripts/verify_release.py --release esolovev-search-staging --expected-digest "$IMAGE_DIGEST" --expected-environment staging --output evidence/esolovev-search-staging/normal/candidate
+          python scripts/check_promotion.py --digest "$IMAGE_DIGEST"
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: production-promotion-and-rollback
+          path: lab2/evidence/
+      - name: Remove temporary credentials
+        if: always()
+        run: rm -f "$RUNNER_TEMP/mlops-students.kubeconfig"

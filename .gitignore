@@ -1,0 +1,16 @@
+.venv/
+.tools/
+.course-access/
+**/__pycache__/
+**/.pytest_cache/
+**/artifacts/
+**/evidence/
+**/model.joblib
+**/*.kubeconfig
+**/config.json
+**/.env
+**/.env.*
+!**/.env.example
+__MACOSX/
+.DS_Store
+/COURSE_STATUS_2026-10-08.md
