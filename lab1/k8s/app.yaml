@@ -34,8 +34,11 @@ spec:
         app.kubernetes.io/name: iris-api
         app.kubernetes.io/instance: esolovev-iris
     spec:
+      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -60,6 +63,12 @@ spec:
               port: http
             initialDelaySeconds: 15
             periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            failureThreshold: 30
+            periodSeconds: 2
           resources:
             requests:
               cpu: 100m

@@ -4,7 +4,8 @@ from pathlib import Path
 
 import joblib
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Annotated
 
 MODEL_PATH = Path(os.getenv("MODEL_PATH", "model.joblib"))
 MODEL_VERSION = os.getenv("MODEL_VERSION", "iris-v1")
@@ -12,15 +13,18 @@ model = None
 
 
 class PredictionRequest(BaseModel):
-    features: list[float] = Field(min_length=4, max_length=4)
+    model_config = ConfigDict(extra="forbid")
+    features: list[Annotated[float, Field(strict=True, allow_inf_nan=False)]] = Field(min_length=4, max_length=4)
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     global model
     model = joblib.load(MODEL_PATH)
-    yield
-    model = None
+    try:
+        yield
+    finally:
+        model = None
 
 
 app = FastAPI(title="Iris classifier", lifespan=lifespan)

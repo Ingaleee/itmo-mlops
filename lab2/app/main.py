@@ -1,14 +1,16 @@
 import json
 import logging
 import os
+import re
 import threading
 import time
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request, Response
-from pydantic import BaseModel, Field
+from fastapi import FastAPI, HTTPException, Query, Request, Response
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.search import SearchEngine
 
@@ -24,6 +26,7 @@ search_latency_seconds = 0.0
 
 
 class SearchRequest(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
     query: str = Field(min_length=2, max_length=500, examples=["rollback canary deployment"])
     limit: int = Field(default=5, ge=1, le=10)
 
@@ -39,8 +42,10 @@ async def lifespan(_: FastAPI):
         "index_version": engine.metadata["index_version"],
         "documents": engine.metadata["documents"],
     }))
-    yield
-    engine = None
+    try:
+        yield
+    finally:
+        engine = None
 
 
 app = FastAPI(
@@ -54,10 +59,15 @@ app = FastAPI(
 @app.middleware("http")
 async def observability(request: Request, call_next):
     global request_count
-    request_id = request.headers.get("x-request-id", str(uuid.uuid4()))
+    supplied_id = request.headers.get("x-request-id", "")
+    request_id = supplied_id if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}", supplied_id) else str(uuid.uuid4())
     request.state.request_id = request_id
     started = time.perf_counter()
-    response = await call_next(request)
+    try:
+        response = await call_next(request)
+    except Exception:
+        logger.exception(json.dumps({"event": "request_failed", "request_id": request_id}))
+        response = JSONResponse(status_code=500, content={"detail": "internal server error", "request_id": request_id})
     elapsed = time.perf_counter() - started
     with metrics_lock:
         request_count += 1
@@ -111,6 +121,7 @@ def metadata() -> dict[str, str | int]:
         "ranking_mode": engine.ranking_mode if engine else "unavailable",
         "index_version": engine.metadata["index_version"] if engine else "unavailable",
         "model_type": engine.metadata.get("model_type", "unknown") if engine else "unavailable",
+        "artifact_sha256": engine.metadata["artifact_sha256"] if engine else "unavailable",
         "documents": engine.metadata["documents"] if engine else 0,
     }
 
@@ -146,34 +157,36 @@ def search_alias(request: SearchRequest, http_request: Request) -> dict:
 
 
 @app.get("/v1/documents/{document_id}/recommendations", tags=["retrieval"])
-def recommend(document_id: str, limit: int = 3) -> dict:
+def recommend(document_id: str, limit: int = Query(default=3, ge=1, le=10)) -> dict:
     if engine is None:
         raise HTTPException(status_code=503, detail="search index is not loaded")
     try:
-        results = engine.recommend(document_id, min(max(limit, 1), 10))
+        results = engine.recommend(document_id, limit)
     except KeyError as error:
         raise HTTPException(status_code=404, detail="document not found") from error
     return {"document_id": document_id, "index_version": engine.metadata["index_version"], "results": results}
 
 
 @app.get("/recommend/{document_id}", include_in_schema=False)
-def recommend_alias(document_id: str, limit: int = 3) -> dict:
+def recommend_alias(document_id: str, limit: int = Query(default=3, ge=1, le=10)) -> dict:
     return recommend(document_id, limit)
 
 
 @app.get("/metrics", tags=["platform"])
 def metrics() -> Response:
     index_loaded = 1 if engine is not None else 0
+    with metrics_lock:
+        requests, searches, latency = request_count, search_count, search_latency_seconds
     body = "\n".join([
         "# HELP http_requests_total Total HTTP requests processed.",
         "# TYPE http_requests_total counter",
-        f"http_requests_total {request_count}",
+        f"http_requests_total {requests}",
         "# HELP search_requests_total Total retrieval requests processed.",
         "# TYPE search_requests_total counter",
-        f"search_requests_total {search_count}",
+        f"search_requests_total {searches}",
         "# HELP search_request_duration_seconds_sum Cumulative retrieval latency.",
         "# TYPE search_request_duration_seconds_sum counter",
-        f"search_request_duration_seconds_sum {search_latency_seconds:.6f}",
+        f"search_request_duration_seconds_sum {latency:.6f}",
         "# HELP search_index_loaded Whether the search index is loaded.",
         "# TYPE search_index_loaded gauge",
         f"search_index_loaded {index_loaded}",

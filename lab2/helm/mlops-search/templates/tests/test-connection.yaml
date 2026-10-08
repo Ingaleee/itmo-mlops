@@ -8,11 +8,21 @@ metadata:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
+  automountServiceAccountToken: false
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
   restartPolicy: Never
   containers:
     - name: curl
       image: curlimages/curl:8.15.0
       args: ["--fail", "--silent", "http://{{ include "mlops-search.name" . }}:{{ .Values.service.port }}/readyz"]
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]
       resources:
         requests:
           cpu: 10m

@@ -15,11 +15,14 @@ def main():
     command = [args.helm, "template", "esolovev-search-staging", "helm/mlops-search", "-n", "mlops-students"]
     for invalid in ("", "latest", "sha256:abc", "sha256:" + "g" * 64):
         result = subprocess.run(command + ["--set-string", "image.digest=" + invalid], capture_output=True, text=True)
-        assert result.returncode != 0 and "image.digest" in result.stderr, result.stderr
+        assert result.returncode != 0 and "digest" in result.stderr, result.stderr
     for repository in ("ghcr.io/ingaleee/esolovev-search:latest", "ghcr.io/ingaleee/esolovev-search@" + digest):
         result = subprocess.run(command + ["--set-string", "image.digest=" + digest, "--set-string", "image.repository=" + repository], capture_output=True, text=True)
-        assert result.returncode != 0 and "image.repository" in result.stderr, result.stderr
+        assert result.returncode != 0 and "repository" in result.stderr, result.stderr
     options = ["--set-string", "image.repository=ghcr.io/ingaleee/esolovev-search", "--set-string", "image.digest=" + digest]
+    for key, value in (("rankingMode", "typo"), ("environment", "typo"), ("replicaCount", "0")):
+        result = subprocess.run(command + options + ["--set", key + "=" + value], capture_output=True, text=True)
+        assert result.returncode != 0, f"unsafe {key} accepted"
     subprocess.run([args.helm, "lint", "helm/mlops-search"] + options, check=True)
     rendered = subprocess.check_output(command + options, text=True)
     objects = list(yaml.safe_load_all(rendered))
@@ -31,6 +34,10 @@ def main():
     assert container["readinessProbe"]["httpGet"]["path"] == "/readyz"
     assert container["livenessProbe"]["httpGet"]["path"] == "/livez"
     assert container["securityContext"]["readOnlyRootFilesystem"]
+    pod = deployment["spec"]["template"]["spec"]
+    assert pod["automountServiceAccountToken"] is False
+    assert pod["securityContext"]["runAsUser"] == pod["securityContext"]["runAsGroup"] == 10001
+    assert container["startupProbe"]["httpGet"]["path"] == "/readyz"
     assert container["resources"]["limits"] and container["resources"]["requests"]
     assert service["spec"]["type"] == "ClusterIP"
     assert config["data"]["IMAGE_DIGEST"] == digest

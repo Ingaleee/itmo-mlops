@@ -34,29 +34,36 @@ jobs:
   test-quality:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    outputs:
+      index_version: ${{ steps.index.outputs.index_version }}
     steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-python@v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          python-version: '3.12'
-      - run: pip install -r lab2/requirements.txt pyyaml==6.0.3
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12.15'
+      - run: pip install -r lab2/requirements-dev.txt && pip check
       - name: Train Iris and verify API contract
         working-directory: lab1
         run: |
           python train.py
+          python -m pytest -q --junitxml=evidence/tests.xml
           python scripts/check_api.py
       - name: Build retrieval index and test API
+        id: index
         working-directory: lab2
         run: |
           python scripts/build_index.py --output artifacts
-          python -m pytest -q
+          python -m pytest -q --junitxml=evidence/tests.xml
           python scripts/check_quality.py
+          python -c 'import json,os; from pathlib import Path; metadata=json.loads(Path("artifacts/metadata.json").read_text()); print("index_version="+metadata["index_version"],file=open(os.environ["GITHUB_OUTPUT"],"a"))'
       - name: Install verified Helm and kubectl
         run: bash scripts/install_ci_tools.sh
       - name: Check immutable chart and runtime protections
         working-directory: lab2
         run: python scripts/check_chart.py
-      - uses: actions/upload-artifact@v7.0.2
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: quality-and-contracts
@@ -75,10 +82,13 @@ jobs:
     outputs:
       iris_digest: ${{ steps.iris.outputs.digest }}
       search_digest: ${{ steps.search.outputs.digest }}
+      index_version: ${{ needs.test-quality.outputs.index_version }}
     steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: docker/setup-buildx-action@v4.4.1
-      - uses: docker/login-action@v4.6.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         if: github.event_name != 'pull_request'
         with:
           registry: ghcr.io
@@ -86,9 +96,13 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and publish Iris
         id: iris
-        uses: docker/build-push-action@v7.4.0
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: lab1
+          cache-from: type=gha,scope=iris
+          cache-to: type=gha,scope=iris,mode=max
+          sbom: true
+          provenance: mode=max
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.IRIS_IMAGE }}:${{ github.sha }}
@@ -98,9 +112,13 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
       - name: Build and publish Runbook Search
         id: search
-        uses: docker/build-push-action@v7.4.0
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: lab2
+          cache-from: type=gha,scope=search
+          cache-to: type=gha,scope=search,mode=max
+          sbom: true
+          provenance: mode=max
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ env.SEARCH_IMAGE }}:${{ github.sha }}
           labels: |
@@ -122,7 +140,7 @@ jobs:
               'search': {'repository': os.environ['SEARCH_IMAGE'], 'digest': os.environ['SEARCH_DIGEST']},
           }, indent=2) + '\n')
           PY
-      - uses: actions/upload-artifact@v7.0.2
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: github.event_name != 'pull_request'
         with:
           name: immutable-images
@@ -138,11 +156,14 @@ jobs:
       IMAGE_REPOSITORY: ghcr.io/ingaleee/esolovev-search
       IMAGE_DIGEST: ${{ needs.build-images.outputs.search_digest }}
       BUILD_REVISION: ${{ github.sha }}
+      INDEX_VERSION: ${{ needs.build-images.outputs.index_version }}
     steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-python@v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          python-version: '3.12'
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12.15'
       - run: bash scripts/install_ci_tools.sh
       - name: Create isolated CI Kubernetes
         run: bash scripts/create_ci_cluster.sh
@@ -156,19 +177,13 @@ jobs:
       - name: Verify semantic failure, rollback and identical digest
         working-directory: lab2
         run: |
-          if bash scripts/deploy_release.sh esolovev-search-prod production reverse; then
-            echo 'ERROR: reverse ranking passed semantic smoke'
-            exit 1
-          fi
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          result = json.loads(Path('evidence/esolovev-search-prod/reverse/rollback.json').read_text())
-          assert result['failure_stage'] == 'semantic_smoke_failed' and result['rollback_verified'], result
-          PY
-          bash scripts/deploy_release.sh esolovev-search-prod production normal
+          bash scripts/demonstrate_rollback.sh esolovev-search-prod production
           python scripts/check_promotion.py --digest "$IMAGE_DIGEST"
-      - uses: actions/upload-artifact@v7.0.2
+      - name: Summarize deployment evidence
+        if: always()
+        working-directory: lab2
+        run: python scripts/write_summary.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: local-kubernetes-integration
@@ -191,10 +206,12 @@ jobs:
       group: esolovev-teaching-cluster-deploy
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-python@v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          python-version: '3.12'
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12.15'
       - run: bash scripts/install_ci_tools.sh
       - name: Load masked kubeconfig
         env:
@@ -210,8 +227,9 @@ jobs:
           IMAGE_REPOSITORY: ${{ env.SEARCH_IMAGE }}
           IMAGE_DIGEST: ${{ needs.build-images.outputs.search_digest }}
           BUILD_REVISION: ${{ github.sha }}
+          INDEX_VERSION: ${{ needs.build-images.outputs.index_version }}
         run: bash scripts/deploy_release.sh esolovev-search-staging staging normal
-      - uses: actions/upload-artifact@v7.0.2
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: staging-and-iris-evidence
@@ -220,7 +238,7 @@ jobs:
             lab2/evidence/
       - name: Remove temporary credentials
         if: always()
-        run: rm -f "$RUNNER_TEMP/mlops-students.kubeconfig"
+        run: rm -f "$RUNNER_TEMP/mlops-students.kubeconfig" "$RUNNER_TEMP/kubeconfig-validation.json"
 
   promote-production:
     needs: [build-images, deploy-staging]
@@ -231,10 +249,12 @@ jobs:
       group: esolovev-teaching-cluster-deploy
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v7.0.1
-      - uses: actions/setup-python@v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          python-version: '3.12'
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12.15'
       - run: bash scripts/install_ci_tools.sh
       - name: Load masked kubeconfig
         env:
@@ -246,6 +266,7 @@ jobs:
           IMAGE_REPOSITORY: ${{ env.SEARCH_IMAGE }}
           IMAGE_DIGEST: ${{ needs.build-images.outputs.search_digest }}
           BUILD_REVISION: ${{ github.sha }}
+          INDEX_VERSION: ${{ needs.build-images.outputs.index_version }}
         run: bash scripts/deploy_release.sh esolovev-search-prod production normal
       - name: Demonstrate semantic failure and verified rollback
         if: inputs.demonstrate_rollback
@@ -254,30 +275,27 @@ jobs:
           IMAGE_REPOSITORY: ${{ env.SEARCH_IMAGE }}
           IMAGE_DIGEST: ${{ needs.build-images.outputs.search_digest }}
           BUILD_REVISION: ${{ github.sha }}
+          INDEX_VERSION: ${{ needs.build-images.outputs.index_version }}
         run: |
-          if bash scripts/deploy_release.sh esolovev-search-prod production reverse; then
-            echo 'ERROR: reverse ranking passed semantic smoke'
-            exit 1
-          fi
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          result = json.loads(Path('evidence/esolovev-search-prod/reverse/rollback.json').read_text())
-          assert result['failure_stage'] == 'semantic_smoke_failed' and result['rollback_verified'], result
-          PY
-          bash scripts/deploy_release.sh esolovev-search-prod production normal
+          bash scripts/demonstrate_rollback.sh esolovev-search-prod production
       - name: Retrieve staging metadata and prove identical promotion
         working-directory: lab2
         env:
           IMAGE_DIGEST: ${{ needs.build-images.outputs.search_digest }}
+          BUILD_REVISION: ${{ github.sha }}
+          INDEX_VERSION: ${{ needs.build-images.outputs.index_version }}
         run: |
-          python scripts/verify_release.py --release esolovev-search-staging --expected-digest "$IMAGE_DIGEST" --expected-environment staging --output evidence/esolovev-search-staging/normal/candidate
+          python scripts/verify_release.py --release esolovev-search-staging --expected-digest "$IMAGE_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment staging --output evidence/esolovev-search-staging/normal/candidate
           python scripts/check_promotion.py --digest "$IMAGE_DIGEST"
-      - uses: actions/upload-artifact@v7.0.2
+      - name: Summarize production evidence
+        if: always()
+        working-directory: lab2
+        run: python scripts/write_summary.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: production-promotion-and-rollback
           path: lab2/evidence/
       - name: Remove temporary credentials
         if: always()
-        run: rm -f "$RUNNER_TEMP/mlops-students.kubeconfig"
+        run: rm -f "$RUNNER_TEMP/mlops-students.kubeconfig" "$RUNNER_TEMP/kubeconfig-validation.json"

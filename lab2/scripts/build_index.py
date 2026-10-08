@@ -1,11 +1,16 @@
 import argparse
 import hashlib
 import json
+import sys
 from pathlib import Path
 
 import joblib
 from sklearn.pipeline import FeatureUnion
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import normalize
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from app.index_contract import MODEL_CONFIG, fingerprint
 
 
 def document_text(document: dict) -> str:
@@ -18,27 +23,29 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=Path("artifacts"))
     args = parser.parse_args()
 
-    raw = args.documents.read_bytes()
-    documents = json.loads(raw)
+    documents = json.loads(args.documents.read_text(encoding="utf-8"))
+    contract = fingerprint(documents)
     texts = [document_text(document) for document in documents]
     vectorizer = FeatureUnion([
-        ("word", TfidfVectorizer(lowercase=True, ngram_range=(1, 2), sublinear_tf=True)),
-        ("char", TfidfVectorizer(lowercase=True, analyzer="char_wb", ngram_range=(3, 5), min_df=1)),
+        ("word", TfidfVectorizer(lowercase=True, ngram_range=tuple(MODEL_CONFIG["word"]["ngram_range"]),
+                                sublinear_tf=MODEL_CONFIG["word"]["sublinear_tf"])),
+        ("char", TfidfVectorizer(lowercase=True, analyzer=MODEL_CONFIG["char"]["analyzer"],
+                                ngram_range=tuple(MODEL_CONFIG["char"]["ngram_range"]), min_df=MODEL_CONFIG["char"]["min_df"])),
     ])
-    matrix = vectorizer.fit_transform(texts)
+    matrix = normalize(vectorizer.fit_transform(texts), norm="l2")
 
     args.output.mkdir(parents=True, exist_ok=True)
-    joblib.dump({"vectorizer": vectorizer, "matrix": matrix, "documents": documents}, args.output / "search-index.joblib")
+    artifact_path = args.output / "search-index.joblib"
+    joblib.dump({"vectorizer": vectorizer, "matrix": matrix, "documents": documents}, artifact_path)
     metadata = {
-        "artifact_schema": "runbook-search-index/v1",
+        **contract,
         "model_name": "runbook-hybrid-tfidf",
         "model_type": "tfidf-word-char-cosine",
-        "index_version": hashlib.sha256(raw).hexdigest()[:12],
-        "corpus_sha256": hashlib.sha256(raw).hexdigest(),
+        "artifact_sha256": hashlib.sha256(artifact_path.read_bytes()).hexdigest(),
         "documents": len(documents),
         "features": int(matrix.shape[1]),
     }
-    (args.output / "metadata.json").write_text(json.dumps(metadata, indent=2) + "\n")
+    (args.output / "metadata.json").write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(metadata))
 
 
