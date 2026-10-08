@@ -41,7 +41,13 @@ def main():
     assert container["resources"]["limits"] and container["resources"]["requests"]
     assert service["spec"]["type"] == "ClusterIP"
     assert config["data"]["IMAGE_DIGEST"] == digest
-    assert any(obj["kind"] == "Pod" and obj["metadata"].get("annotations", {}).get("helm.sh/hook") == "test" for obj in objects)
+    test_pod = next(obj["spec"] for obj in objects if obj["kind"] == "Pod" and obj["metadata"].get("annotations", {}).get("helm.sh/hook") == "test")
+    assert test_pod["automountServiceAccountToken"] is False
+    assert test_pod["securityContext"]["runAsNonRoot"] is True
+    assert test_pod["securityContext"]["runAsUser"] == test_pod["securityContext"]["runAsGroup"] == 10001
+    test_security = test_pod["containers"][0]["securityContext"]
+    assert test_security["allowPrivilegeEscalation"] is False and test_security["readOnlyRootFilesystem"] is True
+    assert test_security["capabilities"]["drop"] == ["ALL"]
     evidence = Path("evidence")
     evidence.mkdir(exist_ok=True)
     (evidence / "helm-render.yaml").write_text(rendered)
