@@ -35,7 +35,9 @@ Pipeline проверяет обе лабораторные, собирает и
 - `ghcr.io/ingaleee/esolovev-iris:<commit>` (дополнительно `v1`);
 - `ghcr.io/ingaleee/esolovev-search:<commit>`.
 
-На push выполняются тесты и публикация образов. Для кластерного этапа запустите workflow вручную с `deploy=true`, после настройки секрета и публичности контейнеров. Для controlled rollback оставьте `demonstrate_rollback=true`.
+На push выполняются тесты, публикация образов и полная проверка обеих работ в отдельном Kubernetes внутри CI: staging, production, отрицательный smoke и настоящий rollback. Эти результаты сохраняются в artifact `local-kubernetes-integration`. Этот кластер временный и не является учебным стендом преподавателя.
+
+Для учебного кластерного этапа запустите workflow вручную с `deploy=true`, после настройки секрета и публичности контейнеров. Для controlled rollback оставьте `demonstrate_rollback=true`.
 
 Перед первым деплоем:
 

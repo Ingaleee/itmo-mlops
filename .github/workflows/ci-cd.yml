@@ -128,9 +128,62 @@ jobs:
           name: immutable-images
           path: release/images.json
 
+  local-integration:
+    if: github.event_name != 'pull_request'
+    needs: build-images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      IRIS_DIGEST: ${{ needs.build-images.outputs.iris_digest }}
+      IMAGE_REPOSITORY: ghcr.io/ingaleee/esolovev-search
+      IMAGE_DIGEST: ${{ needs.build-images.outputs.search_digest }}
+      BUILD_REVISION: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: '3.12'
+      - run: bash scripts/install_ci_tools.sh
+      - name: Create isolated CI Kubernetes
+        run: bash scripts/create_ci_cluster.sh
+      - name: Verify published Iris image in Kubernetes
+        run: bash scripts/deploy_iris.sh
+      - name: Verify staging and production promotion
+        working-directory: lab2
+        run: |
+          bash scripts/deploy_release.sh esolovev-search-staging staging normal
+          bash scripts/deploy_release.sh esolovev-search-prod production normal
+      - name: Verify semantic failure, rollback and identical digest
+        working-directory: lab2
+        run: |
+          if bash scripts/deploy_release.sh esolovev-search-prod production reverse; then
+            echo 'ERROR: reverse ranking passed semantic smoke'
+            exit 1
+          fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result = json.loads(Path('evidence/esolovev-search-prod/reverse/rollback.json').read_text())
+          assert result['failure_stage'] == 'semantic_smoke_failed' and result['rollback_verified'], result
+          PY
+          bash scripts/deploy_release.sh esolovev-search-prod production normal
+          python scripts/check_promotion.py --digest "$IMAGE_DIGEST"
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: local-kubernetes-integration
+          path: |
+            lab1/evidence/
+            lab2/evidence/
+      - name: Remove isolated CI Kubernetes
+        if: always()
+        run: |
+          "$RUNNER_TEMP/mlops-tools/k3d" cluster delete ci-labs
+          rm -f "$RUNNER_TEMP/local-ci.kubeconfig"
+
   deploy-staging:
     if: github.event_name == 'workflow_dispatch' && inputs.deploy
-    needs: build-images
+    needs: [build-images, local-integration]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment: staging
