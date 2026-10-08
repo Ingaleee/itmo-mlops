@@ -33,6 +33,11 @@ def main() -> None:
                                 ngram_range=tuple(MODEL_CONFIG["char"]["ngram_range"]), min_df=MODEL_CONFIG["char"]["min_df"])),
     ])
     matrix = normalize(vectorizer.fit_transform(texts), norm="l2")
+    # sklearn caches id(stop_words) for validation. A process address is not
+    # model state and would make identical builds produce different bytes.
+    # transform() recomputes this cache when needed after deserialization.
+    for _, transformer in vectorizer.transformer_list:
+        transformer.__dict__.pop("_stop_words_id", None)
 
     args.output.mkdir(parents=True, exist_ok=True)
     artifact_path = args.output / "search-index.joblib"
