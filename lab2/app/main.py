@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query, Request, Response
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -28,7 +29,7 @@ search_latency_seconds = 0.0
 class SearchRequest(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
     query: str = Field(min_length=2, max_length=500, examples=["rollback canary deployment"])
-    limit: int = Field(default=5, ge=1, le=10)
+    limit: int = Field(default=5, strict=True, ge=1, le=10)
 
 
 @asynccontextmanager
@@ -54,6 +55,12 @@ app = FastAPI(
     version="1.2.0",
     lifespan=lifespan,
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def invalid_request(_, error: RequestValidationError):
+    details = [{key: issue[key] for key in ("type", "loc", "msg")} for issue in error.errors()]
+    return JSONResponse(status_code=422, content={"detail": details})
 
 
 @app.middleware("http")

@@ -31,6 +31,18 @@ def test_invalid_features_do_not_reach_model(client, payload):
     assert client.post("/predict", json=payload).status_code == 422
 
 
+@pytest.mark.parametrize("value", ["NaN", "Infinity", "-Infinity", "1e400", "1e100", "-1e100"])
+def test_nonfinite_and_overflow_input_returns_validation_error(client, monkeypatch, value):
+    def unexpected_prediction(*_):
+        pytest.fail("invalid features reached the model")
+    monkeypatch.setattr(service.model, "predict", unexpected_prediction)
+    response = client.post("/predict", content='{"features":[' + value + ',2,3,4]}',
+                           headers={"content-type": "application/json"})
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"] == ["body", "features", 0]
+    assert "input" not in response.json()["detail"][0]
+
+
 def test_liveness_and_readiness_are_distinct(client, monkeypatch):
     assert client.get("/health").status_code == 200
     monkeypatch.setattr(service, "model", None)

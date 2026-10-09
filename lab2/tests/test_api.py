@@ -37,10 +37,21 @@ def test_unknown_recommendation_document() -> None:
     {"query": "   "}, {"query": "q"}, {"query": "a" * 501},
     {"query": "rollback", "limit": 0}, {"query": "rollback", "limit": 11},
     {"query": "rollback", "unexpected": "value"},
+    {"query": "rollback", "limit": True}, {"query": "rollback", "limit": "3"},
 ])
 def test_invalid_search_is_rejected(payload):
     with TestClient(app) as client:
         assert client.post("/v1/search", json=payload).status_code == 422
+
+
+@pytest.mark.parametrize("body", ['{"query":NaN}', '{"query":"rollback","limit":Infinity}'])
+def test_nonstandard_json_returns_422_with_request_id(body):
+    with TestClient(app) as client:
+        response = client.post("/v1/search", content=body,
+                               headers={"content-type": "application/json", "x-request-id": "invalid-json-42"})
+        assert response.status_code == 422
+        assert response.headers["x-request-id"] == "invalid-json-42"
+        assert "input" not in response.json()["detail"][0]
 
 
 @pytest.mark.parametrize("limit", [0, 11])

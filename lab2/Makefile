@@ -6,7 +6,7 @@ BIN := $(VENV)/bin
 
 venv:
 	$(PYTHON) -m venv $(VENV)
-	$(BIN)/pip install -r requirements.txt
+	$(BIN)/pip install -r requirements-dev.txt
 
 index: venv
 	$(BIN)/python scripts/build_index.py --output artifacts
@@ -18,11 +18,7 @@ quality: index
 	$(BIN)/python scripts/evaluate.py --artifact-dir artifacts
 
 negative: index
-	@if $(BIN)/python scripts/evaluate.py --artifact-dir artifacts --ranking-mode reverse; then \
-		echo "ERROR: bad candidate passed"; exit 1; \
-	else \
-		echo "Bad candidate blocked as expected"; \
-	fi
+	$(BIN)/python scripts/check_quality.py
 
 build:
 	docker compose build search
