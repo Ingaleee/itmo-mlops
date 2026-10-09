@@ -23,7 +23,7 @@ uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```bash
 export IMAGE=ghcr.io/ingaleee/esolovev-iris:v1
 docker build -t "$IMAGE" .
-docker run --rm --read-only --cap-drop=ALL --security-opt=no-new-privileges --cpus=.5 --memory=512m -p 127.0.0.1:18090:8000 "$IMAGE"
+docker run --rm --read-only --cap-drop=ALL --security-opt=no-new-privileges --cpus=.2 --memory=512m -p 127.0.0.1:18090:8000 "$IMAGE"
 ```
 
 В другом терминале:

@@ -184,6 +184,9 @@ jobs:
         run: |
           bash scripts/demonstrate_rollback.sh esolovev-search-prod production
           python scripts/check_promotion.py --digest "$IMAGE_DIGEST"
+      - name: Capture own deployment diagnostics
+        if: always()
+        run: bash scripts/capture_diagnostics.sh
       - name: Summarize deployment evidence
         if: always()
         working-directory: lab2
@@ -234,6 +237,9 @@ jobs:
           BUILD_REVISION: ${{ github.sha }}
           INDEX_VERSION: ${{ needs.build-images.outputs.index_version }}
         run: bash scripts/deploy_release.sh esolovev-search-staging staging normal
+      - name: Capture own deployment diagnostics
+        if: always()
+        run: bash scripts/capture_diagnostics.sh
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
@@ -292,6 +298,9 @@ jobs:
         run: |
           python scripts/verify_release.py --release esolovev-search-staging --expected-digest "$IMAGE_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment staging --output evidence/esolovev-search-staging/normal/candidate
           python scripts/check_promotion.py --digest "$IMAGE_DIGEST"
+      - name: Capture own deployment diagnostics
+        if: always()
+        run: bash scripts/capture_diagnostics.sh
       - name: Summarize production evidence
         if: always()
         working-directory: lab2
