@@ -60,6 +60,11 @@ jobs:
           python -c 'import json,os; from pathlib import Path; metadata=json.loads(Path("artifacts/metadata.json").read_text()); print("index_version="+metadata["index_version"],file=open(os.environ["GITHUB_OUTPUT"],"a"))'
       - name: Install verified Helm and kubectl
         run: bash scripts/install_ci_tools.sh
+      - name: Audit pinned runtime dependencies
+        run: |
+          python -m venv "$RUNNER_TEMP/dependency-audit-env"
+          "$RUNNER_TEMP/dependency-audit-env/bin/pip" install pip-audit==2.10.1
+          "$RUNNER_TEMP/dependency-audit-env/bin/pip-audit" --no-deps --disable-pip -r lab1/requirements.lock -r lab2/requirements.lock --timeout 15 -f json -o lab2/evidence/dependency-audit.json
       - name: Check immutable chart and runtime protections
         working-directory: lab2
         run: python scripts/check_chart.py
