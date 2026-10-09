@@ -35,6 +35,9 @@ def main():
     assert container["livenessProbe"]["httpGet"]["path"] == "/livez"
     assert container["securityContext"]["readOnlyRootFilesystem"]
     pod = deployment["spec"]["template"]["spec"]
+    assert deployment["spec"]["strategy"]["rollingUpdate"] == {"maxUnavailable": 1, "maxSurge": 0}
+    no_progress = subprocess.run(command + options + ["--set", "strategy.maxUnavailable=0", "--set", "strategy.maxSurge=0"], capture_output=True, text=True)
+    assert no_progress.returncode != 0, "non-progressing rollout strategy accepted"
     assert pod["automountServiceAccountToken"] is False
     assert pod["securityContext"]["runAsUser"] == pod["securityContext"]["runAsGroup"] == 10001
     assert container["startupProbe"]["httpGet"]["path"] == "/readyz"

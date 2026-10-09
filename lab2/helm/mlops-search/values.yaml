@@ -3,6 +3,13 @@ environment: staging
 rankingMode: normal
 buildRevision: unknown
 
+# Shared teaching quota cannot guarantee capacity for a surge replica.
+# One replica may be unavailable during an update; use 0/1 for higher availability
+# only when the namespace has capacity for the additional pod.
+strategy:
+  maxUnavailable: 1
+  maxSurge: 0
+
 image:
   repository: docker.io/devijoe/runbook-search-api
   digest: ""
