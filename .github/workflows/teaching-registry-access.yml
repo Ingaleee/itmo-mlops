@@ -1,0 +1,86 @@
+name: Temporary teaching registry access
+
+on:
+  workflow_dispatch:
+    inputs:
+      public_key_b64:
+        description: Base64 encoded public GPG key from the teaching VM
+        required: true
+        type: string
+      fingerprint:
+        description: Primary GPG fingerprint of that public key
+        required: true
+        type: string
+
+permissions:
+  packages: read
+
+concurrency:
+  group: esolovev-teaching-registry-access
+  cancel-in-progress: false
+
+jobs:
+  temporary-access:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Encrypt temporary registry credential for the teaching VM
+        env:
+          COURSE_PUBLIC_KEY: ${{ inputs.public_key_b64 }}
+          COURSE_FINGERPRINT: ${{ inputs.fingerprint }}
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import base64, json, os, re, subprocess, tempfile
+          from pathlib import Path
+
+          fingerprint = os.environ['COURSE_FINGERPRINT'].upper()
+          if not re.fullmatch(r'[0-9A-F]{40}', fingerprint):
+              raise SystemExit('Invalid primary fingerprint')
+          public = base64.b64decode(os.environ['COURSE_PUBLIC_KEY'], validate=True)
+          if len(public) > 32768 or b'PRIVATE KEY' in public or not public.startswith(b'-----BEGIN PGP PUBLIC KEY BLOCK-----'):
+              raise SystemExit('Only a bounded public GPG key is accepted')
+          token = os.environ['REGISTRY_TOKEN'].encode()
+          if not token:
+              raise SystemExit('Missing temporary registry credential')
+          output = Path(os.environ['RUNNER_TEMP']) / 'teaching-registry-access'
+          output.mkdir(mode=0o700)
+          with tempfile.TemporaryDirectory(prefix='teaching-public-gpg-', dir=os.environ['RUNNER_TEMP']) as home:
+              env = dict(os.environ, GNUPGHOME=home)
+              shown = subprocess.run(['gpg', '--batch', '--with-colons', '--import-options', 'show-only', '--import'], input=public, capture_output=True, env=env, check=True)
+              rows = shown.stdout.decode().splitlines()
+              primaries = []
+              expect_fingerprint = False
+              for row in rows:
+                  columns = row.split(':')
+                  if columns[0] == 'pub':
+                      expect_fingerprint = True
+                  elif columns[0] == 'fpr' and expect_fingerprint:
+                      primaries.append(columns[9])
+                      expect_fingerprint = False
+              if primaries != [fingerprint]:
+                  raise SystemExit('Public key does not match the single expected recipient')
+              subprocess.run(['gpg', '--batch', '--import'], input=public, capture_output=True, env=env, check=True)
+              encrypted = subprocess.run(['gpg', '--batch', '--yes', '--trust-model', 'always', '--encrypt', '--recipient', fingerprint], input=token, capture_output=True, env=env, check=True)
+              (output / 'credential.gpg').write_bytes(encrypted.stdout)
+              subprocess.run(['gpgconf', '--kill', 'all'], capture_output=True, env=env, check=True)
+          (output / 'metadata.json').write_text(json.dumps({
+              'recipient_fingerprint': fingerprint,
+              'registry': 'ghcr.io',
+              'username': os.environ['GITHUB_ACTOR'],
+              'permissions': {'packages': 'read'},
+              'run_id': os.environ['GITHUB_RUN_ID'],
+              'commit': os.environ['GITHUB_SHA'],
+              'availability_seconds_after_upload': 240,
+              'plaintext_credential_exported': False,
+          }, indent=2) + '\n')
+          print('Temporary packages:read credential encrypted for the verified public recipient.')
+          PY
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: teaching-registry-access
+          path: ${{ runner.temp }}/teaching-registry-access/
+          if-no-files-found: error
+          retention-days: 1
+      - name: Allow the teaching VM to verify login and pull
+        run: sleep 240
