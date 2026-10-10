@@ -1,0 +1,7 @@
+{
+  "working_directory": "lab1",
+  "command": "python train.py",
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": ""
+}

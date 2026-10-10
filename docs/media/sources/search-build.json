@@ -1,0 +1,7 @@
+{
+  "working_directory": "lab2",
+  "command": "python scripts/build_index.py --output artifacts",
+  "exit_code": 0,
+  "stdout": "{\"artifact_schema\": \"runbook-search-index/v2\", \"corpus_sha256\": \"b3f91fdd6364c2ee47bfd2e4b30f60a2021b8521b21244ee648bf5f9e7ace907\", \"model_config\": {\"word\": {\"ngram_range\": [1, 2], \"sublinear_tf\": true}, \"char\": {\"analyzer\": \"char_wb\", \"ngram_range\": [3, 5], \"min_df\": 1}, \"text_recipe\": \"title-body-tags-twice/v1\", \"normalization\": \"joint-l2\"}, \"dependencies\": {\"scikit-learn\": \"1.7.1\", \"numpy\": \"2.3.2\", \"scipy\": \"1.18.1\", \"joblib\": \"1.5.1\"}, \"index_version\": \"1eed508a1515\", \"model_name\": \"runbook-hybrid-tfidf\", \"model_type\": \"tfidf-word-char-cosine\", \"artifact_sha256\": \"3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed\", \"documents\": 12, \"features\": 4068}\n",
+  "stderr": ""
+}

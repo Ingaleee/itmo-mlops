@@ -4,6 +4,27 @@
 
 HTTP-сервис классификации Iris. Модель обучается на четырёх признаках цветка, сохраняется в артефакт и доставляется вместе с API в Docker-образе.
 
+## Демонстрация
+
+[Галерея скриншотов и видео](DEMO.md) показывает модель, реальные ответы для трёх классов, отклонение некорректных запросов, тесты, registry и Kubernetes. Каждый результат связан с исходным отчётом.
+
+| Предсказание | Развёртывание |
+|---|---|
+| [![Предсказание setosa](../docs/media/lab1/setosa.jpg)](DEMO.md) | [![Готовый Iris Deployment](../docs/media/lab1/kubernetes.jpg)](DEMO.md) |
+
+<details>
+<summary>Видеообзоры API и доставки</summary>
+
+[![Iris: API и валидация](../docs/media/lab1/api-demo.gif)](../docs/media/lab1/api-demo.mp4)
+
+[API: скачать MP4](../docs/media/lab1/api-demo.mp4)
+
+[![Iris: модель и доставка](../docs/media/lab1/delivery-demo.gif)](../docs/media/lab1/delivery-demo.mp4)
+
+[Доставка: скачать MP4](../docs/media/lab1/delivery-demo.mp4)
+
+</details>
+
 ## Архитектура
 
 ```text

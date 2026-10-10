@@ -1,0 +1,19 @@
+{
+  "estimator": "RandomForestClassifier",
+  "n_estimators": 50,
+  "random_state": 42,
+  "samples": 150,
+  "features": [
+    "sepal length (cm)",
+    "sepal width (cm)",
+    "petal length (cm)",
+    "petal width (cm)"
+  ],
+  "classes": [
+    "setosa",
+    "versicolor",
+    "virginica"
+  ],
+  "artifact_sha256": "8dcca97d6bcf8cc9e1a4e322708d78557e536e36439c6b69f36f435a8906924a",
+  "artifact_bytes": 94865
+}

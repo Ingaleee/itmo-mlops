@@ -1,0 +1,10 @@
+{
+  "pass_initialized": true,
+  "credential_store": "pass",
+  "registry": "ghcr.io",
+  "docker_login": "succeeded",
+  "credential_roundtrip": "passed",
+  "embedded_auth": false,
+  "authenticated_pull": "passed",
+  "temporary_registry_credential_removed": true
+}

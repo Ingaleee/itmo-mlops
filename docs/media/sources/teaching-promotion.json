@@ -1,0 +1,32 @@
+{
+  "staging": {
+    "image": "ghcr.io/ingaleee/esolovev-search@sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+    "meta": {
+      "service": "runbook-search-api",
+      "service_version": "1.2.0",
+      "build_revision": "2a820a01c2148d75e9fbcbc420dd64f2ec114ccc",
+      "image_digest": "sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+      "environment": "staging",
+      "ranking_mode": "normal",
+      "index_version": "1eed508a1515",
+      "model_type": "tfidf-word-char-cosine",
+      "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+      "documents": 12
+    }
+  },
+  "prod": {
+    "image": "ghcr.io/ingaleee/esolovev-search@sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+    "meta": {
+      "service": "runbook-search-api",
+      "service_version": "1.2.0",
+      "build_revision": "2a820a01c2148d75e9fbcbc420dd64f2ec114ccc",
+      "image_digest": "sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+      "environment": "production",
+      "ranking_mode": "normal",
+      "index_version": "1eed508a1515",
+      "model_type": "tfidf-word-char-cosine",
+      "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+      "documents": 12
+    }
+  }
+}

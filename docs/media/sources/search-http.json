@@ -1,0 +1,190 @@
+{
+  "ready": {
+    "method": "GET",
+    "endpoint": "/readyz",
+    "request": null,
+    "status_code": 200,
+    "headers": {
+      "content-type": "application/json",
+      "x-request-id": "dcdbd75b-afc0-4af7-8c1c-2913c972503e",
+      "x-response-time-ms": "0.75"
+    },
+    "response": {
+      "status": "ready",
+      "index_version": "1eed508a1515",
+      "documents": 12
+    }
+  },
+  "meta": {
+    "method": "GET",
+    "endpoint": "/meta",
+    "request": null,
+    "status_code": 200,
+    "headers": {
+      "content-type": "application/json",
+      "x-request-id": "2dfe1341-5322-430a-af9b-448c7b22923e",
+      "x-response-time-ms": "1.03"
+    },
+    "response": {
+      "service": "runbook-search-api",
+      "service_version": "dev",
+      "build_revision": "local",
+      "image_digest": "local",
+      "environment": "local",
+      "ranking_mode": "normal",
+      "index_version": "1eed508a1515",
+      "model_type": "tfidf-word-char-cosine",
+      "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+      "documents": 12
+    }
+  },
+  "search": {
+    "method": "POST",
+    "endpoint": "/v1/search",
+    "request": {
+      "query": "как вернуть предыдущую модель после плохого релиза",
+      "limit": 3
+    },
+    "status_code": 200,
+    "headers": {
+      "content-type": "application/json",
+      "x-request-id": "demo-search",
+      "x-response-time-ms": "3.19"
+    },
+    "response": {
+      "request_id": "demo-search",
+      "query": "как вернуть предыдущую модель после плохого релиза",
+      "took_ms": 1.893,
+      "index_version": "1eed508a1515",
+      "results": [
+        {
+          "id": "doc-rollback",
+          "title": "Откат релиза",
+          "tags": [
+            "rollback",
+            "helm",
+            "release",
+            "incident"
+          ],
+          "score": 0.169413,
+          "summary": "Rollback возвращает последнюю согласованную версию кода модели tokenizer данных и индекса. Перед обновлением сохраните revision, после неуспешного smoke test выполните helm rollback."
+        },
+        {
+          "id": "doc-probes",
+          "title": "Проверки Kubernetes",
+          "tags": [
+            "kubernetes",
+            "health",
+            "readiness",
+            "liveness"
+          ],
+          "score": 0.072462,
+          "summary": "Liveness определяет нужно ли перезапустить процесс. Readiness разрешает направлять трафик только после загрузки модели и индекса. Startup probe подходит для долгого старта."
+        },
+        {
+          "id": "doc-canary",
+          "title": "Canary-релиз модели",
+          "tags": [
+            "canary",
+            "deployment",
+            "experiment",
+            "rollback"
+          ],
+          "score": 0.065037,
+          "summary": "Новая модель получает малую долю трафика. Сравните latency errors и качество, задайте критерии остановки, затем увеличьте трафик или выполните rollback."
+        }
+      ]
+    }
+  },
+  "recommendations": {
+    "method": "GET",
+    "endpoint": "/v1/documents/doc-rollback/recommendations?limit=3",
+    "request": null,
+    "status_code": 200,
+    "headers": {
+      "content-type": "application/json",
+      "x-request-id": "4144d2d1-d289-41a5-b443-68bec3b7bd7d",
+      "x-response-time-ms": "1.77"
+    },
+    "response": {
+      "document_id": "doc-rollback",
+      "index_version": "1eed508a1515",
+      "results": [
+        {
+          "id": "doc-canary",
+          "title": "Canary-релиз модели",
+          "tags": [
+            "canary",
+            "deployment",
+            "experiment",
+            "rollback"
+          ],
+          "score": 0.185367,
+          "summary": "Новая модель получает малую долю трафика. Сравните latency errors и качество, задайте критерии остановки, затем увеличьте трафик или выполните rollback."
+        },
+        {
+          "id": "doc-probes",
+          "title": "Проверки Kubernetes",
+          "tags": [
+            "kubernetes",
+            "health",
+            "readiness",
+            "liveness"
+          ],
+          "score": 0.040615,
+          "summary": "Liveness определяет нужно ли перезапустить процесс. Readiness разрешает направлять трафик только после загрузки модели и индекса. Startup probe подходит для долгого старта."
+        },
+        {
+          "id": "doc-observability",
+          "title": "Наблюдаемость ML-сервиса",
+          "tags": [
+            "monitoring",
+            "metrics",
+            "logs",
+            "slo"
+          ],
+          "score": 0.036544,
+          "summary": "Следите за latency traffic errors saturation, структурированными логами, версией модели и распределением входных данных. HTTP 200 не гарантирует качество ранжирования."
+        }
+      ]
+    }
+  },
+  "invalid": {
+    "method": "POST",
+    "endpoint": "/v1/search",
+    "request": {
+      "query": "  ",
+      "limit": 3
+    },
+    "status_code": 422,
+    "headers": {
+      "content-type": "application/json",
+      "x-request-id": "d172de76-3171-4bea-b6b1-0d83582283b8",
+      "x-response-time-ms": "0.48"
+    },
+    "response": {
+      "detail": [
+        {
+          "type": "string_too_short",
+          "loc": [
+            "body",
+            "query"
+          ],
+          "msg": "String should have at least 2 characters"
+        }
+      ]
+    }
+  },
+  "metrics": {
+    "method": "GET",
+    "endpoint": "/metrics",
+    "request": null,
+    "status_code": 200,
+    "headers": {
+      "content-type": "text/plain; version=0.0.4; charset=utf-8",
+      "x-request-id": "b02158c4-5522-45fc-ba30-f4429421b272",
+      "x-response-time-ms": "0.58"
+    },
+    "response": "# HELP http_requests_total Total HTTP requests processed.\n# TYPE http_requests_total counter\nhttp_requests_total 6\n# HELP search_requests_total Total retrieval requests processed.\n# TYPE search_requests_total counter\nsearch_requests_total 1\n# HELP search_request_duration_seconds_sum Cumulative retrieval latency.\n# TYPE search_request_duration_seconds_sum counter\nsearch_request_duration_seconds_sum 0.001893\n# HELP search_index_loaded Whether the search index is loaded.\n# TYPE search_index_loaded gauge\nsearch_index_loaded 1\n"
+  }
+}

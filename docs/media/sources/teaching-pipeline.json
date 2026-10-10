@@ -1,0 +1,395 @@
+{
+  "build_revision": "2a820a01c2148d75e9fbcbc420dd64f2ec114ccc",
+  "conclusion": "success",
+  "run_id": 37905104404,
+  "url": "https://github.com/Ingaleee/itmo-mlops/actions/runs/37905104404",
+  "status": "completed",
+  "jobs": [
+    {
+      "name": "test-quality",
+      "status": "completed",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run pip install -r lab2/requirements-dev.txt && pip check",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Train Iris and verify API contract",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build retrieval index and test API",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Install verified Helm and kubectl",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Audit pinned runtime dependencies",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Check immutable chart and runtime protections",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "conclusion": "success"
+    },
+    {
+      "name": "build-images",
+      "status": "completed",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run docker/login-action@dbcb813823bdd20940b903addbd779551569679f",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build and publish Iris",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build and publish Runbook Search",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save immutable release identifiers",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Build and publish Runbook Search",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Build and publish Iris",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run docker/login-action@dbcb813823bdd20940b903addbd779551569679f",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "conclusion": "success"
+    },
+    {
+      "name": "local-integration",
+      "status": "completed",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/install_ci_tools.sh",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Create isolated CI Kubernetes",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify published Iris image in Kubernetes",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify staging and production promotion",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Verify semantic failure, rollback and identical digest",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Capture own deployment diagnostics",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Summarize deployment evidence",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Remove isolated CI Kubernetes",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "conclusion": "success"
+    },
+    {
+      "name": "deploy-staging",
+      "status": "completed",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/install_ci_tools.sh",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Load masked kubeconfig",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Deploy and verify Iris",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Deploy and verify staging by digest",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Capture own deployment diagnostics",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Remove temporary credentials",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "conclusion": "success"
+    },
+    {
+      "name": "promote-production",
+      "status": "completed",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run bash scripts/install_ci_tools.sh",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Load masked kubeconfig",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Promote the staging digest",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Demonstrate semantic failure and verified rollback",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Retrieve staging metadata and prove identical promotion",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Capture own deployment diagnostics",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Summarize production evidence",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Remove temporary credentials",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ],
+      "conclusion": "success"
+    }
+  ],
+  "name": "ITMO MLOps labs"
+}

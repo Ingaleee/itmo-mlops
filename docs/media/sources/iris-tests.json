@@ -1,0 +1,7 @@
+{
+  "working_directory": "lab1",
+  "command": "python -m pytest -q",
+  "exit_code": 0,
+  "stdout": "..................                                                       [100%]\n18 passed in 2.29s\n",
+  "stderr": ""
+}

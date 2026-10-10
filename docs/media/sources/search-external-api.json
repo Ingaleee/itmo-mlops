@@ -1,0 +1,7 @@
+{
+  "working_directory": "lab2",
+  "command": "python scripts/verify_release.py --base-url http://127.0.0.1:8001 --output evidence/media-local",
+  "exit_code": 0,
+  "stdout": "{\"meta\": {\"service\": \"runbook-search-api\", \"service_version\": \"dev\", \"build_revision\": \"local\", \"image_digest\": \"local\", \"environment\": \"local\", \"ranking_mode\": \"normal\", \"index_version\": \"1eed508a1515\", \"model_type\": \"tfidf-word-char-cosine\", \"artifact_sha256\": \"3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed\", \"documents\": 12}, \"mrr\": 0.9375, \"hit_rate_at_3\": 1.0, \"macro_recall_at_3\": 0.875, \"cases\": 8}\n",
+  "stderr": ""
+}

@@ -1,0 +1,142 @@
+{
+  "health": {
+    "method": "GET",
+    "endpoint": "/health",
+    "request": null,
+    "status_code": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "status": "ready",
+      "model_version": "iris-v1"
+    }
+  },
+  "live": {
+    "method": "GET",
+    "endpoint": "/live",
+    "request": null,
+    "status_code": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "status": "alive"
+    }
+  },
+  "setosa": {
+    "method": "POST",
+    "endpoint": "/predict",
+    "request": {
+      "features": [
+        5.1,
+        3.5,
+        1.4,
+        0.2
+      ]
+    },
+    "status_code": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "class_id": 0,
+      "model_version": "iris-v1"
+    }
+  },
+  "versicolor": {
+    "method": "POST",
+    "endpoint": "/predict",
+    "request": {
+      "features": [
+        7,
+        3.2,
+        4.7,
+        1.4
+      ]
+    },
+    "status_code": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "class_id": 1,
+      "model_version": "iris-v1"
+    }
+  },
+  "virginica": {
+    "method": "POST",
+    "endpoint": "/predict",
+    "request": {
+      "features": [
+        6.3,
+        3.3,
+        6,
+        2.5
+      ]
+    },
+    "status_code": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "class_id": 2,
+      "model_version": "iris-v1"
+    }
+  },
+  "invalid-size": {
+    "method": "POST",
+    "endpoint": "/predict",
+    "request": {
+      "features": [
+        1,
+        2
+      ]
+    },
+    "status_code": 422,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "detail": [
+        {
+          "type": "too_short",
+          "loc": [
+            "body",
+            "features"
+          ],
+          "msg": "List should have at least 4 items after validation, not 2"
+        }
+      ]
+    }
+  },
+  "invalid-type": {
+    "method": "POST",
+    "endpoint": "/predict",
+    "request": {
+      "features": [
+        true,
+        2,
+        3,
+        4
+      ]
+    },
+    "status_code": 422,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "response": {
+      "detail": [
+        {
+          "type": "float_type",
+          "loc": [
+            "body",
+            "features",
+            0
+          ],
+          "msg": "Input should be a valid number"
+        }
+      ]
+    }
+  }
+}

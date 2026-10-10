@@ -6,10 +6,10 @@
 
 ## Лабораторные
 
-| № | Проект | Задача | Технологии |
-|---|---|---|---|
-| 1 | [Iris Classifier](lab1/README.md) | Обучение классификатора и доставка API в Kubernetes | scikit-learn, FastAPI, Docker, Kubernetes |
-| 2 | [Runbook Search](lab2/README.md) | Поиск по базе знаний с проверкой качества, promotion и rollback | TF-IDF, FastAPI, Docker Compose, Helm, GitHub Actions |
+| № | Проект | Задача | Технологии | Демонстрация |
+|---|---|---|---|---|
+| 1 | [Iris Classifier](lab1/README.md) | Обучение классификатора и доставка API в Kubernetes | scikit-learn, FastAPI, Docker, Kubernetes | [Скриншоты и видео](lab1/DEMO.md) |
+| 2 | [Runbook Search](lab2/README.md) | Поиск по базе знаний с проверкой качества, promotion и rollback | TF-IDF, FastAPI, Docker Compose, Helm, GitHub Actions | [Скриншоты и видео](lab2/DEMO.md) |
 
 ## С чего начать
 
@@ -18,6 +18,8 @@
 3. Для развёртывания использовать [инструкцию CI/CD](docs/delivery.md).
 
 Подтверждённые результаты и ссылки на CI собраны в [проверках проекта](docs/validation.md).
+
+Каждая лабораторная содержит галерею с фактическими ответами API, проверками и видеообзорами. [Медиа и исходные данные](docs/media/README.md) организованы по проектам; рядом с каждым снимком указано, что он подтверждает.
 
 ## Структура репозитория
 
@@ -32,6 +34,7 @@ docs/
   validation.md          # результаты и воспроизводимые проверки
   lab-template.md        # шаблон документации новой лабораторной
   verification/          # краткие машинные отчёты
+  media/                 # снимки, видео и проверяемые источники по labN
 ```
 
 В каждом `labN/` README описывает готовую реализацию; `ASSIGNMENT.md` сохраняет исходные условия. Данные моделей и временные отчёты создаются при запуске и исключены из Git.

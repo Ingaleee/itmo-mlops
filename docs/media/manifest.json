@@ -1,0 +1,426 @@
+{
+  "format": "Browser screenshots and screen walkthroughs",
+  "images": [
+    {
+      "file": "lab1/model.jpg",
+      "title": "Обученный классификатор",
+      "width": 1264,
+      "height": 827,
+      "origin": "Локальная сборка · train.py",
+      "sources": [
+        "sources/iris-model.json",
+        "sources/iris-training.json"
+      ],
+      "sha256": "10e39ed06806c66350d81d464e69deddd7ee8af111e49a7f49fa483735700fe0"
+    },
+    {
+      "file": "lab1/health.jpg",
+      "title": "Readiness после загрузки модели",
+      "width": 1280,
+      "height": 720,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/iris-http.json"
+      ],
+      "sha256": "fd4dfaa1c6855230babb1019c356fa035c539d6610ed41b1cf009d7e274bc7a9"
+    },
+    {
+      "file": "lab1/setosa.jpg",
+      "title": "Предсказание: setosa",
+      "width": 1264,
+      "height": 723,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/iris-http.json"
+      ],
+      "sha256": "1b2037cc3a42fd354b6bfcec873723de151448ac055bc80aa7d38faa24733f7f"
+    },
+    {
+      "file": "lab1/versicolor.jpg",
+      "title": "Предсказание: versicolor",
+      "width": 1264,
+      "height": 723,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/iris-http.json"
+      ],
+      "sha256": "e9a2f0bae6af9edc27f7de9f9cf90c96cdf7f2f1eb22196438f71810f8b8390f"
+    },
+    {
+      "file": "lab1/virginica.jpg",
+      "title": "Предсказание: virginica",
+      "width": 1264,
+      "height": 723,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/iris-http.json"
+      ],
+      "sha256": "38438e2c7b8053d9037f031d8d278aa4ebd7758455d8dbbd9bc1c6aeb53152dd"
+    },
+    {
+      "file": "lab1/invalid-size.jpg",
+      "title": "Неверная размерность",
+      "width": 1264,
+      "height": 827,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/iris-http.json"
+      ],
+      "sha256": "69f3b2c7e96fa348bce94353beb0aa1c567fb204c221d96772815d2267d51fc0"
+    },
+    {
+      "file": "lab1/invalid-type.jpg",
+      "title": "Строгая проверка типов",
+      "width": 1264,
+      "height": 827,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/iris-http.json"
+      ],
+      "sha256": "0b29ef1a704b8a5d94f4d61d5d1551ef064af423fc6f0c22a7601dda0d301522"
+    },
+    {
+      "file": "lab1/tests.jpg",
+      "title": "Автоматические проверки",
+      "width": 1280,
+      "height": 720,
+      "origin": "Локальный запуск · pytest и acceptance scripts",
+      "sources": [
+        "sources/iris-tests.json",
+        "sources/iris-external-api.json"
+      ],
+      "sha256": "d11e196b5e8b7e3934e0da94a266c438a8d64069b5f0840c3f267d48ae6a7eb3"
+    },
+    {
+      "file": "lab1/kubernetes.jpg",
+      "title": "Готовые Deployment",
+      "width": 1280,
+      "height": 720,
+      "origin": "Учебный Kubernetes · Actions run #37905104404 · сохранённая проверка",
+      "sources": [
+        "sources/teaching-deployments.json"
+      ],
+      "sha256": "7c38337a1959d2b51915ebae0db075086d3ba6a14d19f850ca57b4c6dc592bde"
+    },
+    {
+      "file": "lab1/security.jpg",
+      "title": "Ограничения runtime",
+      "width": 1264,
+      "height": 1575,
+      "origin": "Учебный Kubernetes · Actions run #37905104404 · сохранённая проверка",
+      "sources": [
+        "sources/teaching-deployments.json"
+      ],
+      "sha256": "fe63a24d49e49c74b42781265c97209f39f80ad3876cda8b81d3b287b42ae8bc"
+    },
+    {
+      "file": "lab1/pipeline.jpg",
+      "title": "Полный pipeline",
+      "width": 1264,
+      "height": 754,
+      "origin": "GitHub Actions API · run #37905104404",
+      "sources": [
+        "sources/teaching-pipeline.json"
+      ],
+      "sha256": "4156551c4be9984e1dffe23be839c2d44b797fe0f47c96288ce4ce722fcb5aed"
+    },
+    {
+      "file": "lab2/tests.jpg",
+      "title": "Автоматические проверки",
+      "width": 1264,
+      "height": 792,
+      "origin": "Локальный запуск · pytest и acceptance scripts",
+      "sources": [
+        "sources/search-tests.json",
+        "sources/search-external-api.json"
+      ],
+      "sha256": "ff55849cd1c3d763111e804f523b0ca9f374a021ed479379150a600c6cfbca53"
+    },
+    {
+      "file": "lab2/kubernetes.jpg",
+      "title": "Готовые Deployment",
+      "width": 1264,
+      "height": 792,
+      "origin": "Учебный Kubernetes · Actions run #37905104404 · сохранённая проверка",
+      "sources": [
+        "sources/teaching-deployments.json"
+      ],
+      "sha256": "7c29afffab34b7d7d7d9c8bc92e544185956a55c3b35802783eaeb85ec29e0e8"
+    },
+    {
+      "file": "lab2/security.jpg",
+      "title": "Ограничения runtime",
+      "width": 1264,
+      "height": 1575,
+      "origin": "Учебный Kubernetes · Actions run #37905104404 · сохранённая проверка",
+      "sources": [
+        "sources/teaching-deployments.json"
+      ],
+      "sha256": "a6370cecf0bbdf857b6e7d7025715d0bd686c90cd240a68eb3c66ac43eb342a1"
+    },
+    {
+      "file": "lab2/pipeline.jpg",
+      "title": "Полный pipeline",
+      "width": 1264,
+      "height": 792,
+      "origin": "GitHub Actions API · run #37905104404",
+      "sources": [
+        "sources/teaching-pipeline.json"
+      ],
+      "sha256": "7a635997b29706fa9fc0815178e09caf5d231ceec0ed1d6df7658cd3839aea71"
+    },
+    {
+      "file": "lab1/registry.jpg",
+      "title": "Registry credentials через pass",
+      "width": 1264,
+      "height": 870,
+      "origin": "Сохранённая проверка registry · docs/verification/lab1.json",
+      "sources": [
+        "sources/iris-registry.json"
+      ],
+      "sha256": "f391f26dafd7411b97a2f974b7d7d962c6d05212777122799d608150605ef615"
+    },
+    {
+      "file": "lab2/request-id.jpg",
+      "title": "Трассировка запроса",
+      "width": 1264,
+      "height": 792,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/search-http.json"
+      ],
+      "sha256": "f03c874a79ed7e3c560e2f832eb13600ebc11148b31fc1f149a5123f1c55f27e"
+    },
+    {
+      "file": "lab2/ready.jpg",
+      "title": "Готовность индекса",
+      "width": 1264,
+      "height": 792,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/search-http.json"
+      ],
+      "sha256": "3e27ea2f0ac4bcde961290e8510739f8fb678ba4aca0792ddc41d1b85be38019"
+    },
+    {
+      "file": "lab2/search.jpg",
+      "title": "Поиск по базе знаний",
+      "width": 1264,
+      "height": 792,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/search-http.json"
+      ],
+      "sha256": "a3711948347a98d92599e0b4c37dc33b2a7e4b1da89e56aeda66fbee7b78755c"
+    },
+    {
+      "file": "lab2/recommendations.jpg",
+      "title": "Похожие документы",
+      "width": 1264,
+      "height": 792,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/search-http.json"
+      ],
+      "sha256": "0d6a3f873c89e7a708e7fa499e55624db248c6adba60763adffcbee45b0e196d"
+    },
+    {
+      "file": "lab2/invalid.jpg",
+      "title": "Пустой запрос отклонён",
+      "width": 1264,
+      "height": 806,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/search-http.json"
+      ],
+      "sha256": "019e836ac82e71a9923be1d0580a830210e59245d1b179793010096f9f648095"
+    },
+    {
+      "file": "lab2/metrics.jpg",
+      "title": "Метрики сервиса",
+      "width": 1264,
+      "height": 868,
+      "origin": "Локальный API · реальный HTTP-ответ",
+      "sources": [
+        "sources/search-http.json"
+      ],
+      "sha256": "d2b5124d9740da11e3f3baafcba8967e816f8b736992cf031c11b9dac68f0339"
+    },
+    {
+      "file": "lab2/index.jpg",
+      "title": "Контракт retrieval-индекса",
+      "width": 1264,
+      "height": 1284,
+      "origin": "Локальная сборка · build_index.py",
+      "sources": [
+        "sources/search-build.json"
+      ],
+      "sha256": "931997b4aefc1fdf6a7f72623576065f4708e0f286f6516dc2e424ecb41537c5"
+    },
+    {
+      "file": "lab2/reproducibility.jpg",
+      "title": "Повторная сборка совпадает",
+      "width": 1264,
+      "height": 792,
+      "origin": "Локальная сборка · сравнение metadata и SHA-256",
+      "sources": [
+        "sources/search-reproducibility.json",
+        "sources/search-rebuild.json"
+      ],
+      "sha256": "d5d5c89dc915b406d5096a79dee02edc3f423dbc1b19d63ee5d8ad637869997f"
+    },
+    {
+      "file": "lab2/quality-normal.jpg",
+      "title": "Качество поиска",
+      "width": 1264,
+      "height": 1122,
+      "origin": "Локальная оценка · check_quality.py",
+      "sources": [
+        "sources/search-quality-normal.json",
+        "sources/search-quality.json"
+      ],
+      "sha256": "1fa28548cfa193cec855467fd67aa30861b61778fa97053dd6a732064c35309e"
+    },
+    {
+      "file": "lab2/quality-reverse.jpg",
+      "title": "Отрицательный контроль: reverse",
+      "width": 1264,
+      "height": 1122,
+      "origin": "Локальная оценка · check_quality.py",
+      "sources": [
+        "sources/search-quality-reverse.json",
+        "sources/search-quality.json"
+      ],
+      "sha256": "e64bb24432ca5d0c8080a71797d39f004d2acf6d7e56009137a04b463a276823"
+    },
+    {
+      "file": "lab2/promotion.jpg",
+      "title": "Одна сборка в двух средах",
+      "width": 1264,
+      "height": 792,
+      "origin": "Учебный Kubernetes · Actions run #37905104404 · сохранённая проверка",
+      "sources": [
+        "sources/teaching-promotion.json"
+      ],
+      "sha256": "bff6308e99254896e6ad3e21f2cdb46a5aa54b9abda2d379d63d62a5e8220f7d"
+    },
+    {
+      "file": "lab2/rollback.jpg",
+      "title": "Откат восстановил рабочий релиз",
+      "width": 1264,
+      "height": 827,
+      "origin": "Учебный Kubernetes · Actions run #37905104404 · сохранённая проверка",
+      "sources": [
+        "sources/teaching-rollback.json"
+      ],
+      "sha256": "d200726ac6c021cb8f67cc9fe9530e21bd41ac171879819f6d77c9fca5b0c1fa"
+    },
+    {
+      "file": "lab1/openapi.jpg",
+      "title": "Iris OpenAPI",
+      "origin": "Swagger UI локального Iris API",
+      "sources": [
+        "sources/iris-openapi.json"
+      ],
+      "width": 1280,
+      "height": 720,
+      "sha256": "becac533f757da2d997c4cc616f2651ea66dc25e8cb335fc30fd0cc8009f636a"
+    },
+    {
+      "file": "lab2/openapi.jpg",
+      "title": "Search OpenAPI",
+      "origin": "Swagger UI локального Search API",
+      "sources": [
+        "sources/search-openapi.json"
+      ],
+      "width": 1264,
+      "height": 964,
+      "sha256": "bdd964d38e97de61d17a259288f32442fb5a03c19b80119f5e8872263d79c136"
+    },
+    {
+      "file": "shared/github-actions.jpg",
+      "title": "GitHub Actions",
+      "origin": "GitHub · run #37905104404",
+      "sources": [
+        "sources/teaching-pipeline.json"
+      ],
+      "width": 1265,
+      "height": 712,
+      "sha256": "ec457a45d02cccaa0bb9f39f95d5607af8c94ee5b8389d354006274d1d0c5515"
+    }
+  ],
+  "videos": [
+    {
+      "lab": "lab1",
+      "slug": "api-demo",
+      "title": "Iris: readiness, три класса и валидация",
+      "pages": [
+        "health",
+        "setosa",
+        "versicolor",
+        "virginica",
+        "invalid-size",
+        "invalid-type"
+      ],
+      "mp4": "lab1/api-demo.mp4",
+      "preview": "lab1/api-demo.gif",
+      "duration_seconds": 30,
+      "recording": "Sequence of browser screenshots; each screen shows captured real results",
+      "sha256": "277965a684cbc175f75894af07412e49f0202c93b3a3414c5ad2ac48f3034445"
+    },
+    {
+      "lab": "lab1",
+      "slug": "delivery-demo",
+      "title": "Iris: модель, тесты, pipeline и Kubernetes",
+      "pages": [
+        "model",
+        "tests",
+        "pipeline",
+        "kubernetes",
+        "security",
+        "registry"
+      ],
+      "mp4": "lab1/delivery-demo.mp4",
+      "preview": "lab1/delivery-demo.gif",
+      "duration_seconds": 30,
+      "recording": "Sequence of browser screenshots; each screen shows captured real results",
+      "sha256": "7bd9586b6db979791dc1afea89776fd0ee72f5abdcab0a09ab8d82f8675ce485"
+    },
+    {
+      "lab": "lab2",
+      "slug": "retrieval-demo",
+      "title": "Search: индекс, поиск, рекомендации и метрики",
+      "pages": [
+        "ready",
+        "search",
+        "recommendations",
+        "invalid",
+        "metrics",
+        "reproducibility"
+      ],
+      "mp4": "lab2/retrieval-demo.mp4",
+      "preview": "lab2/retrieval-demo.gif",
+      "duration_seconds": 30,
+      "recording": "Sequence of browser screenshots; each screen shows captured real results",
+      "sha256": "6a140b8f62a64226845eea902c69e41acc3dd9434a8c833f0b8b2edd0da3fb27"
+    },
+    {
+      "lab": "lab2",
+      "slug": "release-demo",
+      "title": "Search: quality gate, promotion и rollback",
+      "pages": [
+        "tests",
+        "quality-normal",
+        "quality-reverse",
+        "kubernetes",
+        "promotion",
+        "rollback"
+      ],
+      "mp4": "lab2/release-demo.mp4",
+      "preview": "lab2/release-demo.gif",
+      "duration_seconds": 30,
+      "recording": "Sequence of browser screenshots; each screen shows captured real results",
+      "sha256": "0b38a525e0a65a581197985b8da08a80c313d22db6a2eee22edaef19e28c52cc"
+    }
+  ]
+}

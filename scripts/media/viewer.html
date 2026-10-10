@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MLOps Labs · Evidence</title>
+<style>
+:root{color-scheme:light;--ink:#122033;--muted:#596c80;--line:#dae3ec;--blue:#205ad3;--bg:#f3f6fa}
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink);background:var(--bg)}
+header{height:62px;background:#142b45;color:white;display:flex;align-items:center;justify-content:space-between;padding:0 32px;letter-spacing:.02em}
+header b{font-size:20px}header span{font-size:13px;color:#c6d8ec}aside{position:absolute;left:0;top:62px;width:220px;padding:22px 14px;background:#fff;border-right:1px solid var(--line);min-height:calc(100vh - 62px)}
+aside strong{display:block;font-size:12px;letter-spacing:.1em;color:var(--muted);margin:10px 12px}nav a{display:block;text-decoration:none;color:var(--muted);font-size:13px;line-height:1.35;padding:7px 12px;margin:2px 0;border-radius:6px}nav a.active{background:#e9f0ff;color:var(--blue);font-weight:600}
+main{margin-left:220px;padding:25px 34px 28px;max-width:1720px}.eyebrow{font-size:12px;color:var(--blue);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+h1{font-size:30px;line-height:1.2;margin:7px 0 8px;letter-spacing:-.03em}.subtitle{color:var(--muted);margin:0 0 16px;font-size:15px}.headline{display:flex;justify-content:space-between;gap:12px;align-items:center}.badge{background:#dcf5e9;color:#08774a;padding:7px 11px;border-radius:7px;font-size:12px;font-weight:700;white-space:nowrap}.badge.warn{background:#fff0d8;color:#935b08}
+.origin{color:var(--muted);font-size:12px;margin-bottom:16px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}.card{background:white;border:1px solid var(--line);padding:14px 18px;border-radius:9px;box-shadow:0 2px 3px #142b4505}.card label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.card b{display:block;font-size:23px;margin-top:3px;font-weight:650;word-break:break-word}
+.blocks{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}.block{border:1px solid var(--line);background:#fff;border-radius:9px;overflow:hidden}.block.single{grid-column:1/-1}.block h2{font-size:13px;margin:0;padding:12px 16px;background:#edf2f7;border-bottom:1px solid var(--line);font-weight:650}pre{font:13px/1.6 Consolas,ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;padding:17px 18px;color:#203653}table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:12px}td,th{text-align:left;padding:10px 12px;vertical-align:top;overflow-wrap:anywhere;border-bottom:1px solid #e8edf3}th{color:var(--muted);background:#fafcfe;font-weight:600}tr:last-child td{border-bottom:0}
+.quality{padding:13px 18px}.qrow{display:grid;grid-template-columns:120px 1fr 160px;align-items:center;gap:10px;margin:7px 0;font-size:12px}.track{height:15px;background:#ebeff5;border-radius:4px;position:relative}.fill{height:100%;background:#258a6b;border-radius:4px;min-width:2px}.fill.bad{background:#d77b27}.threshold{position:absolute;top:-3px;bottom:-3px;width:2px;background:#30485f}.note{margin:17px 0 14px;background:#eaf0f8;border-left:3px solid var(--blue);border-radius:0 7px 7px 0;padding:11px 15px;font-size:13px;color:#304862}.sources{font-size:11px;color:var(--muted);overflow-wrap:anywhere}.sources a{color:#476689}.footer{display:flex;justify-content:space-between;gap:12px;margin-top:14px;font-size:11px;color:var(--muted)}button{border:1px solid var(--line);border-radius:5px;background:white;color:var(--ink);font:inherit;font-size:12px;padding:7px 10px;cursor:pointer}
+@media(max-width:1000px){aside{width:175px}main{margin-left:175px;padding:22px}.card b{font-size:20px}.blocks{grid-template-columns:1fr}.block{grid-column:1/-1}h1{font-size:26px}}
+@media(max-width:650px){aside{display:none}main{margin-left:0;padding:18px}.cards{gap:6px}.card{padding:10px}.card b{font-size:17px}.headline{align-items:flex-start}header{padding:0 18px}.qrow{grid-template-columns:100px 1fr 120px}}
+</style>
+<header><b>MLOps Labs</b><span>ПРОВЕРКИ · API · ДОСТАВКА</span></header>
+<aside><strong id="lab-name"></strong><nav id="navigation"></nav></aside>
+<main id="content"></main>
+<script>
+const pages=__PAGES__;
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const stringify=v=>typeof v==='string'?v:JSON.stringify(v,null,2);
+function block(b,total){
+ if(b.type==='code')return `<section class="block ${total===1?'single':''}"><h2>${esc(b.title)}</h2><pre>${esc(stringify(b.value))}</pre></section>`;
+ if(b.type==='table')return `<section class="block ${total===1?'single':''}"><h2>${esc(b.title)}</h2><table><thead><tr>${b.headers.map((h,i)=>`<th${b.widths?` style="width:${b.widths[i]}%"`:''}>${esc(h)}</th>`).join('')}</tr></thead><tbody>${b.rows.map(row=>`<tr>${row.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></section>`;
+ const q=b.value;
+ return `<section class="block"><h2>Quality gate · пороги показаны вертикальными линиями</h2><div class="quality">${[['MRR@3',q.mrr,.85],['Hit rate@3',q.hit_rate_at_3,.9]].map(([name,value,threshold])=>`<div class="qrow"><b>${name}</b><div class="track"><div class="fill ${value<threshold?'bad':''}" style="width:${value*100}%"></div><i class="threshold" style="left:${threshold*100}%"></i></div><span>${value} / порог ${threshold}</span></div>`).join('')}</div></section>`;
+}
+function render(){
+ const id=location.hash.slice(1)||'lab1/model';
+ const p=pages.find(p=>`${p.lab}/${p.slug}`===id)||pages[0];
+ document.title=`${p.title} · MLOps Labs`;
+ document.querySelector('#lab-name').textContent=p.lab==='lab1'?'01 / IRIS CLASSIFIER':'02 / RUNBOOK SEARCH';
+ document.querySelector('#navigation').innerHTML=pages.filter(x=>x.lab===p.lab).map(x=>`<a class="${x===p?'active':''}" href="#${x.lab}/${x.slug}">${esc(x.title)}</a>`).join('')+`<br><a href="#${p.lab==='lab1'?'lab2/ready':'lab1/model'}">Другая лабораторная →</a>`;
+ document.querySelector('#content').innerHTML=`<div class="eyebrow">${p.lab==='lab1'?'Лабораторная 1 · Iris Classifier':'Лабораторная 2 · Runbook Search'}</div><div class="headline"><h1>${esc(p.title)}</h1><span class="badge ${p.badge.includes('REJECT')||p.badge.includes('422')?'warn':''}">${esc(p.badge)}</span></div><p class="subtitle">${esc(p.subtitle)}</p><div class="origin">${esc(p.origin)}</div><div class="cards">${p.cards.map(([label,value])=>`<div class="card"><label>${esc(label)}</label><b>${esc(value)}</b></div>`).join('')}</div><div class="blocks">${p.blocks.map(b=>block(b,p.blocks.length)).join('')}</div><div class="note">${esc(p.note)}</div><div class="sources">Исходные данные: ${p.sources.map(s=>`<a href="sources/${encodeURIComponent(s)}">${esc(s)}</a>`).join(' · ')}</div><div class="footer"><span>Снимок реальных результатов · данные доступны для проверки</span><span>${esc(id)}</span></div>`;
+ scrollTo(0,0);
+}
+addEventListener('hashchange',render);render();
+</script>
+</html>

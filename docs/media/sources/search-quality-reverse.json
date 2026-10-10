@@ -1,0 +1,107 @@
+{
+  "ranking_mode": "reverse",
+  "index_version": "1eed508a1515",
+  "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+  "mrr": 0.0,
+  "recall_at_3": 0.0,
+  "hit_rate_at_3": 0.0,
+  "macro_recall_at_3": 0.0,
+  "metric_definitions": {
+    "mrr": "mean reciprocal rank truncated at 3, as in the assignment",
+    "recall_at_3": "query hit rate at 3, as in the assignment",
+    "macro_recall_at_3": "mean fraction of each query's relevant documents retrieved at 3"
+  },
+  "cases": [
+    {
+      "query": "как вернуть предыдущую модель после плохого релиза",
+      "top3": [
+        "doc-security",
+        "doc-features",
+        "doc-data"
+      ],
+      "relevant": [
+        "doc-rollback"
+      ]
+    },
+    {
+      "query": "pod запущен но трафик на него не идет readiness",
+      "top3": [
+        "doc-rollback",
+        "doc-drift",
+        "doc-registry"
+      ],
+      "relevant": [
+        "doc-probes"
+      ]
+    },
+    {
+      "query": "как хранить пароль registry и ограничить права",
+      "top3": [
+        "doc-features",
+        "doc-data",
+        "doc-ci"
+      ],
+      "relevant": [
+        "doc-security"
+      ]
+    },
+    {
+      "query": "почему HTTP 200 есть а поиск стал хуже",
+      "top3": [
+        "doc-container",
+        "doc-data",
+        "doc-rollback"
+      ],
+      "relevant": [
+        "doc-drift",
+        "doc-observability"
+      ]
+    },
+    {
+      "query": "один и тот же образ перенести из staging в production",
+      "top3": [
+        "doc-canary",
+        "doc-drift",
+        "doc-rollback"
+      ],
+      "relevant": [
+        "doc-ci",
+        "doc-container"
+      ]
+    },
+    {
+      "query": "реплики по загрузке процессора requests limits",
+      "top3": [
+        "doc-observability",
+        "doc-security",
+        "doc-canary"
+      ],
+      "relevant": [
+        "doc-scaling"
+      ]
+    },
+    {
+      "query": "связать модель данные commit и метрики",
+      "top3": [
+        "doc-features",
+        "doc-security",
+        "doc-drift"
+      ],
+      "relevant": [
+        "doc-data",
+        "doc-registry"
+      ]
+    },
+    {
+      "query": "маленькая доля трафика новой версии модели",
+      "top3": [
+        "doc-security",
+        "doc-features",
+        "doc-drift"
+      ],
+      "relevant": [
+        "doc-canary"
+      ]
+    }
+  ]
+}

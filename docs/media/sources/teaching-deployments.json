@@ -1,0 +1,224 @@
+{
+  "workflow_run": 37905104404,
+  "deployments": [
+    {
+      "name": "esolovev-iris",
+      "namespace": "mlops-students",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "available_replicas": 1,
+      "image": "ghcr.io/ingaleee/esolovev-iris@sha256:bb255540fbd96a75acd40bd0f6c206c114591da75397f74b2359ce4b4b508e6b",
+      "resources": {
+        "limits": {
+          "cpu": "200m",
+          "memory": "512Mi"
+        },
+        "requests": {
+          "cpu": "100m",
+          "memory": "128Mi"
+        }
+      },
+      "pod_security": {
+        "runAsGroup": 10001,
+        "runAsNonRoot": true,
+        "runAsUser": 10001,
+        "seccompProfile": {
+          "type": "RuntimeDefault"
+        }
+      },
+      "container_security": {
+        "allowPrivilegeEscalation": false,
+        "capabilities": {
+          "drop": [
+            "ALL"
+          ]
+        },
+        "readOnlyRootFilesystem": true
+      },
+      "automount_service_account_token": false,
+      "probes": {
+        "startupProbe": {
+          "failureThreshold": 30,
+          "httpGet": {
+            "path": "/health",
+            "port": "http",
+            "scheme": "HTTP"
+          },
+          "periodSeconds": 2,
+          "successThreshold": 1,
+          "timeoutSeconds": 1
+        },
+        "readinessProbe": {
+          "failureThreshold": 3,
+          "httpGet": {
+            "path": "/health",
+            "port": "http",
+            "scheme": "HTTP"
+          },
+          "initialDelaySeconds": 5,
+          "periodSeconds": 5,
+          "successThreshold": 1,
+          "timeoutSeconds": 1
+        },
+        "livenessProbe": {
+          "failureThreshold": 3,
+          "httpGet": {
+            "path": "/live",
+            "port": "http",
+            "scheme": "HTTP"
+          },
+          "initialDelaySeconds": 15,
+          "periodSeconds": 10,
+          "successThreshold": 1,
+          "timeoutSeconds": 1
+        }
+      }
+    },
+    {
+      "name": "esolovev-search-staging-mlops-search",
+      "namespace": "mlops-students",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "available_replicas": 1,
+      "image": "ghcr.io/ingaleee/esolovev-search@sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+      "resources": {
+        "limits": {
+          "cpu": "200m",
+          "memory": "768Mi"
+        },
+        "requests": {
+          "cpu": "100m",
+          "memory": "256Mi"
+        }
+      },
+      "pod_security": {
+        "runAsGroup": 10001,
+        "runAsNonRoot": true,
+        "runAsUser": 10001,
+        "seccompProfile": {
+          "type": "RuntimeDefault"
+        }
+      },
+      "container_security": {
+        "allowPrivilegeEscalation": false,
+        "capabilities": {
+          "drop": [
+            "ALL"
+          ]
+        },
+        "readOnlyRootFilesystem": true
+      },
+      "automount_service_account_token": false,
+      "probes": {
+        "startupProbe": {
+          "failureThreshold": 30,
+          "httpGet": {
+            "path": "/readyz",
+            "port": "http",
+            "scheme": "HTTP"
+          },
+          "periodSeconds": 2,
+          "successThreshold": 1,
+          "timeoutSeconds": 1
+        },
+        "readinessProbe": {
+          "failureThreshold": 3,
+          "httpGet": {
+            "path": "/readyz",
+            "port": "http",
+            "scheme": "HTTP"
+          },
+          "initialDelaySeconds": 3,
+          "periodSeconds": 5,
+          "successThreshold": 1,
+          "timeoutSeconds": 1
+        },
+        "livenessProbe": {
+          "failureThreshold": 3,
+          "httpGet": {
+            "path": "/livez",
+            "port": "http",
+            "scheme": "HTTP"
+          },
+          "initialDelaySeconds": 10,
+          "periodSeconds": 10,
+          "successThreshold": 1,
+          "timeoutSeconds": 1
+        }
+      }
+    },
+    {
+      "name": "esolovev-search-prod-mlops-search",
+      "namespace": "mlops-students",
+      "replicas": 1,
+      "ready_replicas": 1,
+      "available_replicas": 1,
+      "image": "ghcr.io/ingaleee/esolovev-search@sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+      "resources": {
+        "limits": {
+          "cpu": "200m",
+          "memory": "768Mi"
+        },
+        "requests": {
+          "cpu": "100m",
+          "memory": "256Mi"
+        }
+      },
+      "pod_security": {
+        "runAsGroup": 10001,
+        "runAsNonRoot": true,
+        "runAsUser": 10001,
+        "seccompProfile": {
+          "type": "RuntimeDefault"
+        }
+      },
+      "container_security": {
+        "allowPrivilegeEscalation": false,
+        "capabilities": {
+          "drop": [
+            "ALL"
+          ]
+        },
+        "readOnlyRootFilesystem": true
+      },
+      "automount_service_account_token": false,
+      "probes": {
+        "startupProbe": {
+          "failureThreshold": 30,
+          "httpGet": {
+            "path": "/readyz",
+            "port": "http",
+            "scheme": "HTTP"
+          },
+          "periodSeconds": 2,
+          "successThreshold": 1,
+          "timeoutSeconds": 1
+        },
+        "readinessProbe": {
+          "failureThreshold": 3,
+          "httpGet": {
+            "path": "/readyz",
+            "port": "http",
+            "scheme": "HTTP"
+          },
+          "initialDelaySeconds": 3,
+          "periodSeconds": 5,
+          "successThreshold": 1,
+          "timeoutSeconds": 1
+        },
+        "livenessProbe": {
+          "failureThreshold": 3,
+          "httpGet": {
+            "path": "/livez",
+            "port": "http",
+            "scheme": "HTTP"
+          },
+          "initialDelaySeconds": 10,
+          "periodSeconds": 10,
+          "successThreshold": 1,
+          "timeoutSeconds": 1
+        }
+      }
+    }
+  ]
+}

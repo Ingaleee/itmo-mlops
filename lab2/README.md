@@ -4,6 +4,29 @@
 
 Сервис поиска по инженерной базе знаний. Retrieval-модель входит в контейнер, а выпуск в Kubernetes проходит проверки API и качества поиска. Одна сборка продвигается из staging в production; ухудшение ранжирования запускает rollback.
 
+## Демонстрация
+
+[Галерея скриншотов и видео](DEMO.md) показывает поиск, рекомендации, трассировку и метрики, воспроизводимость индекса, quality gate, совпадение staging/production и проверенный rollback. У снимков доступны исходные данные.
+
+| Quality gate | Восстановление релиза |
+|---|---|
+| [![Качество поиска](../docs/media/lab2/quality-normal.jpg)](DEMO.md) | [![Проверенный rollback](../docs/media/lab2/rollback.jpg)](DEMO.md) |
+
+<details>
+<summary>Видеообзоры retrieval и выпуска</summary>
+
+[![Search: retrieval и API](../docs/media/lab2/retrieval-demo.gif)](../docs/media/lab2/retrieval-demo.mp4)
+
+[Retrieval: скачать MP4](../docs/media/lab2/retrieval-demo.mp4)
+
+[![Search: quality gate и rollback](../docs/media/lab2/release-demo.gif)](../docs/media/lab2/release-demo.mp4)
+
+[Выпуск: скачать MP4](../docs/media/lab2/release-demo.mp4)
+
+Снимки учебного стенда показывают сохранённый успешный запуск; в видеообзорах последовательно представлены его результаты.
+
+</details>
+
 ## Архитектура
 
 ```text
