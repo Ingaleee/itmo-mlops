@@ -1,0 +1,24 @@
+{
+  "tests": [
+    {
+      "file": "lab1/evidence/tests.xml",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "file": "lab2/evidence/tests.xml",
+      "tests": 31,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "total_tests": 49,
+  "audit": [
+    {
+      "file": "lab2/evidence/dependency-audit.json",
+      "packages": 19,
+      "known_advisories": 0
+    }
+  ]
+}

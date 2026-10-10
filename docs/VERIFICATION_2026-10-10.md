@@ -35,6 +35,6 @@ Build revision: `2a820a01c2148d75e9fbcbc420dd64f2ec114ccc`; index version: `1eed
 - Gitleaks проверил опубликованную историю после добавления ручного workflow: утечек не найдено.
 - [Временный registry access](https://github.com/Ingaleee/itmo-mlops/actions/runs/38043516699) завершился успешно. После использования зашифрованный credential artifact удалён; в отчётах нет токенов или приватных ключей.
 
-Несекретные отчёты: [настройка registry на ВМ](evidence/teaching-vm-registry-2026-10-10.json), [текущие API и Helm history](evidence/teaching-live-2026-10-10.json), [CI-тесты и аудит](evidence/ci-quality-2026-10-10.json).
+Несекретные отчёты: [настройка registry на ВМ](verification/teaching-vm-registry-2026-10-10.json), [текущие API и Helm history](verification/teaching-live-2026-10-10.json), [CI-тесты и аудит](verification/ci-quality-2026-10-10.json).
 
 На локальном компьютере также сохранены Deployment JSON и полные логи проверок. В GitHub artifacts полного учебного pipeline находятся исходные отчёты качества и rollback.

@@ -1,0 +1,130 @@
+{
+  "status": "passed",
+  "date_moscow": "2026-10-10",
+  "same_release_identity": true,
+  "results": [
+    {
+      "target": "iris",
+      "status": "passed",
+      "api": {
+        "health": {
+          "status": "ready",
+          "model_version": "iris-v1"
+        },
+        "predictions": [
+          {
+            "features": [
+              5.1,
+              3.5,
+              1.4,
+              0.2
+            ],
+            "class_id": 0,
+            "model_version": "iris-v1"
+          },
+          {
+            "features": [
+              7.0,
+              3.2,
+              4.7,
+              1.4
+            ],
+            "class_id": 1,
+            "model_version": "iris-v1"
+          },
+          {
+            "features": [
+              6.3,
+              3.3,
+              6.0,
+              2.5
+            ],
+            "class_id": 2,
+            "model_version": "iris-v1"
+          }
+        ],
+        "invalid_inputs_rejected": 5
+      }
+    },
+    {
+      "target": "esolovev-search-staging",
+      "status": "passed",
+      "meta": {
+        "service": "runbook-search-api",
+        "service_version": "1.2.0",
+        "build_revision": "2a820a01c2148d75e9fbcbc420dd64f2ec114ccc",
+        "image_digest": "sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+        "environment": "staging",
+        "ranking_mode": "normal",
+        "index_version": "1eed508a1515",
+        "model_type": "tfidf-word-char-cosine",
+        "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+        "documents": 12
+      },
+      "mrr": 0.9375,
+      "hit_rate_at_3": 1.0,
+      "macro_recall_at_3": 0.875,
+      "cases": 8,
+      "history": [
+        {
+          "revision": 1,
+          "status": "failed",
+          "description": "Release \"esolovev-search-staging\" failed: resource Deployment/mlops-students/esolovev-search-staging-mlops-search not ready. status: InProgress, message: Replicas: 0/1\ncontext deadline exceeded"
+        },
+        {
+          "revision": 2,
+          "status": "superseded",
+          "description": "Upgrade \"esolovev-search-staging\" failed: resource Deployment/mlops-students/esolovev-search-staging-mlops-search not ready. status: InProgress, message: Updated: 0/1\ncontext deadline exceeded"
+        },
+        {
+          "revision": 3,
+          "status": "deployed",
+          "description": "Upgrade complete"
+        }
+      ]
+    },
+    {
+      "target": "esolovev-search-prod",
+      "status": "passed",
+      "meta": {
+        "service": "runbook-search-api",
+        "service_version": "1.2.0",
+        "build_revision": "2a820a01c2148d75e9fbcbc420dd64f2ec114ccc",
+        "image_digest": "sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+        "environment": "production",
+        "ranking_mode": "normal",
+        "index_version": "1eed508a1515",
+        "model_type": "tfidf-word-char-cosine",
+        "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+        "documents": 12
+      },
+      "mrr": 0.9375,
+      "hit_rate_at_3": 1.0,
+      "macro_recall_at_3": 0.875,
+      "cases": 8,
+      "history": [
+        {
+          "revision": 1,
+          "status": "superseded",
+          "description": "Install complete"
+        },
+        {
+          "revision": 2,
+          "status": "superseded",
+          "description": "Upgrade complete"
+        },
+        {
+          "revision": 3,
+          "status": "superseded",
+          "description": "Rollback to 1",
+          "rollback_revision": 1
+        },
+        {
+          "revision": 4,
+          "status": "deployed",
+          "description": "Upgrade complete"
+        }
+      ]
+    }
+  ]
+}

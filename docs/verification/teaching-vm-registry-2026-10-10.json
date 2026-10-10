@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "execution_host": "teaching VM 77.234.215.138:60073",
+  "user": "esolovev",
+  "pass_initialized": true,
+  "credential_store": "pass",
+  "registry": "ghcr.io",
+  "token_permissions": {
+    "packages": "read"
+  },
+  "token_run_id": "38043516699",
+  "date_moscow": "2026-10-10",
+  "private_key_exported": false,
+  "docker_login": "succeeded",
+  "credential_roundtrip": "passed",
+  "embedded_auth": false,
+  "encrypted_entries_during_login": 1,
+  "authenticated_pull": "passed",
+  "image": "ghcr.io/ingaleee/esolovev-iris@sha256:bb255540fbd96a75acd40bd0f6c206c114591da75397f74b2359ce4b4b508e6b",
+  "docker_logout": "succeeded",
+  "temporary_registry_credential_removed": true,
+  "encrypted_entries_after_logout": 0
+}
