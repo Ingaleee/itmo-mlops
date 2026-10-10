@@ -13,4 +13,4 @@
 !**/.env.example
 __MACOSX/
 .DS_Store
-/COURSE_STATUS_2026-10-08.md
+/COURSE_STATUS*.md

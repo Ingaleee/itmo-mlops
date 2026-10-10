@@ -1,29 +1,89 @@
-# Iris ML-сервис
+# Лабораторная 1 — Iris Classifier
 
-Готовое решение первой лабораторной. Полная исходная методичка — `ASSIGNMENT.md`. Ресурсы используют префикс `esolovev-iris` и namespace `mlops-students`.
+[Каталог проектов](../README.md) · [Окружение](../docs/development.md) · [CI/CD](../docs/delivery.md)
 
-## Локальная проверка
+HTTP-сервис классификации Iris. Модель обучается на четырёх признаках цветка, сохраняется в артефакт и доставляется вместе с API в Docker-образе.
 
-Python 3.12; из каталога `lab1`:
+## Архитектура
+
+```text
+Iris dataset → RandomForest → model.joblib → Docker image → FastAPI → Kubernetes
+```
+
+`train.py` обучает `RandomForestClassifier(n_estimators=50, random_state=42)` на встроенном наборе Iris. API загружает модель при старте; readiness подтверждает её доступность. Multi-stage Docker-сборка выполняет обучение и тесты, затем переносит модель и runtime-зависимости в финальный образ.
+
+| Каталог или файл | Назначение |
+|---|---|
+| `app/main.py` | API, загрузка модели и валидация запросов |
+| `train.py` | Обучение и сохранение модели |
+| `tests/` | Проверки модели и HTTP-контракта |
+| `scripts/check_api.py` | Внешняя проверка работающего сервиса |
+| `Dockerfile` | Сборка и непривилегированный runtime |
+| `k8s/app.yaml` | ConfigMap, Deployment и ClusterIP Service |
+
+## Локальный запуск
+
+Подготовьте [окружение](../docs/development.md), затем выполняйте команды из `lab1/`.
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements-dev.txt
+python train.py
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+Документация API: `http://127.0.0.1:8000/docs`.
+
+## API
+
+| Метод | Endpoint | Ответ |
+|---|---|---|
+| GET | `/live` | Процесс принимает запросы |
+| GET | `/health` | Модель загружена, доступна её версия |
+| POST | `/predict` | Класс цветка и версия модели |
+| GET | `/docs` | OpenAPI UI |
+
+`features` содержит ровно четыре конечных числа: длину и ширину чашелистика, длину и ширину лепестка. Неверный размер, bool, строки, NaN, Infinity, значения вне диапазона float32 и лишние поля отклоняются с 422.
+
+```bash
+curl -s http://127.0.0.1:8000/predict \
+  -H 'Content-Type: application/json' \
+  -d '{"features":[5.1,3.5,1.4,0.2]}'
+```
+
+```json
+{"class_id":0,"model_version":"iris-v1"}
+```
+
+| `class_id` | Класс |
+|---|---|
+| 0 | setosa |
+| 1 | versicolor |
+| 2 | virginica |
+
+## Проверки
+
+```bash
 python train.py
 python -m pytest -q
 python scripts/check_api.py
-uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-`train.py` обучает заданный `RandomForestClassifier(n_estimators=50, random_state=42)` на исходном Iris без изменения задания. Проверка API принимает setosa, versicolor и virginica и отвергает неверные признаки. `/live` проверяет процесс, `/health` — загрузку модели. Переменные `MODEL_PATH` и `MODEL_VERSION` поддерживаются.
-
-## Контейнер и публикация
+Для сервиса, запущенного отдельно:
 
 ```bash
-export IMAGE=ghcr.io/ingaleee/esolovev-iris:v1
-docker build -t "$IMAGE" .
-docker run --rm --read-only --cap-drop=ALL --security-opt=no-new-privileges --cpus=.2 --memory=512m -p 127.0.0.1:18090:8000 "$IMAGE"
+python scripts/check_api.py --base-url http://127.0.0.1:8000
+```
+
+Проверяются readiness, все три класса и пять некорректных входов. Подтверждённые результаты: **18 тестов**, внешний API-контракт и развёртывание по digest — [отчёт](../docs/validation.md#iris-classifier).
+
+## Docker
+
+Команды выполняются из `lab1/`. Порт контейнера опубликован только на localhost.
+
+```bash
+docker build -t iris-api:local .
+docker run --rm --name iris-api-local --read-only --cap-drop=ALL \
+  --security-opt=no-new-privileges --cpus=.2 --memory=512m \
+  -p 127.0.0.1:18090:8000 iris-api:local
 ```
 
 В другом терминале:
@@ -32,16 +92,29 @@ docker run --rm --read-only --cap-drop=ALL --security-opt=no-new-privileges --cp
 python scripts/check_api.py --base-url http://127.0.0.1:18090
 ```
 
-GitHub Actions публикует образ с tag `v1` и tag commit, сохраняет digest, SBOM и provenance. Runtime содержит обученную модель и только runtime-зависимости, работает как UID/GID 10001. Публикация использует временный `GITHUB_TOKEN` с правом `packages:write` только в build job.
+## Kubernetes
 
-## Учебный Kubernetes
+Общий [pipeline](../docs/delivery.md) публикует образ, подставляет digest в манифест и выполняет server dry-run, apply, rollout и внешний API-check. Оркестрация находится в [`scripts/deploy_iris.sh`](../scripts/deploy_iris.sh).
 
-`k8s/app.yaml` содержит исправленные ConfigMap, Deployment и ClusterIP Service. `scripts/deploy_iris.sh` из корня репозитория заменяет tag на digest из сборки, выполняет server dry-run, apply и rollout, проверяет фактический Deployment image и запускает внешнюю проверку через localhost port-forward. Он сохраняет Deployment, ответы API и лог port-forward в `lab1/evidence/`.
+Ресурсы: `esolovev-iris-config`, `esolovev-iris` Deployment и Service в `mlops-students`. Runtime работает как UID/GID 10001, с read-only filesystem, без повышения привилегий и ServiceAccount token.
 
-Для учебного развёртывания запускается общий workflow с `deploy=true`; для временного CI-кластера этот же сценарий выполняется автоматически. Только API учебного кластера может подтвердить его RBAC и квоты; приёмку ставит преподаватель.
+```bash
+kubectl -n mlops-students port-forward --address=127.0.0.1 service/esolovev-iris 18090:80
+```
 
-Дополнительный workflow `Iris registry credential store` проверяет настоящий `pass init` и `docker login ghcr.io` на Linux runner: создаёт временный GPG key и отдельный Docker config с `credsStore=pass`, проверяет расшифровку credential helper и отсутствие embedded auth, скачивает проверенный Iris по digest и удаляет временные credentials. Права токена ограничены `packages:read`. В artifact `registry-credential-evidence` попадают только результаты проверок и логи login/pull, без config, ключей и credential helper output. Helper 0.9.8 проверяется по SHA-256 официального релиза. Настройка соответствует [документации Docker](https://docs.docker.com/reference/cli/docker/login/).
+В другом терминале, из `lab1/` с окружением лабораторной:
 
-Этот workflow проверяет credential store в CI. Отдельная проверка 10 октября 2026 выполнена на исходной учебной ВМ под `esolovev`: после восстановления доступа инициализирован `pass`, настоящий `docker login ghcr.io` прошёл, зашифрованная запись credential helper проверена, Iris скачан по digest учебного развёртывания. Затем выполнен logout и временный credential удалён. Администратор подтвердил вход только по SSH-ключу; пароль учётной записи задавать не требуется. Результаты обеих лабораторных приведены в [отчёте проверки](../docs/VERIFICATION_2026-10-10.md).
+```bash
+python scripts/check_api.py --base-url http://127.0.0.1:18090
+```
 
-Ручной workflow `Temporary teaching registry access` выдаёт токен только с `packages:read` и шифрует его проверенным публичным GPG-ключом ВМ. Приватные ключи остаются на ВМ/локальном компьютере, а постоянный GitHub credential не передаётся. Время проверки ограничено; [GITHUB_TOKEN перестаёт действовать при завершении job](https://docs.github.com/en/actions/concepts/security/github_token). Перед новым запуском нужно получить согласие владельца на передачу временного токена выбранной ВМ и проверить fingerprint получателя. Plaintext credentials, ключи и kubeconfig в Git не сохраняются.
+## Конфигурация
+
+| Переменная | Значение по умолчанию | Назначение |
+|---|---|---|
+| `MODEL_PATH` | `model.joblib` | Путь к доверенному артефакту модели |
+| `MODEL_VERSION` | `iris-v1` | Версия в ответах API |
+
+Модель десериализуется через joblib и должна поступать из доверенной сборки. Изменение пути не меняет версию автоматически.
+
+Исходные требования сохранены в [ASSIGNMENT.md](ASSIGNMENT.md).

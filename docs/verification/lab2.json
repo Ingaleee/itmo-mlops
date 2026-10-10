@@ -1,0 +1,68 @@
+{
+  "service": "runbook-search-api",
+  "build_revision": "2a820a01c2148d75e9fbcbc420dd64f2ec114ccc",
+  "image": "ghcr.io/ingaleee/esolovev-search@sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+  "index_version": "1eed508a1515",
+  "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+  "tests": {
+    "passed": 31,
+    "failures": 0,
+    "errors": 0
+  },
+  "quality": {
+    "cases": 8,
+    "mrr_at_3": 0.9375,
+    "hit_rate_at_3": 1.0,
+    "macro_recall_at_3": 0.875
+  },
+  "environments": [
+    {
+      "name": "staging",
+      "release": "esolovev-search-staging",
+      "ranking_mode": "normal",
+      "status": "passed"
+    },
+    {
+      "name": "production",
+      "release": "esolovev-search-prod",
+      "ranking_mode": "normal",
+      "status": "passed"
+    }
+  ],
+  "promotion": {
+    "same_digest": true,
+    "same_build": true,
+    "same_index": true,
+    "same_artifact": true
+  },
+  "rollback": {
+    "verified": true,
+    "restored_revision": 1,
+    "restored_digest": "sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+    "failure_kind": "semantic_quality",
+    "revisions": [
+      {
+        "revision": 1,
+        "status": "superseded"
+      },
+      {
+        "revision": 2,
+        "status": "superseded"
+      },
+      {
+        "revision": 3,
+        "status": "superseded",
+        "restored_revision": 1
+      },
+      {
+        "revision": 4,
+        "status": "deployed"
+      }
+    ],
+    "negative_control": {
+      "ranking_mode": "reverse",
+      "mrr_at_3": 0.0,
+      "hit_rate_at_3": 0.0
+    }
+  }
+}
