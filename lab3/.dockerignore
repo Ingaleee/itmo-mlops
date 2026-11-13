@@ -1,0 +1,10 @@
+*
+!Dockerfile
+!requirements.lock
+!app/
+!app/**
+!model/
+!model/fetch_tokenizer.py
+!model/fetch_model.py
+!model/Modelfile
+**/__pycache__

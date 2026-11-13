@@ -120,7 +120,7 @@ Compose публикует API на `127.0.0.1:18080`. Multi-stage Dockerfile в
 
 ## Kubernetes
 
-Релизы `esolovev-search-staging` и `esolovev-search-prod` размещаются в `mlops-students`. Helm принимает только `repository@sha256:<64 hex>`; неполный digest и repository с mutable tag отклоняются до деплоя. Service имеет тип ClusterIP.
+Релизы `esolovev-search-staging` и `esolovev-search-prod` размещаются в `itmo-student-01`. Helm принимает только `repository@sha256:<64 hex>`; неполный digest и repository с mutable tag отклоняются до деплоя. Service имеет тип ClusterIP.
 
 Внешняя проверка существующего staging:
 

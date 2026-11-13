@@ -1,0 +1,157 @@
+name: Knowledge Portal
+
+on:
+  push:
+    branches: [main]
+    paths: [lab3/**, .github/workflows/lab3.yml]
+  pull_request:
+    paths: [lab3/**, .github/workflows/lab3.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: knowledge-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  contracts-and-failover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: lab3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12.15"
+      - run: pip install -r requirements-dev.txt && pip check
+      - run: python model/fetch_tokenizer.py
+      - name: Verify synthetic contracts, privacy, failures and cancellation
+        run: python -m pytest -q --junitxml=evidence/tests.xml
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: knowledge-contracts
+          path: lab3/evidence/
+
+  build-images:
+    needs: contracts-and-failover
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      app_digest: ${{ steps.app.outputs.digest }}
+      ollama_digest: ${{ steps.ollama.outputs.digest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build code-only portal and MCP image
+        id: app
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: lab3
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ghcr.io/ingaleee/esolovev-knowledge:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          sbom: true
+          provenance: mode=max
+          cache-from: type=gha,scope=knowledge
+          cache-to: type=gha,scope=knowledge,mode=max
+      - name: Build CPU-only Ollama runtime without weights or corpus
+        id: ollama
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: lab3/model
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ghcr.io/ingaleee/esolovev-ollama-cpu:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          sbom: true
+          provenance: mode=max
+          cache-from: type=gha,scope=knowledge-ollama
+          cache-to: type=gha,scope=knowledge-ollama,mode=max
+      - name: Save immutable image identities
+        if: github.event_name != 'pull_request'
+        env:
+          APP_DIGEST: ${{ steps.app.outputs.digest }}
+          OLLAMA_DIGEST: ${{ steps.ollama.outputs.digest }}
+        run: |
+          mkdir release
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          Path('release/knowledge-images.json').write_text(json.dumps({
+            'revision':os.environ['GITHUB_SHA'],
+            'app':'ghcr.io/ingaleee/esolovev-knowledge@'+os.environ['APP_DIGEST'],
+            'ollama':'ghcr.io/ingaleee/esolovev-ollama-cpu@'+os.environ['OLLAMA_DIGEST']
+          },indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: github.event_name != 'pull_request'
+        with:
+          name: knowledge-images
+          path: release/knowledge-images.json
+
+  cpu-kubernetes-integration:
+    if: github.event_name != 'pull_request'
+    needs: build-images
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
+    env:
+      KUBE_NAMESPACE: itmo-student-01
+      APP_IMAGE: ghcr.io/ingaleee/esolovev-knowledge@${{ needs.build-images.outputs.app_digest }}
+      OLLAMA_IMAGE: ghcr.io/ingaleee/esolovev-ollama-cpu@${{ needs.build-images.outputs.ollama_digest }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12.15"
+      - run: pip install -r lab3/requirements-dev.txt
+      - run: python lab3/model/fetch_tokenizer.py
+      - run: bash scripts/install_ci_tools.sh
+      - name: Create isolated Kubernetes
+        run: bash scripts/create_ci_cluster.sh
+      - name: Verify MCP, real CPU generation and model persistence
+        env:
+          GH_PACKAGES_TOKEN: ${{ github.token }}
+        run: bash lab3/scripts/ci_integration.sh
+      - name: Capture own workload diagnostics
+        if: always()
+        run: |
+          mkdir -p lab3/evidence/kubernetes
+          kubectl -n itmo-student-01 get pods -o json > lab3/evidence/kubernetes/pods-final.json || true
+          kubectl -n itmo-student-01 get events -o json > lab3/evidence/kubernetes/events.json || true
+          kubectl -n itmo-student-01 logs deployment/llm-local --all-containers --tail=100 > lab3/evidence/kubernetes/model-runtime.log 2>&1 || true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: knowledge-cpu-kubernetes
+          path: lab3/evidence/
+      - name: Remove isolated Kubernetes and temporary credentials
+        if: always()
+        run: |
+          "$RUNNER_TEMP/mlops-tools/k3d" cluster delete ci-labs
+          rm -f "$RUNNER_TEMP/local-ci.kubeconfig" "$RUNNER_TEMP/mcp.token" "$RUNNER_TEMP/portal.token"

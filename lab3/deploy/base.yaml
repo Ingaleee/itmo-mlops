@@ -1,0 +1,325 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: knowledge-models
+  labels: { app.kubernetes.io/part-of: esolovev-knowledge }
+spec:
+  accessModes: [ReadWriteOnce]
+  resources: { requests: { storage: 5Gi } }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kb-mcp
+  labels: { app.kubernetes.io/part-of: esolovev-knowledge }
+spec:
+  replicas: 1
+  strategy: { type: Recreate }
+  selector: { matchLabels: { app: kb-mcp } }
+  template:
+    metadata:
+      { labels: { app: kb-mcp, app.kubernetes.io/part-of: esolovev-knowledge } }
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        {
+          runAsNonRoot: true,
+          runAsUser: 10001,
+          runAsGroup: 10001,
+          fsGroup: 10001,
+          seccompProfile: { type: RuntimeDefault },
+        }
+      containers:
+        - name: mcp
+          image: APP_IMAGE
+          args:
+            [
+              python,
+              -m,
+              uvicorn,
+              "app.mcp_server:create_app",
+              --factory,
+              --host,
+              0.0.0.0,
+              --port,
+              "8000",
+              --no-access-log,
+            ]
+          env:
+            - { name: KB_CORPUS, value: /knowledge/corpus.json }
+            - {
+                name: MCP_SERVICE_TOKEN,
+                valueFrom:
+                  { secretKeyRef: { name: knowledge-service, key: mcp-token } },
+              }
+          ports: [{ name: http, containerPort: 8000 }]
+          resources:
+            {
+              requests: { cpu: 100m, memory: 128Mi },
+              limits: { cpu: 200m, memory: 256Mi },
+            }
+          startupProbe:
+            {
+              httpGet: { path: /readyz, port: http },
+              periodSeconds: 3,
+              failureThreshold: 30,
+            }
+          readinessProbe:
+            { httpGet: { path: /readyz, port: http }, periodSeconds: 10 }
+          livenessProbe:
+            { httpGet: { path: /livez, port: http }, periodSeconds: 15 }
+          securityContext:
+            {
+              allowPrivilegeEscalation: false,
+              readOnlyRootFilesystem: true,
+              capabilities: { drop: [ALL] },
+            }
+          volumeMounts:
+            [
+              { name: corpus, mountPath: /knowledge, readOnly: true },
+              { name: index, mountPath: /app/artifacts },
+              { name: tmp, mountPath: /tmp },
+            ]
+      volumes:
+        - {
+            name: corpus,
+            secret: { secretName: knowledge-corpus, defaultMode: 288 },
+          }
+        - { name: index, emptyDir: { sizeLimit: 32Mi } }
+        - { name: tmp, emptyDir: { sizeLimit: 32Mi } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  { name: kb-mcp, labels: { app.kubernetes.io/part-of: esolovev-knowledge } }
+spec:
+  type: ClusterIP
+  selector: { app: kb-mcp }
+  ports: [{ name: http, port: 8000, targetPort: http }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  {
+    name: knowledge-portal,
+    labels: { app.kubernetes.io/part-of: esolovev-knowledge },
+  }
+spec:
+  replicas: 1
+  strategy: { type: Recreate }
+  selector: { matchLabels: { app: knowledge-portal } }
+  template:
+    metadata:
+      {
+        labels:
+          {
+            app: knowledge-portal,
+            app.kubernetes.io/part-of: esolovev-knowledge,
+          },
+      }
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        {
+          runAsNonRoot: true,
+          runAsUser: 10001,
+          runAsGroup: 10001,
+          fsGroup: 10001,
+          seccompProfile: { type: RuntimeDefault },
+        }
+      containers:
+        - name: portal
+          image: APP_IMAGE
+          env:
+            - { name: MCP_URL, value: "http://kb-mcp:8000/mcp" }
+            - { name: LOCAL_BASE_URL, value: "http://llm-local:11434/v1" }
+            - { name: LOCAL_MODEL, value: line-local }
+            - { name: CLOUD_MODEL, value: mistral-Nemo-Instruct-2407 }
+            - {
+                name: MCP_SERVICE_TOKEN,
+                valueFrom:
+                  { secretKeyRef: { name: knowledge-service, key: mcp-token } },
+              }
+            - {
+                name: PORTAL_ACCESS_TOKEN,
+                valueFrom:
+                  {
+                    secretKeyRef:
+                      { name: knowledge-service, key: portal-token },
+                  },
+              }
+            - {
+                name: LLM7_API_KEY,
+                valueFrom:
+                  {
+                    secretKeyRef:
+                      { name: knowledge-cloud, key: api-key, optional: true },
+                  },
+              }
+          ports: [{ name: http, containerPort: 8000 }]
+          resources:
+            {
+              requests: { cpu: 100m, memory: 128Mi },
+              limits: { cpu: 200m, memory: 256Mi },
+            }
+          startupProbe:
+            {
+              httpGet: { path: /readyz, port: http },
+              periodSeconds: 3,
+              failureThreshold: 30,
+            }
+          readinessProbe:
+            { httpGet: { path: /readyz, port: http }, periodSeconds: 10 }
+          livenessProbe:
+            { httpGet: { path: /livez, port: http }, periodSeconds: 15 }
+          securityContext:
+            {
+              allowPrivilegeEscalation: false,
+              readOnlyRootFilesystem: true,
+              capabilities: { drop: [ALL] },
+            }
+          volumeMounts: [{ name: tmp, mountPath: /tmp }]
+      volumes: [{ name: tmp, emptyDir: { sizeLimit: 32Mi } }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  {
+    name: knowledge-portal,
+    labels: { app.kubernetes.io/part-of: esolovev-knowledge },
+  }
+spec:
+  type: ClusterIP
+  selector: { app: knowledge-portal }
+  ports: [{ name: http, port: 8000, targetPort: http }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  { name: llm-local, labels: { app.kubernetes.io/part-of: esolovev-knowledge } }
+spec:
+  replicas: 1
+  strategy: { type: Recreate }
+  selector: { matchLabels: { app: llm-local } }
+  template:
+    metadata:
+      {
+        labels:
+          { app: llm-local, app.kubernetes.io/part-of: esolovev-knowledge },
+      }
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        {
+          runAsNonRoot: true,
+          runAsUser: 10001,
+          runAsGroup: 10001,
+          fsGroup: 10001,
+          seccompProfile: { type: RuntimeDefault },
+        }
+      initContainers:
+        - name: download-verified-weights
+          image: APP_IMAGE
+          command: [python, model/fetch_model.py, --directory, /weights]
+          resources:
+            {
+              requests: { cpu: 50m, memory: 64Mi },
+              limits: { cpu: 200m, memory: 128Mi },
+            }
+          securityContext:
+            {
+              allowPrivilegeEscalation: false,
+              readOnlyRootFilesystem: true,
+              capabilities: { drop: [ALL] },
+            }
+          volumeMounts:
+            [
+              { name: models, mountPath: /weights },
+              { name: tmp, mountPath: /tmp },
+            ]
+        - name: register-model
+          image: OLLAMA_IMAGE
+          command: [/bin/sh, -ec]
+          args:
+            - |
+              ollama serve >/tmp/import-server.log 2>&1 &
+              daemon=$!
+              trap 'kill "$daemon" 2>/dev/null || true' EXIT
+              for i in $(seq 1 30); do ollama list >/dev/null 2>&1 && break; sleep 1; done
+              ollama create line-local -f /config/Modelfile >/tmp/import.log 2>&1
+          env: [{ name: OLLAMA_HOST, value: "127.0.0.1:11434" }]
+          resources:
+            {
+              requests: { cpu: 50m, memory: 64Mi },
+              limits: { cpu: 200m, memory: 256Mi },
+            }
+          securityContext:
+            {
+              allowPrivilegeEscalation: false,
+              readOnlyRootFilesystem: true,
+              capabilities: { drop: [ALL] },
+            }
+          volumeMounts:
+            [
+              { name: models, mountPath: /models },
+              { name: models, mountPath: /weights, readOnly: true },
+              { name: model-config, mountPath: /config, readOnly: true },
+              { name: tmp, mountPath: /tmp },
+            ]
+      containers:
+        - name: ollama
+          image: OLLAMA_IMAGE
+          ports: [{ name: http, containerPort: 11434 }]
+          resources:
+            {
+              requests: { cpu: 1000m, memory: 2560Mi },
+              limits: { cpu: 1800m, memory: 3072Mi },
+            }
+          startupProbe:
+            {
+              exec: { command: [ollama, show, line-local] },
+              periodSeconds: 5,
+              failureThreshold: 60,
+            }
+          readinessProbe:
+            { exec: { command: [ollama, show, line-local] }, periodSeconds: 10 }
+          livenessProbe:
+            { httpGet: { path: /api/version, port: http }, periodSeconds: 20 }
+          securityContext:
+            {
+              allowPrivilegeEscalation: false,
+              readOnlyRootFilesystem: true,
+              capabilities: { drop: [ALL] },
+            }
+          volumeMounts:
+            [
+              { name: models, mountPath: /models, readOnly: true },
+              { name: tmp, mountPath: /tmp },
+            ]
+      volumes:
+        - {
+            name: models,
+            persistentVolumeClaim: { claimName: knowledge-models },
+          }
+        - { name: tmp, emptyDir: { sizeLimit: 64Mi } }
+        - { name: model-config, configMap: { name: knowledge-model-config } }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  { name: llm-local, labels: { app.kubernetes.io/part-of: esolovev-knowledge } }
+spec:
+  type: ClusterIP
+  selector: { app: llm-local }
+  ports: [{ name: http, port: 11434, targetPort: http }]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: knowledge-private-services }
+spec:
+  podSelector:
+    { matchLabels: { app.kubernetes.io/part-of: esolovev-knowledge } }
+  policyTypes: [Ingress]
+  ingress:
+    - from: [{ podSelector: { matchLabels: { app: knowledge-portal } } }]
+      ports: [{ port: 8000 }, { port: 11434 }]

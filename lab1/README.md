@@ -117,10 +117,10 @@ python scripts/check_api.py --base-url http://127.0.0.1:18090
 
 Общий [pipeline](../docs/delivery.md) публикует образ, подставляет digest в манифест и выполняет server dry-run, apply, rollout и внешний API-check. Оркестрация находится в [`scripts/deploy_iris.sh`](../scripts/deploy_iris.sh).
 
-Ресурсы: `esolovev-iris-config`, `esolovev-iris` Deployment и Service в `mlops-students`. Runtime работает как UID/GID 10001, с read-only filesystem, без повышения привилегий и ServiceAccount token.
+Ресурсы: `esolovev-iris-config`, `esolovev-iris` Deployment и Service в `itmo-student-01`. Runtime работает как UID/GID 10001, с read-only filesystem, без повышения привилегий и ServiceAccount token.
 
 ```bash
-kubectl -n mlops-students port-forward --address=127.0.0.1 service/esolovev-iris 18090:80
+kubectl -n itmo-student-01 port-forward --address=127.0.0.1 service/esolovev-iris 18090:80
 ```
 
 В другом терминале, из `lab1/` с окружением лабораторной:

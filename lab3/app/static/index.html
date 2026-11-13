@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Линия · База знаний</title>
+    <link rel="stylesheet" href="/static/portal.css" />
+    <script src="/static/portal.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <a href="/" class="brand">линия<span> / знания</span></a
+      ><span class="header-note">Внутренний портал · ЛираТех</span
+      ><button id="logout" class="quiet">Выйти</button>
+    </header>
+    <main id="login-panel" hidden>
+      <div class="login">
+        <span class="eyebrow">ДОСТУП К БАЗЕ ЗНАНИЙ</span>
+        <h1>Всё начинается<br />с источника.</h1>
+        <p>
+          Введите токен портала. Документы доступны только внутри защищённого
+          сеанса.
+        </p>
+        <form id="login-form">
+          <label for="token">Токен доступа</label
+          ><input
+            id="token"
+            type="password"
+            autocomplete="current-password"
+            required
+            minlength="24"
+          /><button>Открыть базу знаний →</button>
+        </form>
+      </div>
+    </main>
+    <main id="workspace" hidden>
+      <aside>
+        <div class="aside-title">
+          БИБЛИОТЕКА <span id="document-count"></span>
+        </div>
+        <button id="all-documents" class="tree-all">Все разделы</button>
+        <nav id="tree" aria-label="Разделы базы знаний"></nav>
+        <p class="aside-foot">
+          Каждый ответ можно проверить.<br />Редакции сохраняются отдельно.
+        </p>
+      </aside>
+      <article>
+        <section id="search-view">
+          <div class="eyebrow">НАЙТИ. ПОНЯТЬ. ПРОВЕРИТЬ.</div>
+          <h1>Знания команды,<br />связанные воедино.</h1>
+          <p class="intro">
+            Задайте вопрос о продукте, процессах или решениях. Сначала документы
+            — затем ответ со ссылками.
+          </p>
+          <form id="search-form">
+            <label class="sr-only" for="question">Поисковый вопрос</label>
+            <div class="search-box">
+              <textarea
+                id="question"
+                rows="2"
+                minlength="2"
+                maxlength="500"
+                placeholder="Сколько подписчиков помещается в закрытый канал?"
+                required
+              ></textarea>
+              <div class="search-actions">
+                <label
+                  ><input id="private" type="checkbox" /> Только локальная
+                  модель</label
+                ><button id="search" class="secondary" type="submit">
+                  Найти документы</button
+                ><button id="ask" type="button">Спросить →</button>
+              </div>
+            </div>
+            <div class="filters">
+              <span id="path-filter">Все разделы</span
+              ><label><input id="archive" type="checkbox" /> Архив</label
+              ><label><input id="draft" type="checkbox" /> Черновики</label>
+            </div>
+          </form>
+          <div id="status" role="status" aria-live="polite"></div>
+          <section id="answer-panel" hidden>
+            <div class="answer-heading">
+              <span class="eyebrow">ОТВЕТ ПО ИСТОЧНИКАМ</span
+              ><span id="mode" class="badge"></span>
+            </div>
+            <p id="answer"></p>
+            <div id="source-map"></div>
+            <details>
+              <summary>Проверка ответа</summary>
+              <pre id="diagnostics"></pre>
+            </details>
+          </section>
+          <div id="results-heading" hidden>
+            <h2>Найденные документы</h2>
+            <span id="result-count"></span>
+          </div>
+          <div id="results"></div>
+          <div id="empty-state">
+            <span class="empty-icon">↗</span>
+            <h2>От вопроса к точному документу</h2>
+            <p>
+              Поиск учитывает раздел и статус. Архивные редакции и черновики
+              включаются отдельно.
+            </p>
+            <div class="examples">
+              <button
+                data-question="Сколько активных подписчиков помещается в закрытый канал сейчас? Влияют ли непринятые приглашения?"
+              >
+                Лимиты закрытого канала</button
+              ><button
+                data-question="Кто подписывает расход 18 000 ₽ из резерва?"
+              >
+                Согласование расходов</button
+              ><button
+                data-question="Поддерживаются ли iOS и Firefox на приёмке пилота?"
+              >
+                Поддерживаемые платформы
+              </button>
+            </div>
+          </div>
+        </section>
+        <section id="document-view" hidden>
+          <a href="/" class="back">← К поиску</a>
+          <div id="document-meta" class="eyebrow"></div>
+          <h1 id="document-title"></h1>
+          <div id="document-body"></div>
+          <section id="document-links"></section>
+        </section>
+      </article>
+    </main>
+    <footer>
+      Линия / Knowledge Portal <span>MCP · RAG · CPU inference</span>
+    </footer>
+  </body>
+</html>

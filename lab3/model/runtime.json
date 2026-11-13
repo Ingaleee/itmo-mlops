@@ -1,0 +1,13 @@
+{
+  "model_family": "Qwen3-4B-Instruct-2507 Q4_K_M",
+  "prompt_ceiling_tokens": 1500,
+  "version": "0.40.16",
+  "weights_sha256": "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597",
+  "context_tokens": 2048,
+  "model": "line-local",
+  "vocabulary_sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+  "weights_bytes": 2497281120,
+  "cpu_threads": 2,
+  "image": "ollama/ollama@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592",
+  "gpu_layers": 0
+}

@@ -6,6 +6,9 @@
 **/artifacts/
 **/evidence/
 **/model.joblib
+**/*.gguf
+**/*.gguf.partial
+lab3/model/*tokenizer.json
 **/*.kubeconfig
 **/config.json
 **/.env

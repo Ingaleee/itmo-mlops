@@ -10,6 +10,7 @@
 |---|---|---|---|---|
 | 1 | [Iris Classifier](lab1/README.md) | Обучение классификатора и доставка API в Kubernetes | scikit-learn, FastAPI, Docker, Kubernetes | [Скриншоты и видео](lab1/DEMO.md) |
 | 2 | [Runbook Search](lab2/README.md) | Поиск по базе знаний с проверкой качества, promotion и rollback | TF-IDF, FastAPI, Docker Compose, Helm, GitHub Actions | [Скриншоты и видео](lab2/DEMO.md) |
+| 3 | [Knowledge Portal](lab3/README.md) | Версионный поиск и RAG, облачная и CPU-модель | MCP SDK, SQLite FTS5, Ollama, llm7.io, Kubernetes | [Проверки и запуск](lab3/RUNBOOK.md) |
 
 ## С чего начать
 
@@ -27,6 +28,7 @@
 .github/workflows/       # CI/CD и проверки registry
 lab1/                    # Iris: приложение, модель, тесты, Dockerfile, Kubernetes
 lab2/                    # Search: приложение, данные, тесты, Dockerfile, Helm
+lab3/                    # Knowledge Portal: MCP, RAG, UI, CPU-модель, тесты и Kubernetes
 scripts/                 # инструменты CI и развёртывания
 docs/
   development.md         # окружение и общие правила разработки
@@ -41,7 +43,7 @@ docs/
 
 ## Принципы реализации
 
-- Модель или индекс собираются вместе с приложением и входят в контейнер.
+- Версии моделей и индексов фиксируются; крупные веса и закрытые данные доставляются отдельно от публичного кода.
 - В кластер продвигается образ по digest; staging и production получают одну сборку.
 - Тесты API, качество модели и работа опубликованного образа проверяются отдельно.
 - Production требует подтверждения; ошибка качества приводит к проверенному откату.

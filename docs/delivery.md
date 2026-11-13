@@ -35,7 +35,7 @@ Tags позволяют найти сборку; Kubernetes получает `re
 
 | Параметр | Значение |
 |---|---|
-| Namespace | `mlops-students` |
+| Namespace | `itmo-student-01` |
 | Префикс | `esolovev` |
 | Helm storage driver | `configmap` |
 | Secret | `KUBE_CONFIG_B64` |
@@ -52,7 +52,7 @@ Pipeline создаёт только свои Deployment, Service, ConfigMap и 
 ```bash
 export KUBECONFIG=/path/to/cluster.kubeconfig
 export HELM_DRIVER=configmap
-kubectl -n mlops-students auth can-i get deployments
+kubectl -n itmo-student-01 auth can-i get deployments
 ```
 
 ## Запуск deployment
@@ -101,3 +101,7 @@ Docker может использовать `pass` как credential store: се�
 | `registry-credential-evidence` | Несекретный отчёт credential store и cleanup в CI |
 
 Полные доказательства остаются в artifacts конкретного запуска. В репозитории публикуются только [краткие результаты](validation.md) без credentials и истории настройки доступа.
+
+## Knowledge Portal
+
+Третья работа использует отдельный [workflow](../.github/workflows/lab3.yml): synthetic contracts/privacy/failover и сборка code-only приложения плюс CPU runtime. Он не получает закрытый корпус или llm7 token. Публикация образов не объявляется готовым deployment. Установка корпуса, credentials, PVC и сервисов выполняется напрямую из локального окружения по [RUNBOOK](../lab3/RUNBOOK.md).
