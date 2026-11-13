@@ -3,6 +3,7 @@ set -euo pipefail
 : "${IRIS_IMAGE:?image repository required}"
 : "${IRIS_DIGEST:?digest required}"
 [[ "$IRIS_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || exit 2
+namespace=${KUBE_NAMESPACE:-mlops-students}
 python - <<'PY'
 import os
 from pathlib import Path
@@ -13,11 +14,11 @@ if text.count(placeholder) != 1 or os.environ['IRIS_IMAGE'] != 'ghcr.io/ingaleee
 text = text.replace(placeholder, os.environ['IRIS_IMAGE'] + '@' + os.environ['IRIS_DIGEST'])
 Path(os.environ['RUNNER_TEMP'], 'iris.yaml').write_text(text)
 PY
-kubectl apply --dry-run=server -f "$RUNNER_TEMP/iris.yaml"
-kubectl apply -f "$RUNNER_TEMP/iris.yaml"
-kubectl -n mlops-students rollout status deployment/esolovev-iris --timeout=180s
+kubectl -n "$namespace" apply --dry-run=server -f "$RUNNER_TEMP/iris.yaml"
+kubectl -n "$namespace" apply -f "$RUNNER_TEMP/iris.yaml"
+kubectl -n "$namespace" rollout status deployment/esolovev-iris --timeout=180s
 mkdir -p lab1/evidence
-kubectl -n mlops-students get deployment esolovev-iris -o json > lab1/evidence/deployment.json
+kubectl -n "$namespace" get deployment esolovev-iris -o json > lab1/evidence/deployment.json
 python - <<'PY'
 import json, os
 from pathlib import Path
@@ -27,7 +28,7 @@ if resource['spec']['template']['spec']['containers'][0]['image'] != expected:
     raise RuntimeError('Iris Deployment digest mismatch')
 PY
 port=$(python -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()')
-kubectl -n mlops-students port-forward --address=127.0.0.1 service/esolovev-iris "$port:80" > lab1/evidence/port-forward.log 2>&1 &
+kubectl -n "$namespace" port-forward --address=127.0.0.1 service/esolovev-iris "$port:80" > lab1/evidence/port-forward.log 2>&1 &
 forward_pid=$!
 trap 'kill "$forward_pid" 2>/dev/null || true' EXIT
 for attempt in {1..30}; do

@@ -14,4 +14,4 @@ umask 077
 "$tools/k3d" kubeconfig get ci-labs > "$KUBECONFIG"
 echo "KUBECONFIG=$KUBECONFIG" >> "$GITHUB_ENV"
 [[ "$(kubectl config current-context)" == 'k3d-ci-labs' ]]
-kubectl create namespace mlops-students
+kubectl create namespace "${KUBE_NAMESPACE:-mlops-students}"

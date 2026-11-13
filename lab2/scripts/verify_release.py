@@ -1,6 +1,7 @@
 """Check the actual API and deployed image, preserving evidence before failure."""
 import argparse
 import json
+import os
 import re
 import socket
 import subprocess
@@ -122,7 +123,7 @@ def main():
     target = parser.add_mutually_exclusive_group(required=True)
     target.add_argument("--release")
     target.add_argument("--base-url")
-    parser.add_argument("--namespace", default="mlops-students")
+    parser.add_argument("--namespace", default=os.getenv("KUBE_NAMESPACE", "mlops-students"))
     parser.add_argument("--port", type=int, default=0)
     parser.add_argument("--output", type=Path, default=Path("evidence/smoke"))
     parser.add_argument("--expected-digest")

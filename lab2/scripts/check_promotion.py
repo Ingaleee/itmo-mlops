@@ -9,7 +9,7 @@ from verify_release import require
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--prefix", default="esolovev")
-    parser.add_argument("--namespace", default="mlops-students")
+    parser.add_argument("--namespace", default=os.getenv("KUBE_NAMESPACE", "mlops-students"))
     parser.add_argument("--digest", required=True)
     args = parser.parse_args()
     report = {}

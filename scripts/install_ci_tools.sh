@@ -7,8 +7,8 @@ curl --fail --silent --show-error --location --retry 3 --connect-timeout 10 --ma
 (cd "$tools"; sed 's/helm-v4.3.0-linux-amd64.tar.gz/helm.tar.gz/' helm.sha256sum | sha256sum --check)
 tar -xzf "$tools/helm.tar.gz" -C "$tools"
 mv "$tools/linux-amd64/helm" "$tools/helm"
-curl --fail --silent --show-error --location --retry 3 --connect-timeout 10 --max-time 120 https://dl.k8s.io/release/v1.34.1/bin/linux/amd64/kubectl -o "$tools/kubectl"
-curl --fail --silent --show-error --location --retry 3 --connect-timeout 10 --max-time 120 https://dl.k8s.io/release/v1.34.1/bin/linux/amd64/kubectl.sha256 -o "$tools/kubectl.sha256"
+curl --fail --silent --show-error --location --retry 3 --connect-timeout 10 --max-time 120 https://dl.k8s.io/release/v1.36.4/bin/linux/amd64/kubectl -o "$tools/kubectl"
+curl --fail --silent --show-error --location --retry 3 --connect-timeout 10 --max-time 120 https://dl.k8s.io/release/v1.36.4/bin/linux/amd64/kubectl.sha256 -o "$tools/kubectl.sha256"
 (cd "$tools"; printf '%s  kubectl\n' "$(cat kubectl.sha256)" | sha256sum --check)
 chmod +x "$tools/helm" "$tools/kubectl"
 echo "$tools" >> "$GITHUB_PATH"
