@@ -10,7 +10,7 @@
 |---|---|---|---|---|
 | 1 | [Iris Classifier](lab1/README.md) | Обучение классификатора и доставка API в Kubernetes | scikit-learn, FastAPI, Docker, Kubernetes | [Скриншоты и видео](lab1/DEMO.md) |
 | 2 | [Runbook Search](lab2/README.md) | Поиск по базе знаний с проверкой качества, promotion и rollback | TF-IDF, FastAPI, Docker Compose, Helm, GitHub Actions | [Скриншоты и видео](lab2/DEMO.md) |
-| 3 | [Knowledge Portal](lab3/README.md) | Версионный поиск и RAG, облачная и CPU-модель | MCP SDK, SQLite FTS5, Ollama, llm7.io, Kubernetes | [Проверки и запуск](lab3/RUNBOOK.md) |
+| 3 | [Knowledge Portal](lab3/README.md) | Версионный поиск и RAG, облачная и CPU-модель | MCP SDK, SQLite FTS5, Ollama, llm7.io, Kubernetes | [Скриншоты и видео](lab3/DEMO.md) |
 
 ## С чего начать
 

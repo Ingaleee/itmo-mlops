@@ -347,6 +347,66 @@
       "width": 1265,
       "height": 712,
       "sha256": "ec457a45d02cccaa0bb9f39f95d5607af8c94ee5b8389d354006274d1d0c5515"
+    },
+    {
+      "file": "lab3/portal.jpg",
+      "title": "Главная страница портала",
+      "width": 1265,
+      "height": 712,
+      "origin": "Локальный портал / настоящий MCP / Ollama CPU",
+      "sources": [
+        "sources/knowledge-mcp.json",
+        "sources/knowledge-privacy.json"
+      ],
+      "sha256": "c11c906dce54c5e587151c723d0292ecef6e3947cefdd1a4cdbd02ff2843ede8"
+    },
+    {
+      "file": "lab3/search.jpg",
+      "title": "Поиск и пять карточек",
+      "width": 1264,
+      "height": 1817,
+      "origin": "Локальный портал / настоящий MCP / Ollama CPU",
+      "sources": [
+        "sources/knowledge-mcp.json",
+        "sources/knowledge-privacy.json"
+      ],
+      "sha256": "f972c98a625f639087cbde3a0ca499527957ac04c1d64dd208b4a97c36c52cc7"
+    },
+    {
+      "file": "lab3/local-answer.jpg",
+      "title": "Настоящий ответ Ollama CPU",
+      "width": 1264,
+      "height": 2063,
+      "origin": "Локальный портал / настоящий MCP / Ollama CPU",
+      "sources": [
+        "sources/knowledge-mcp.json",
+        "sources/knowledge-privacy.json"
+      ],
+      "sha256": "1c2f8757021e78c7e8286a35cdd2d1e026102c29d1f6d8c029bb3e77eb65955b"
+    },
+    {
+      "file": "lab3/current-version.jpg",
+      "title": "M-05@2.0: действующая редакция",
+      "width": 1264,
+      "height": 1370,
+      "origin": "Локальный портал / настоящий MCP / Ollama CPU",
+      "sources": [
+        "sources/knowledge-mcp.json",
+        "sources/knowledge-privacy.json"
+      ],
+      "sha256": "dc27c66a78ae67d8cb97bb3ea8540dad63410f5e7d20ab505ccfa9aa0f121d14"
+    },
+    {
+      "file": "lab3/archive-version.jpg",
+      "title": "M-05@1.1: архивная редакция",
+      "width": 1264,
+      "height": 1370,
+      "origin": "Локальный портал / настоящий MCP / Ollama CPU",
+      "sources": [
+        "sources/knowledge-mcp.json",
+        "sources/knowledge-privacy.json"
+      ],
+      "sha256": "1a993b5b97eed0994f8b63be5e51acf05b3b9276618c6850aae47508f6a04eb1"
     }
   ],
   "videos": [
@@ -421,6 +481,23 @@
       "duration_seconds": 30,
       "recording": "Sequence of browser screenshots; each screen shows captured real results",
       "sha256": "0b38a525e0a65a581197985b8da08a80c313d22db6a2eee22edaef19e28c52cc"
+    },
+    {
+      "lab": "lab3",
+      "slug": "portal-demo",
+      "title": "Knowledge Portal: поиск, CPU-ответ, точные редакции",
+      "pages": [
+        "portal",
+        "search",
+        "local-answer",
+        "current-version",
+        "archive-version"
+      ],
+      "mp4": "lab3/portal-demo.mp4",
+      "preview": "lab3/portal-demo.gif",
+      "duration_seconds": 25,
+      "recording": "Sequence of actual browser screenshots, viewport crops; not a continuous screen recording",
+      "sha256": "6f31be7984bcd78fea0e8e2e2ec08daa23e5f319c5b2563dc0d2a6b6fb234110"
     }
   ]
 }

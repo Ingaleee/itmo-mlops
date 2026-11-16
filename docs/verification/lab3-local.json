@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "environment": "native Windows localhost, real MCP and Ollama CPU",
+  "revision": "6ec0746df016dfb2683227bfb8b245f6cf7f2c67",
+  "cases": 8,
+  "model": "Qwen3-4B-Instruct-2507 Q4_K_M",
+  "gpu_layers": 0,
+  "latency_ms": {
+    "min": 25954,
+    "median": 39070.5,
+    "max": 53607
+  },
+  "prompt_tokens_max": 972
+}

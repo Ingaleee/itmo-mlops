@@ -1,0 +1,594 @@
+{
+  "status": "passed",
+  "transport": "streamable-http",
+  "protocol": "2025-11-25",
+  "tools": [
+    {
+      "name": "list_sections",
+      "title": null,
+      "description": "List the hierarchy, document IDs, exact revisions and statuses.",
+      "inputSchema": {
+        "properties": {},
+        "title": "list_sectionsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "$defs": {
+          "Branch": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "title": "Id",
+                "type": "string"
+              },
+              "title": {
+                "title": "Title",
+                "type": "string"
+              },
+              "subsections": {
+                "items": {
+                  "$ref": "#/$defs/Subsection"
+                },
+                "title": "Subsections",
+                "type": "array"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "subsections"
+            ],
+            "title": "Branch",
+            "type": "object"
+          },
+          "Leaf": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "title": "Id",
+                "type": "string"
+              },
+              "version": {
+                "title": "Version",
+                "type": "string"
+              },
+              "title": {
+                "title": "Title",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "Действует",
+                  "Архив",
+                  "Черновик"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "visibility": {
+                "enum": [
+                  "cloud_ok",
+                  "local_only"
+                ],
+                "title": "Visibility",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "version",
+              "title",
+              "status",
+              "visibility"
+            ],
+            "title": "Leaf",
+            "type": "object"
+          },
+          "Subsection": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "title": "Id",
+                "type": "string"
+              },
+              "title": {
+                "title": "Title",
+                "type": "string"
+              },
+              "documents": {
+                "items": {
+                  "$ref": "#/$defs/Leaf"
+                },
+                "title": "Documents",
+                "type": "array"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "documents"
+            ],
+            "title": "Subsection",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "generation": {
+            "title": "Generation",
+            "type": "string"
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/$defs/Branch"
+            },
+            "title": "Sections",
+            "type": "array"
+          }
+        },
+        "required": [
+          "generation",
+          "sections"
+        ],
+        "title": "Tree",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": null,
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "get_doc",
+      "title": null,
+      "description": "Read one exact document revision, including original sections.",
+      "inputSchema": {
+        "properties": {
+          "doc_id": {
+            "title": "Doc Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "doc_id",
+          "version"
+        ],
+        "title": "get_docArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "$defs": {
+          "Section": {
+            "additionalProperties": false,
+            "properties": {
+              "anchor": {
+                "title": "Anchor",
+                "type": "string"
+              },
+              "title": {
+                "title": "Title",
+                "type": "string"
+              },
+              "body": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Body",
+                "type": "array"
+              }
+            },
+            "required": [
+              "anchor",
+              "title",
+              "body"
+            ],
+            "title": "Section",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "Действует",
+              "Архив",
+              "Черновик"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "owner": {
+            "title": "Owner",
+            "type": "string"
+          },
+          "visibility": {
+            "enum": [
+              "cloud_ok",
+              "local_only"
+            ],
+            "title": "Visibility",
+            "type": "string"
+          },
+          "path": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Path",
+            "type": "array"
+          },
+          "replaces": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Replaces"
+          },
+          "links": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/$defs/Section"
+            },
+            "title": "Sections",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "title",
+          "status",
+          "date",
+          "owner",
+          "visibility",
+          "path",
+          "replaces",
+          "links",
+          "sections"
+        ],
+        "title": "Document",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": null,
+      "meta": null,
+      "execution": null
+    },
+    {
+      "name": "search_docs",
+      "title": null,
+      "description": "Search filtered sections and return unique revision cards and source anchors.",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "limit": {
+            "default": 5,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Path"
+          },
+          "statuses": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Statuses"
+          },
+          "doc_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Doc Id"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Version"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "search_docsArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "$defs": {
+          "Card": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "title": "Id",
+                "type": "string"
+              },
+              "version": {
+                "title": "Version",
+                "type": "string"
+              },
+              "title": {
+                "title": "Title",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "Действует",
+                  "Архив",
+                  "Черновик"
+                ],
+                "title": "Status",
+                "type": "string"
+              },
+              "visibility": {
+                "enum": [
+                  "cloud_ok",
+                  "local_only"
+                ],
+                "title": "Visibility",
+                "type": "string"
+              },
+              "path": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Path",
+                "type": "array"
+              },
+              "links": {
+                "items": {
+                  "type": "string"
+                },
+                "title": "Links",
+                "type": "array"
+              },
+              "rank": {
+                "title": "Rank",
+                "type": "integer"
+              },
+              "fragments": {
+                "items": {
+                  "$ref": "#/$defs/Fragment"
+                },
+                "maxItems": 3,
+                "title": "Fragments",
+                "type": "array"
+              }
+            },
+            "required": [
+              "id",
+              "version",
+              "title",
+              "status",
+              "visibility",
+              "path",
+              "links",
+              "rank",
+              "fragments"
+            ],
+            "title": "Card",
+            "type": "object"
+          },
+          "Fragment": {
+            "additionalProperties": false,
+            "properties": {
+              "anchor": {
+                "title": "Anchor",
+                "type": "string"
+              },
+              "chunk_id": {
+                "title": "Chunk Id",
+                "type": "string"
+              },
+              "heading": {
+                "title": "Heading",
+                "type": "string"
+              },
+              "text": {
+                "title": "Text",
+                "type": "string"
+              },
+              "rank": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "title": "Rank"
+              }
+            },
+            "required": [
+              "anchor",
+              "chunk_id",
+              "heading",
+              "text",
+              "rank"
+            ],
+            "title": "Fragment",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "generation": {
+            "title": "Generation",
+            "type": "string"
+          },
+          "cards": {
+            "items": {
+              "$ref": "#/$defs/Card"
+            },
+            "maxItems": 10,
+            "title": "Cards",
+            "type": "array"
+          }
+        },
+        "required": [
+          "generation",
+          "cards"
+        ],
+        "title": "SearchSnapshot",
+        "type": "object"
+      },
+      "icons": null,
+      "annotations": null,
+      "meta": null,
+      "execution": null
+    }
+  ],
+  "missing_revision": "tool_error",
+  "controls": [
+    {
+      "id": "K01",
+      "documents": [
+        "B-01@1.2",
+        "M-05@2.0",
+        "B-02@1.2",
+        "A-03@1.1",
+        "P-01@1.4"
+      ],
+      "generation": "bd874cfa72e986c9"
+    },
+    {
+      "id": "K02",
+      "documents": [
+        "M-05@1.1"
+      ],
+      "generation": "bd874cfa72e986c9"
+    },
+    {
+      "id": "K03",
+      "documents": [
+        "P-05@0.8",
+        "M-05@2.0",
+        "S-05@1.2",
+        "P-01@1.4",
+        "O-01@1.2"
+      ],
+      "generation": "bd874cfa72e986c9"
+    },
+    {
+      "id": "K04",
+      "documents": [
+        "B-06@1.0",
+        "P-02@1.2",
+        "P-06@1.1",
+        "B-04@1.1",
+        "P-01@1.4"
+      ],
+      "generation": "bd874cfa72e986c9"
+    },
+    {
+      "id": "K05",
+      "documents": [
+        "P-03@1.3",
+        "B-05@1.2",
+        "P-02@1.2",
+        "B-04@1.1",
+        "B-06@1.0"
+      ],
+      "generation": "bd874cfa72e986c9"
+    },
+    {
+      "id": "K06",
+      "documents": [
+        "B-05@1.2",
+        "A-05@1.2",
+        "P-03@1.3",
+        "B-06@1.0",
+        "O-06@1.1"
+      ],
+      "generation": "bd874cfa72e986c9"
+    },
+    {
+      "id": "K07",
+      "documents": [
+        "P-04@1.1",
+        "P-01@1.4",
+        "P-02@1.2",
+        "B-06@1.0",
+        "B-04@1.1"
+      ],
+      "generation": "bd874cfa72e986c9"
+    },
+    {
+      "id": "K08",
+      "documents": [
+        "B-04@1.1",
+        "P-01@1.4",
+        "P-03@1.3",
+        "M-05@2.0",
+        "M-03@1.0"
+      ],
+      "generation": "bd874cfa72e986c9"
+    }
+  ]
+}

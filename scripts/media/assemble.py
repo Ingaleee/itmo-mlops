@@ -41,6 +41,15 @@ def main():
         executable = imageio_ffmpeg.get_ffmpeg_exe()
     pages = json.loads((MEDIA / "sources/pages.json").read_text(encoding="utf-8"))
     manifest = {"format": "Browser screenshots and screen walkthroughs", "images": [], "videos": []}
+    # Each laboratory owns its media. Regenerating the original two projects
+    # must preserve independently produced galleries of later laboratories.
+    previous_path = MEDIA / "manifest.json"
+    if previous_path.exists():
+        previous = json.loads(previous_path.read_text(encoding="utf-8"))
+        owned = {video["lab"] for video in WALKTHROUGHS}
+        manifest["images"].extend(item for item in previous.get("images", [])
+                                  if item["file"].split('/')[0] not in owned | {"shared"})
+        manifest["videos"].extend(item for item in previous.get("videos", []) if item["lab"] not in owned)
     for page in pages:
         path = MEDIA / page["lab"] / (page["slug"] + ".jpg")
         with Image.open(path) as im:

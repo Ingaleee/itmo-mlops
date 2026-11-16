@@ -66,7 +66,14 @@ def main():
             r"[a-z0-9./_-]+@sha256:[0-9a-f]{64}", image
         ):
             raise SystemExit("Teaching images must be immutable SHA-256 references")
-    command = ["kubectl", "--kubeconfig", args.kubeconfig, "-n", args.namespace]
+    command = [
+        "kubectl",
+        "--request-timeout=20s",
+        "--kubeconfig",
+        args.kubeconfig,
+        "-n",
+        args.namespace,
+    ]
     docs = resources(
         args.app_image, args.ollama_image, args.local, args.image_pull_secret
     )
@@ -87,9 +94,10 @@ def main():
                         "rollout",
                         "status",
                         "deployment/" + name,
-                        "--timeout=10m",
+                        "--timeout=8m",
                     ],
                     check=True,
+                    timeout=500,
                 )
     print(
         json.dumps(

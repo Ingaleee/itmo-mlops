@@ -1,0 +1,10 @@
+{
+  "runtime": "native Windows Ollama 0.40.16",
+  "model": "Qwen3-4B-Instruct-2507 Q4_K_M",
+  "cancelled_client_ms": 1,
+  "next_request_ms": 4275,
+  "next_done": true,
+  "next_final_answer": "OK",
+  "gpu_layers": 0,
+  "context": 2048
+}
