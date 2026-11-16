@@ -24,7 +24,7 @@ async def verify(args):
         }
 
     async with httpx.AsyncClient(
-        base_url=args.base_url, trust_env=False, timeout=95
+        base_url=args.base_url, trust_env=False, timeout=200
     ) as http:
         login = await http.post(
             "/api/login",

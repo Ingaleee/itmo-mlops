@@ -86,7 +86,7 @@ def main():
         assert set(args.cases) <= {c["id"] for c in cases}
         cases = [c for c in cases if c["id"] in args.cases]
     results = []
-    with httpx.Client(timeout=95, trust_env=False, follow_redirects=False) as http:
+    with httpx.Client(timeout=200, trust_env=False, follow_redirects=False) as http:
         login = http.post(
             args.base_url + "/api/login",
             json={

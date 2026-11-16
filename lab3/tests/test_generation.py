@@ -37,6 +37,13 @@ def test_retry_http_date():
     assert retry_delay("Fri, 13 Nov 2026 10:00:00", 60) == 60
 
 
+@pytest.mark.parametrize("value", ["0", "181", "invalid"])
+def test_invalid_operator_budget_stops_startup(monkeypatch, value):
+    monkeypatch.setenv("LOCAL_BUDGET_SECONDS", value)
+    with pytest.raises(ValueError):
+        ModelGateway()
+
+
 @pytest.mark.parametrize(
     "kind,status,code,pause,expected",
     [

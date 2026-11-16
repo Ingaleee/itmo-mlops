@@ -32,6 +32,7 @@ CPU-контейнер переносит бинарный файл и библ�
 | CLOUD_MODEL | Default mistral-Nemo-Instruct-2407 |
 | LOCAL_BASE_URL | Например http://127.0.0.1:11440/v1 |
 | LOCAL_MODEL | line-local |
+| LOCAL_BUDGET_SECONDS | CPU-вызов вместе с очередью: 105 с, допустимо 15–180 с |
 
 ```bash
 python -m uvicorn app.mcp_server:create_app --factory --host 127.0.0.1 --port 18080 --no-access-log
@@ -84,6 +85,8 @@ kubectl --kubeconfig /private/student.kubeconfig -n itmo-student-01 \
 ```
 
 5. Выполните MCP probe через временный port-forward и E2E каждого настоящего провайдера. Пересоздайте собственный Pod модели, дождитесь readiness и повторите генерацию. Снимите ресурсы в idle и под нагрузкой. Одних probes недостаточно.
+
+`python scripts/verify_runtime.py --portal-token-file /private/portal.token --output evidence/runtime.json` проверяет настоящую CPU-очередь: одно активное место, одно ожидающее, отказ третьему запросу, отмену обоих и следующий ответ на К01 с фильтром по подразделу. Для него требуется уже готовая модель; облачные запросы не выполняются.
 
 Публичный HTTP Gateway для закрытой базы не создаётся. Для внешней публикации нужен TLS-профиль и проверка доступа.
 

@@ -230,7 +230,9 @@ def create_app():
         work = asyncio.create_task(generate(body, request))
         disconnect = asyncio.create_task(disconnected())
         try:
-            async with asyncio.timeout(92):
+            async with asyncio.timeout(
+                gateway.cloud_timeout + gateway.local_budget + 5
+            ):
                 done, _ = await asyncio.wait(
                     {work, disconnect}, return_when=asyncio.FIRST_COMPLETED
                 )

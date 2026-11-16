@@ -68,6 +68,9 @@ class ModelGateway:
         ).rstrip("/")
         self.local_model = os.getenv("LOCAL_MODEL", "line-local")
         self.cloud_timeout = 12
+        self.local_budget = int(os.getenv("LOCAL_BUDGET_SECONDS", "105"))
+        if not 15 <= self.local_budget <= 180:
+            raise ValueError("LOCAL_BUDGET_SECONDS must be between 15 and 180")
         self.circuit = CloudCircuit()
         self.local_slot = asyncio.Semaphore(1)
         self.admission_lock = asyncio.Lock()
@@ -102,7 +105,7 @@ class ModelGateway:
         # No SDK retries, redirects, environment proxy or provider logging of body.
         try:
             async with httpx.AsyncClient(
-                timeout=72 if local else self.cloud_timeout,
+                timeout=self.local_budget - 3 if local else self.cloud_timeout,
                 trust_env=False,
                 follow_redirects=False,
             ) as http:
@@ -162,7 +165,7 @@ class ModelGateway:
                 raise ProviderFailure("local_capacity")
             self.admitted += 1
         try:
-            async with asyncio.timeout(75):
+            async with asyncio.timeout(self.local_budget):
                 async with self.local_slot:
                     return await self.generate(messages, local=True)
         except TimeoutError as error:
