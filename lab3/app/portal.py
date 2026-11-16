@@ -221,8 +221,11 @@ def create_app():
     @app.post("/api/ask")
     async def ask(body: Query, request: Request):
         async def disconnected():
-            while not await request.is_disconnected():
-                await asyncio.sleep(0.1)
+            # FastAPI has consumed the JSON body. Wait for the ASGI disconnect
+            # directly: is_disconnected's cancelled polling cannot traverse
+            # BaseHTTPMiddleware's receive task group reliably.
+            while (await request.receive())["type"] != "http.disconnect":
+                pass
 
         work = asyncio.create_task(generate(body, request))
         disconnect = asyncio.create_task(disconnected())

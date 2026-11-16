@@ -48,6 +48,7 @@ export MCP_SERVICE_TOKEN
   python scripts/probe_mcp.py
   python scripts/check_privacy.py testing/public-corpus.json
   python scripts/verify_portal.py --route local --portal-token-file "$RUNNER_TEMP/portal.token" --output evidence/kubernetes/control-answers.json
+  python scripts/verify_runtime.py --portal-token-file "$RUNNER_TEMP/portal.token" --output evidence/kubernetes/queue-and-filter.json
 )
 kubectl -n "$namespace" exec deployment/llm-local -- sh -c 'cat /sys/fs/cgroup/memory.current /sys/fs/cgroup/memory.peak /sys/fs/cgroup/memory.events /sys/fs/cgroup/cpu.stat' > lab3/evidence/kubernetes/resources-after-generation.txt
 kubectl -n "$namespace" delete pod -l app=llm-local --wait=true

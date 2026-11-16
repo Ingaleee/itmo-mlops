@@ -1,9 +1,14 @@
 import copy
 import json
+import asyncio
+import socket
+import threading
+import time
 
 import httpx
 import pytest
 from fastapi.testclient import TestClient
+import uvicorn
 
 from app.mcp_client import MCPClient
 from app.portal import create_app
@@ -147,3 +152,85 @@ def test_doc_page_is_shell_and_missing_exact_revision_is_not_substituted(
     response = client.get("/docs/M-05/9.9")
     assert response.status_code == 200 and "document-view" in response.text
     assert client.get("/api/docs/M-05/9.9").status_code == 404
+
+
+def test_real_http_disconnect_releases_active_and_waiting_requests(portal):
+    _, _, _, app = portal
+    gateway = app.state.gateway
+    finish = threading.Event()
+    cancelled = []
+
+    async def generate(messages, local=False):
+        try:
+            while not finish.is_set():
+                await asyncio.sleep(0.01)
+            return "Synthetic fact. [1]"
+        except asyncio.CancelledError:
+            cancelled.append(True)
+            raise
+
+    gateway.generate = generate
+    listener = socket.socket()
+    listener.bind(("127.0.0.1", 0))
+    port = listener.getsockname()[1]
+    server = uvicorn.Server(
+        uvicorn.Config(
+            app, loop="asyncio", lifespan="off", access_log=False, log_level="error"
+        )
+    )
+    thread = threading.Thread(
+        target=server.run, kwargs={"sockets": [listener]}, daemon=True
+    )
+    thread.start()
+    sockets = []
+
+    def until(predicate):
+        deadline = time.monotonic() + 3
+        while not predicate():
+            assert time.monotonic() < deadline, (
+                "HTTP cancellation did not release admission"
+            )
+            time.sleep(0.01)
+
+    def pending_request():
+        connection = socket.create_connection(("127.0.0.1", port), timeout=2)
+        sockets.append(connection)
+        body = json.dumps({"query": "Synthetic question", "private": True}).encode()
+        headers = (
+            f"POST /api/ask HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\n"
+            "Content-Type: application/json\r\n"
+            "Cookie: portal_session=synthetic-portal-token-12345678\r\n"
+            f"Content-Length: {len(body)}\r\n\r\n"
+        ).encode()
+        connection.sendall(headers + body)
+        return connection
+
+    try:
+        until(lambda: server.started)
+        active = pending_request()
+        until(lambda: gateway.admitted == 1)
+        waiting = pending_request()
+        until(lambda: gateway.admitted == 2)
+        with httpx.Client(
+            base_url=f"http://127.0.0.1:{port}", timeout=3, trust_env=False
+        ) as http:
+            http.cookies.set("portal_session", "synthetic-portal-token-12345678")
+            overloaded = http.post("/api/ask", json={"query": "Third", "private": True})
+            assert overloaded.json()["reason"] == "private_context:local_capacity"
+            waiting.close()
+            until(lambda: gateway.admitted == 1)
+            active.close()
+            until(lambda: gateway.admitted == 0)
+            assert len(cancelled) == 1
+            finish.set()
+            response = http.post("/api/ask", json={"query": "Next", "private": True})
+            assert response.json()["mode"] == "local"
+            assert response.headers["x-request-id"] == response.json()["request_id"]
+    finally:
+        for connection in sockets:
+            connection.close()
+        finish.set()
+        server.should_exit = True
+        thread.join(timeout=5)
+        listener.close()
+        assert not thread.is_alive()
