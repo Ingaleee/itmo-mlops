@@ -25,7 +25,7 @@ Storage/PVC не ограничены ключами namespace ResourceQuota. Э
 | Профиль | CPU limits | Memory limits |
 |---|---|---|
 | Iris + Search staging + Search production | 600m | 2048Mi |
-| Knowledge Portal: Ollama + MCP + portal | 2200m | 3584Mi |
+| Knowledge Portal: Ollama + MCP + portal | 2200m | 3712Mi |
 
 Первые две работы помещаются одновременно. Третий профиль запускается отдельно: все три с полными лимитами превышают квоту памяти. Переключение описано в [RUNBOOK](../lab3/RUNBOOK.md#kubernetes). Общая квота и чужие ресурсы не изменяются.
 

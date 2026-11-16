@@ -23,7 +23,7 @@ def test_teaching_budget_is_below_actual_4G_quota():
             cpu += int(limits["cpu"][:-1])
             memory += int(limits["memory"][:-2]) * 1024**2
             assert container["securityContext"]["readOnlyRootFilesystem"]
-    assert cpu == 2200 and memory == 3758096384
+    assert cpu == 2200 and memory == 3892314112
     assert cpu <= 2600 and memory < 4_000_000_000
     assert all(
         d.get("spec", {}).get("type") not in {"NodePort", "LoadBalancer"} for d in docs

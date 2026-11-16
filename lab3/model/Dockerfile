@@ -1,6 +1,7 @@
 FROM ollama/ollama@sha256:910d0d8107b538fb0894e63163eb195de0cc7aefcbc666dc62d3b18f71124592 AS upstream
-# Keep only CPU libraries from the official distribution; no CUDA/Vulkan payload.
-RUN mkdir -p /cpu/lib && cp -a /usr/lib/ollama/*.so* /cpu/lib/ && cp /usr/lib/ollama/llama-server /cpu/lib/ && cp /usr/lib/ollama/*LICENSE* /cpu/lib/
+# Keep CPU libraries, excluding the AMX variant whose repacked tensors exceed
+# this profile's memory budget. Other CPU variants retain runtime detection.
+RUN mkdir -p /cpu/lib && cp -a /usr/lib/ollama/*.so* /cpu/lib/ && rm /cpu/lib/libggml-cpu-sapphirerapids.so && cp /usr/lib/ollama/llama-server /cpu/lib/ && cp /usr/lib/ollama/*LICENSE* /cpu/lib/
 FROM ubuntu@sha256:2198e4c65076e9cb0b3d695219df667c0e3b0072da64ca3c2648aca17dcecaf5
 COPY --from=upstream /usr/bin/ollama /usr/bin/ollama
 COPY --from=upstream /cpu/lib/ /usr/lib/ollama/

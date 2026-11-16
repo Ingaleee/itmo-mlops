@@ -283,7 +283,7 @@ spec:
           resources:
             {
               requests: { cpu: 1000m, memory: 2560Mi },
-              limits: { cpu: 1800m, memory: 3072Mi },
+              limits: { cpu: 1800m, memory: 3200Mi },
             }
           startupProbe:
             {
