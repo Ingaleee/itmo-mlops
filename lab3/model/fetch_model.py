@@ -2,6 +2,7 @@
 
 import hashlib
 import argparse
+import os
 from pathlib import Path
 import urllib.request
 
@@ -35,6 +36,13 @@ def main():
         for block in iter(lambda: response.read(4 * 1024 * 1024), b""):
             file.write(block)
             downloaded += len(block)
+            # Dirty page cache is charged to the init container as well. Bound
+            # it while downloading multi-GB weights under a cgroup memory limit.
+            if downloaded % (32 * 1024 * 1024) == 0:
+                file.flush()
+                os.fsync(file.fileno())
+                if hasattr(os, "posix_fadvise"):
+                    os.posix_fadvise(file.fileno(), 0, 0, os.POSIX_FADV_DONTNEED)
             if downloaded % (128 * 1024 * 1024) == 0:
                 print(f"Downloaded {downloaded // 1024 // 1024} MiB", flush=True)
     if checksum(temporary) != SHA256:

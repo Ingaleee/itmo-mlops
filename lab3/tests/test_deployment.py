@@ -51,6 +51,22 @@ def test_model_persists_and_mcp_is_independent():
     assert not any(d["kind"] == "HTTPRoute" for d in docs)
 
 
+def test_init_budget_is_covered_by_the_model_pod_reservation():
+    docs = resources("app", "ollama")
+    llm = next(
+        d
+        for d in docs
+        if d["kind"] == "Deployment" and d["metadata"]["name"] == "llm-local"
+    )
+    pod = llm["spec"]["template"]["spec"]
+    main = pod["containers"][0]["resources"]["limits"]
+    for init in pod["initContainers"]:
+        limits = init["resources"]["limits"]
+        assert int(limits["cpu"][:-1]) <= int(main["cpu"][:-1])
+        assert int(limits["memory"][:-2]) <= int(main["memory"][:-2])
+    assert pod["initContainers"][0]["resources"]["limits"]["memory"] == "512Mi"
+
+
 def test_public_build_context_is_allowlist_without_corpus():
     root = Path(__file__).resolve().parents[1]
     ignore = (root / ".dockerignore").read_text()
