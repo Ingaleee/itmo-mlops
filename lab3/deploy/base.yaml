@@ -246,8 +246,14 @@ spec:
               daemon=$!
               trap 'kill "$daemon" 2>/dev/null || true' EXIT
               for i in $(seq 1 30); do ollama list >/dev/null 2>&1 && break; sleep 1; done
-              ollama create line-local -f /config/Modelfile >/tmp/import.log 2>&1
-          env: [{ name: OLLAMA_HOST, value: "127.0.0.1:11434" }]
+              if ! ollama create line-local -f /config/Modelfile >/tmp/import.log 2>&1; then
+                tail -n 30 /tmp/import-server.log /tmp/import.log >&2
+                exit 1
+              fi
+              ollama show line-local >/dev/null
+          env:
+            - { name: OLLAMA_HOST, value: "127.0.0.1:11434" }
+            - { name: OLLAMA_NOPRUNE, value: "1" }
           resources:
             {
               requests: { cpu: 50m, memory: 64Mi },
@@ -269,6 +275,10 @@ spec:
       containers:
         - name: ollama
           image: OLLAMA_IMAGE
+          env:
+            - { name: OLLAMA_NOPRUNE, value: "1" }
+            - { name: OLLAMA_KEEP_ALIVE, value: "-1" }
+            - { name: LLAMA_ARG_CACHE_RAM, value: "0" }
           ports: [{ name: http, containerPort: 11434 }]
           resources:
             {
@@ -277,9 +287,18 @@ spec:
             }
           startupProbe:
             {
-              exec: { command: [ollama, show, line-local] },
+              exec:
+                {
+                  command:
+                    [
+                      /bin/sh,
+                      -ec,
+                      'ollama run line-local "" </dev/null >/dev/null 2>&1',
+                    ],
+                },
               periodSeconds: 5,
-              failureThreshold: 60,
+              timeoutSeconds: 120,
+              failureThreshold: 3,
             }
           readinessProbe:
             { exec: { command: [ollama, show, line-local] }, periodSeconds: 10 }

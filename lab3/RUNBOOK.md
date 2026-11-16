@@ -72,7 +72,9 @@ python scripts/deploy.py --kubeconfig /private/student.kubeconfig \
   --ollama-image ghcr.io/ingaleee/esolovev-ollama-cpu@sha256:FULL_DIGEST
 ```
 
-PVC knowledge-models хранит веса и manifest Ollama. Init containers проверяют SHA и регистрируют модель. MCP получает корпус из Secret и строит индекс. Recreate не требует дополнительного Pod.
+PVC knowledge-models хранит веса и manifest Ollama. Init containers проверяют SHA, регистрируют модель и проверяют её чтение до read-only монтажа в основном контейнере. OLLAMA_NOPRUNE предотвращает удаление ещё не зарегистрированного GGUF при первом старте. MCP получает корпус из Secret и строит индекс. Recreate не требует дополнительного Pod.
+
+Startup probe [предзагружает модель](https://docs.ollama.com/faq#how-can-i-preload-a-model-into-ollama-to-get-faster-response-times) штатной командой Ollama; холодная загрузка завершается до готовности Pod. OLLAMA_KEEP_ALIVE=-1 удерживает единственную модель в выделенном сервисе. LLAMA_ARG_CACHE_RAM=0 отключает RAM-кеш завершённых промптов в llama-server: его стандартный предел 8 ГиБ несовместим с квотой этого профиля. Контекст активного запроса остаётся 2048 токенов. Измерения выполняются на серии разных вопросов, чтобы обнаружить накопление памяти.
 
 4. Откройте портал через localhost:
 

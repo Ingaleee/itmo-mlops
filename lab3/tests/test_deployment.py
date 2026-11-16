@@ -65,6 +65,15 @@ def test_init_budget_is_covered_by_the_model_pod_reservation():
         assert int(limits["cpu"][:-1]) <= int(main["cpu"][:-1])
         assert int(limits["memory"][:-2]) <= int(main["memory"][:-2])
     assert pod["initContainers"][0]["resources"]["limits"]["memory"] == "512Mi"
+    importer = pod["initContainers"][1]
+    assert {"name": "OLLAMA_NOPRUNE", "value": "1"} in importer["env"]
+    assert "ollama show line-local" in importer["args"][0]
+    assert {"name": "OLLAMA_NOPRUNE", "value": "1"} in pod["containers"][0]["env"]
+    runtime = pod["containers"][0]
+    assert {"name": "LLAMA_ARG_CACHE_RAM", "value": "0"} in runtime["env"]
+    assert {"name": "OLLAMA_KEEP_ALIVE", "value": "-1"} in runtime["env"]
+    assert 'ollama run line-local ""' in runtime["startupProbe"]["exec"]["command"][2]
+    assert runtime["startupProbe"]["timeoutSeconds"] == 120
 
 
 def test_public_build_context_is_allowlist_without_corpus():
