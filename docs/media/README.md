@@ -1,6 +1,6 @@
 # Демонстрационные материалы
 
-[Iris Classifier](../../lab1/DEMO.md) · [Runbook Search](../../lab2/DEMO.md) · [Проверки проекта](../validation.md)
+[Iris Classifier](../../lab1/DEMO.md) · [Runbook Search](../../lab2/DEMO.md) · [Knowledge Portal](../../lab3/DEMO.md) · [Проверки проекта](../validation.md)
 
 Материалы показывают фактические результаты реализации: HTTP-контракт, модель и индекс, контроль качества, CI/CD и Kubernetes. Галереи каждой лабораторной содержат подписи и ссылки на JSON-источники.
 

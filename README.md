@@ -1,6 +1,7 @@
 # MLOps Labs
 
 [![CI](https://github.com/Ingaleee/itmo-mlops/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Ingaleee/itmo-mlops/actions/workflows/ci-cd.yml)
+[![Knowledge Portal](https://github.com/Ingaleee/itmo-mlops/actions/workflows/lab3.yml/badge.svg)](https://github.com/Ingaleee/itmo-mlops/actions/workflows/lab3.yml)
 
 Практические проекты по эксплуатации систем машинного обучения. Каждый проект содержит отдельный сервис, модель, контейнер и проверки. Общий CI/CD связывает обучение, контроль качества, публикацию образов и развёртывание в Kubernetes.
 

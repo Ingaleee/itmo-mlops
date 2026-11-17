@@ -1,0 +1,54 @@
+{
+  "namespace": "itmo-student-01",
+  "snapshot": "own workloads after restoring labs 1/2 and stopping lab 3",
+  "workloads": [
+    {
+      "name": "esolovev-iris",
+      "replicas": 1,
+      "ready": 1,
+      "images": [
+        "ghcr.io/ingaleee/esolovev-iris@sha256:bb277f41820422e73cf96f41a50d2fb60df8b342901b0fcd836830337cfa8614"
+      ]
+    },
+    {
+      "name": "esolovev-search-staging-mlops-search",
+      "replicas": 1,
+      "ready": 0,
+      "images": [
+        "ghcr.io/ingaleee/esolovev-search@sha256:0224da03fdc96944210fe960aaecac479f5f479dd1df6e7c6f39c2ce2bd00bd0"
+      ]
+    },
+    {
+      "name": "kb-mcp",
+      "replicas": 0,
+      "ready": 0,
+      "images": [
+        "ghcr.io/ingaleee/esolovev-knowledge@sha256:a64d0e9752e1425e43bbe25a11b0075da560ae772b0d992cf602179887f8135f"
+      ]
+    },
+    {
+      "name": "knowledge-portal",
+      "replicas": 0,
+      "ready": 0,
+      "images": [
+        "ghcr.io/ingaleee/esolovev-knowledge@sha256:a64d0e9752e1425e43bbe25a11b0075da560ae772b0d992cf602179887f8135f"
+      ]
+    },
+    {
+      "name": "llm-local",
+      "replicas": 0,
+      "ready": 0,
+      "images": [
+        "ghcr.io/ingaleee/esolovev-ollama-cpu@sha256:9c6678cc739296e08d8fa687d57487ebb080bd4cfdb855f0b7290d9509d6cd1a"
+      ]
+    }
+  ],
+  "storage": [
+    {
+      "name": "knowledge-models",
+      "phase": "Bound",
+      "capacity": "5Gi",
+      "storageClass": "cloudru-ssd"
+    }
+  ]
+}

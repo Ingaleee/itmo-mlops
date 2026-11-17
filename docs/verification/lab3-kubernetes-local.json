@@ -1,0 +1,74 @@
+{
+  "status": "passed",
+  "environment": "isolated local k3d Linux Kubernetes, original corpus, localhost port-forward",
+  "profile_revision": "3c56acc8d0dadee02667fc70f9a54eaaf8bc7260",
+  "application_revision": "fe0ba907f37fe6060e121339c846b3d8a6224b1c",
+  "app_image": "ghcr.io/ingaleee/esolovev-knowledge@sha256:a64d0e9752e1425e43bbe25a11b0075da560ae772b0d992cf602179887f8135f",
+  "cpu_image": "itmo-lab3-ollama-cpu:dev, official Ollama 0.40.16 CPU binaries",
+  "weights_sha256": "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597",
+  "model": "Qwen3-4B-Instruct-2507 Q4_K_M",
+  "processor": "100% CPU",
+  "context_tokens": 2048,
+  "cases": 8,
+  "latency_ms": {
+    "min": 36566,
+    "median": 50450.0,
+    "max": 68813
+  },
+  "prompt_tokens_max": 972,
+  "resources": {
+    "limit_bytes": 3221225472,
+    "before": {
+      "memory_current_bytes": 3057733632,
+      "memory_peak_bytes": 3065335808,
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "usage_usec": 10802490,
+      "user_usec": 4498733,
+      "system_usec": 6303756,
+      "nr_periods": 106,
+      "nr_throttled": 15,
+      "throttled_usec": 123540,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "after_eight_answers": {
+      "memory_current_bytes": 3085791232,
+      "memory_peak_bytes": 3102179328,
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "usage_usec": 734000866,
+      "user_usec": 725936758,
+      "system_usec": 8064107,
+      "nr_periods": 4163,
+      "nr_throttled": 3825,
+      "throttled_usec": 29043886,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "measurement": "Linux cgroup v2, memory.current/memory.peak/memory.events/cpu.stat"
+  },
+  "restart": {
+    "pod_uid_before": "9230f869-a0bb-4f7a-a794-83e5da4b0d27",
+    "pod_uid_after": "acea9d2e-ad89-4da8-b691-33b7678f7b34",
+    "both_ready": true,
+    "unexpected_restarts": 0,
+    "weights_unchanged": true,
+    "after_restart_control": "K01",
+    "after_restart_latency_ms": 46261,
+    "status": "passed"
+  },
+  "boundaries": [
+    "local hostPath reuses a dedicated Docker volume; teaching PVC is verified separately",
+    "this image ran on a non-AMX workstation; later CPU image excludes AMX after the clean CI exposed its extra memory",
+    "no cloud credential transferred or cloud generation claimed in this Kubernetes run"
+  ]
+}

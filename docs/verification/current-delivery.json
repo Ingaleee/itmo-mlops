@@ -1,0 +1,39 @@
+{
+  "labs_1_2": {
+    "revision": "789b2b1edc4f0a8ede1ac591594535055424e210",
+    "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43422084305",
+    "iris_api": "passed on personal teaching cluster",
+    "search_staging": "blocked: node GHCR DNS/TLS image pull",
+    "production_and_rollback": "not reached on personal cluster",
+    "historical_complete_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/37905104404"
+  },
+  "lab_3": {
+    "revision": "2e9c53965dbf2685100f7dc2da5f9e68120bb050",
+    "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43981776796",
+    "unit_and_loopback_integration_tests": 62,
+    "native_cpu_controls": "8/8 passed",
+    "teaching_manifests": "server dry-run passed; PVC Bound; application startup blocked by GHCR TLS handshake timeout; third-profile replicas set to zero, previous lab replicas restored",
+    "cloud_full_control_set": "not passed; real cloud generation confirmed, some complex answers incomplete",
+    "previous_cpu_kubernetes_run": {
+      "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43975343298",
+      "revision": "3c56acc8d0dadee02667fc70f9a54eaaf8bc7260",
+      "weight_download": "verified 2497281120 bytes and SHA-256; init completed without restart",
+      "registration": "completed without restart",
+      "model": "AMX CPU backend repacks weights; OOMKilled at 3Gi before ready",
+      "correction": "exclude AMX backend from official CPU image; model limit 3200Mi, total stack 3712Mi < 4G",
+      "recheck": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43978470485"
+    },
+    "cloud_credential_on_teaching_cluster": "not installed; cloud path not verified in teaching namespace",
+    "pipeline_status": "success",
+    "local_linux_kubernetes": "8/8 CPU controls passed; new Pod UID, unchanged weights SHA-256, K01 after restart passed",
+    "local_linux_report": "lab3-kubernetes-local.json",
+    "local_filtered_runtime_check": "CPU budget exceeded on the workstation, safely returned search_only; full cancellation/filter flow passed in clean CI",
+    "images": {
+      "revision": "2e9c53965dbf2685100f7dc2da5f9e68120bb050",
+      "app": "ghcr.io/ingaleee/esolovev-knowledge@sha256:35798606e7d00d5818b56c7e0a1e42902cece411533155fff3ad16f41daf7943",
+      "ollama": "ghcr.io/ingaleee/esolovev-ollama-cpu@sha256:01cbe54ced5ed14fb5c0677155100f808e093518f5a726c8b1157553f32409e4"
+    },
+    "clean_ci_report": "lab3-kubernetes-ci.json",
+    "cpu_admission_cancellation_and_filtered_K01": "passed with real model in clean CI"
+  }
+}

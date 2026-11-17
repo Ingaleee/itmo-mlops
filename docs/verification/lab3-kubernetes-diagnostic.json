@@ -1,0 +1,32 @@
+{
+  "scope": "isolated CI Kubernetes, clean persistent volume, public acceptance corpus",
+  "runs": [
+    {
+      "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43969237767",
+      "revision": "fe0ba907f37fe6060e121339c846b3d8a6224b1c",
+      "cause": "weight-download init OOMKilled at 128Mi",
+      "correction_revision": "12ed6fd5c352b20a255271fb3777cfcc0cd8f30c",
+      "correction": "512Mi init plus fsync/posix_fadvise every 32MiB"
+    },
+    {
+      "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43975343298",
+      "revision": "3c56acc8d0dadee02667fc70f9a54eaaf8bc7260",
+      "weight_download": "verified 2497281120 bytes and SHA-256; init completed without restart",
+      "registration": "completed without restart",
+      "model": "AMX CPU backend repacks weights; OOMKilled at 3Gi before ready",
+      "correction": "exclude AMX backend from official CPU image; model limit 3200Mi, total stack 3712Mi < 4G",
+      "recheck": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43978470485"
+    }
+  ],
+  "local_runtime_corrections": {
+    "startup": "disable unreferenced blob pruning during import; read manifest before read-only mount; preload model before readiness",
+    "steady_load": "disable 8GiB cache of previous prompts; keep one model loaded"
+  },
+  "recheck": {
+    "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43978470485",
+    "revision": "38f0a977225fb54976c870f98a3cb74d70f13303",
+    "status": "success",
+    "control_answers_passed": 8,
+    "model_restart_control": "passed"
+  }
+}

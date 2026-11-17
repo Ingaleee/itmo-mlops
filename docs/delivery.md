@@ -104,4 +104,4 @@ Docker может использовать `pass` как credential store: се�
 
 ## Knowledge Portal
 
-Третья работа использует отдельный [workflow](../.github/workflows/lab3.yml): synthetic contracts/privacy/failover и сборка code-only приложения плюс CPU runtime. Он не получает закрытый корпус или llm7 token. Публикация образов не объявляется готовым deployment. Установка корпуса, credentials, PVC и сервисов выполняется напрямую из локального окружения по [RUNBOOK](../lab3/RUNBOOK.md).
+Третья работа использует отдельный [workflow](../.github/workflows/lab3.yml): контракты, privacy/failover, сборка code-only приложения и CPU runtime, затем изолированный Kubernetes с настоящей моделью и проверкой перезапуска. Он не получает закрытый корпус или llm7 token. Публикация образов не объявляется готовым deployment. Установка корпуса, credentials, PVC и сервисов выполняется напрямую из локального окружения по [RUNBOOK](../lab3/RUNBOOK.md).
