@@ -1,0 +1,177 @@
+{
+  "status": "passed",
+  "pipeline": {
+    "id": 44913702769,
+    "head_sha": "f472c9b3b62b8d7aa7be49952ffe4d73623227fe",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44913702769",
+    "run_attempt": 1
+  },
+  "release": {
+    "source_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44912169197",
+    "build_revision": "c4605187d09092a527499c8f5147c81b7db31f02",
+    "index_version": "1eed508a1515",
+    "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+    "iris": {
+      "source_repository": "ghcr.io/ingaleee/esolovev-iris",
+      "repository": "docker.io/inga1e/esolovev-iris",
+      "digest": "sha256:89cfda0d23e193c96b2d2d38338a9896359567f96f81cd71f7267d6582bf9114"
+    },
+    "search": {
+      "source_repository": "ghcr.io/ingaleee/esolovev-search",
+      "repository": "docker.io/inga1e/esolovev-search",
+      "digest": "sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1"
+    }
+  },
+  "source_pipeline": {
+    "id": 44912169197,
+    "head_sha": "c4605187d09092a527499c8f5147c81b7db31f02",
+    "conclusion": "success",
+    "html_url": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44912169197"
+  },
+  "manifests_identical": true,
+  "iris": {
+    "health": {
+      "status": "ready",
+      "model_version": "iris-v1"
+    },
+    "predictions": [
+      {
+        "features": [
+          5.1,
+          3.5,
+          1.4,
+          0.2
+        ],
+        "class_id": 0,
+        "model_version": "iris-v1"
+      },
+      {
+        "features": [
+          7.0,
+          3.2,
+          4.7,
+          1.4
+        ],
+        "class_id": 1,
+        "model_version": "iris-v1"
+      },
+      {
+        "features": [
+          6.3,
+          3.3,
+          6.0,
+          2.5
+        ],
+        "class_id": 2,
+        "model_version": "iris-v1"
+      }
+    ],
+    "invalid_inputs_rejected": 5
+  },
+  "promotion": {
+    "staging": {
+      "image": "docker.io/inga1e/esolovev-search@sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1",
+      "meta": {
+        "service": "runbook-search-api",
+        "service_version": "1.2.0",
+        "build_revision": "c4605187d09092a527499c8f5147c81b7db31f02",
+        "image_digest": "sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1",
+        "environment": "staging",
+        "ranking_mode": "normal",
+        "index_version": "1eed508a1515",
+        "model_type": "tfidf-word-char-cosine",
+        "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+        "documents": 12
+      }
+    },
+    "prod": {
+      "image": "docker.io/inga1e/esolovev-search@sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1",
+      "meta": {
+        "service": "runbook-search-api",
+        "service_version": "1.2.0",
+        "build_revision": "c4605187d09092a527499c8f5147c81b7db31f02",
+        "image_digest": "sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1",
+        "environment": "production",
+        "ranking_mode": "normal",
+        "index_version": "1eed508a1515",
+        "model_type": "tfidf-word-char-cosine",
+        "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+        "documents": 12
+      }
+    }
+  },
+  "rollback": {
+    "failure_stage": "semantic_smoke_failed",
+    "restored_revision": 5,
+    "rollback_verified": true,
+    "restored_digest": "sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1",
+    "cause": {
+      "kind": "semantic_quality",
+      "message": "release failed semantic quality: MRR=0.0, hit rate=0.0"
+    }
+  },
+  "reverse_quality": {
+    "ready": "ready",
+    "mrr": 0.0,
+    "query_hit_rate_at_3": 0.0
+  },
+  "production_history": [
+    {
+      "revision": 1,
+      "status": "superseded",
+      "description": "Install complete"
+    },
+    {
+      "revision": 2,
+      "status": "superseded",
+      "description": "Upgrade complete"
+    },
+    {
+      "revision": 3,
+      "status": "superseded",
+      "description": "Rollback to 1",
+      "rollback_revision": 1
+    },
+    {
+      "revision": 4,
+      "status": "superseded",
+      "description": "Upgrade complete"
+    },
+    {
+      "revision": 5,
+      "status": "superseded",
+      "description": "Upgrade complete"
+    },
+    {
+      "revision": 6,
+      "status": "superseded",
+      "description": "Upgrade complete"
+    },
+    {
+      "revision": 7,
+      "status": "superseded",
+      "description": "Rollback to 5",
+      "rollback_revision": 5
+    },
+    {
+      "revision": 8,
+      "status": "deployed",
+      "description": "Upgrade complete"
+    }
+  ],
+  "external_checks": {
+    "iris": "passed",
+    "search_staging": "passed",
+    "search_production": "passed"
+  },
+  "request_id": {
+    "direct_service": "client value preserved",
+    "shared_gateway": "edge UUID matches HTTP header and JSON body"
+  },
+  "artifacts": [
+    "dockerhub-staging-and-iris",
+    "dockerhub-production-and-rollback"
+  ]
+}

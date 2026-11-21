@@ -1,7 +1,7 @@
 {
   "service": "iris-api",
-  "build_revision": "2a820a01c2148d75e9fbcbc420dd64f2ec114ccc",
-  "image": "ghcr.io/ingaleee/esolovev-iris@sha256:bb255540fbd96a75acd40bd0f6c206c114591da75397f74b2359ce4b4b508e6b",
+  "build_revision": "c4605187d09092a527499c8f5147c81b7db31f02",
+  "image": "docker.io/inga1e/esolovev-iris@sha256:89cfda0d23e193c96b2d2d38338a9896359567f96f81cd71f7267d6582bf9114",
   "tests": {
     "passed": 18,
     "failures": 0,
@@ -55,5 +55,9 @@
     "embedded_auth": false,
     "authenticated_pull": "passed",
     "temporary_registry_credential_removed": true
-  }
+  },
+  "source_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44912169197",
+  "delivery_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44913702769",
+  "namespace": "itmo-student-01",
+  "url": "http://iris.itmo-student-01.mlops.goctf.online"
 }

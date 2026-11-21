@@ -1,21 +1,30 @@
 {
   "namespace": "itmo-student-01",
-  "snapshot": "own workloads after restoring labs 1/2 and stopping lab 3",
+  "snapshot": "audited Docker Hub delivery; labs 1/2 active, lab 3 stopped",
+  "delivery_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44913702769",
   "workloads": [
     {
       "name": "esolovev-iris",
       "replicas": 1,
       "ready": 1,
       "images": [
-        "ghcr.io/ingaleee/esolovev-iris@sha256:bb277f41820422e73cf96f41a50d2fb60df8b342901b0fcd836830337cfa8614"
+        "docker.io/inga1e/esolovev-iris@sha256:89cfda0d23e193c96b2d2d38338a9896359567f96f81cd71f7267d6582bf9114"
       ]
     },
     {
       "name": "esolovev-search-staging-mlops-search",
       "replicas": 1,
-      "ready": 0,
+      "ready": 1,
       "images": [
-        "ghcr.io/ingaleee/esolovev-search@sha256:0224da03fdc96944210fe960aaecac479f5f479dd1df6e7c6f39c2ce2bd00bd0"
+        "docker.io/inga1e/esolovev-search@sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1"
+      ]
+    },
+    {
+      "name": "esolovev-search-prod-mlops-search",
+      "replicas": 1,
+      "ready": 1,
+      "images": [
+        "docker.io/inga1e/esolovev-search@sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1"
       ]
     },
     {

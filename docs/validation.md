@@ -1,93 +1,89 @@
 # Проверки и результаты
 
-[Каталог проектов](../README.md) · [CI/CD](delivery.md)
+[Каталог проектов](../README.md) · [CI/CD](delivery.md) · [Учебный кластер](teaching-cluster.md)
 
-Результаты привязаны к build revision и digest проверенного релиза. Новая сборка получает собственные идентификаторы и CI artifacts.
+## Iris и Runbook Search
 
-Визуальные подтверждения: [Iris](../lab1/DEMO.md), [Search](../lab2/DEMO.md) и [Knowledge Portal](../lab3/DEMO.md). Галереи связывают скриншоты и видео с JSON-источниками; [манифест медиа](media/manifest.json) содержит SHA-256 файлов.
+[CI сборки](https://github.com/Ingaleee/itmo-mlops/actions/runs/44912169197) проверяет код, зависимости и опубликованные образы. [Поставка на учебный стенд](https://github.com/Ingaleee/itmo-mlops/actions/runs/44913702769) проверяет Iris, Search staging, production и восстановление после отказа качества в персональном namespace `itmo-student-01`.
 
-## Персональный учебный кластер
+| Проверка | Результат |
+|---|---|
+| Iris | 18 тестов; readiness, три класса и 5 внешних проверок невалидного ввода |
+| Search | 37 тестов; API, индекс, оценка качества и корреляция через Gateway |
+| Runtime-зависимости | 19 пакетов, 0 известных advisory; OpenTelemetry API 1.45.2 |
+| Качество поиска | 8 запросов; MRR@3 = 0.9375, query hit rate@3 = 1.0 |
+| Пороги задания | MRR@3 ≥ 0.85, Recall@3 ≥ 0.90 |
+| Macro recall@3 | 0.875; отдельная метрика доли найденных релевантных документов |
+| Docker Hub | OCI manifests совпадают по SHA-256 с исходными образами, включая SBOM/provenance |
+| Deployment | Iris и оба Search доступны; образы закреплены по digest |
+| Promotion | Staging и production используют одинаковые image, build revision, index и artifact SHA-256 |
+| Reverse-кандидат | Readiness успешен; MRR и query hit rate равны 0; semantic smoke отклоняет релиз |
+| Rollback | Восстановлена точная рабочая revision; повторный smoke успешен; история Helm сохранена |
+| Финальное состояние | Оба Search используют `normal` и один digest |
 
-[Запуск 43422084305](https://github.com/Ingaleee/itmo-mlops/actions/runs/43422084305), revision `789b2b1`: тесты, сборка и интеграция опубликованных образов в Kubernetes внутри CI прошли. Staging на `itmo-student-01` остановился до API-проверок: узел получает ImagePullBackOff, TLS handshake timeout и периодические ошибки DNS при скачивании образа.
+`Recall@3` в исходном задании означает долю запросов с релевантным документом в top-3. Macro recall приведён отдельно, чтобы не смешивать определения.
 
-При повторной попытке Iris прошёл внешнюю API-проверку, однако Search staging снова остановился на скачивании образа с DNS/TLS-ошибкой. Дополнительные credentials не требуются: анонимный pull этих образов подтверждён. Production и rollback на новом стенде не выполнялись. Следующие таблицы описывают сохранённый успешный релиз предыдущего стенда, а не доступность нового.
+### Доступные API
+
+| Сервис | Интерфейс | Проверяемый ответ |
+|---|---|---|
+| Iris | [OpenAPI](http://iris.itmo-student-01.mlops.goctf.online/docs) | `/health`, `/predict` |
+| Search staging | [OpenAPI](http://search-staging.itmo-student-01.mlops.goctf.online/docs) | `/meta`, `/v1/search` |
+| Search production | [OpenAPI](http://search.itmo-student-01.mlops.goctf.online/docs) | `/meta`, `/v1/search` |
+
+Прямой API сохраняет клиентский `X-Request-ID`. Общий Envoy назначает внешний UUID: Gateway-проверка требует его совпадения в заголовке и JSON. Оба пути сохраняют доказательства в `request-ids.json`; настройка общего Gateway не меняется.
+
+Readiness подтверждает загрузку индекса и доступность процесса. Корректность результатов подтверждается отдельными контрольными запросами. Поэтому healthy reverse-кандидат проваливает semantic smoke и вызывает откат.
+
+### Идентификаторы и доказательства
+
+Build revision: `c4605187d09092a527499c8f5147c81b7db31f02`. Поставка использует эту сборку без пересборки.
+
+```text
+Iris
+docker.io/inga1e/esolovev-iris@sha256:89cfda0d23e193c96b2d2d38338a9896359567f96f81cd71f7267d6582bf9114
+
+Search staging и production
+docker.io/inga1e/esolovev-search@sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1
+
+Search index: 1eed508a1515
+Artifact SHA-256: 3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed
+```
+
+| Отчёт | Что подтверждает |
+|---|---|
+| [Iris](verification/lab1.json) | HTTP-ответы, образ и credential store |
+| [Search](verification/lab2.json) | Качество, promotion, отрицательный контроль и Helm history |
+| [Поставка Docker Hub](verification/dockerhub-delivery.json) | Связь сборки, зеркалирования, учебного deployment и отката |
+| [Тесты и аудит](verification/ci.json) | 55 тестов и результаты проверки runtime-зависимостей |
+| [Ресурсы стенда](verification/teaching-workloads.json) | Снимок собственных Deployment и сохранённого PVC |
+
+Полные artifacts запуска поставки: `dockerhub-staging-and-iris` и `dockerhub-production-and-rollback`. Они содержат `/meta`, Deployment, ответы API, quality reports, отказ кандидата, rollback и Helm history. Исходный CI сохраняет `quality-and-contracts`, `immutable-images` и `local-kubernetes-integration`.
+
+`pass init`, Docker credential helper, login, зашифрованное хранение, authenticated pull и удаление временного credential подтверждены отдельно. В публичные отчёты входят только результаты. Docker Hub credential остаётся в локальном credential store, kubeconfig — в masked Actions secret.
 
 ## Knowledge Portal
 
-Проверки контрактов, приватности, отказов, настоящего MCP-процесса и отмены HTTP через TCP: 62 passed. На исходном корпусе независимый MCP-клиент подтвердил три tools, точные редакции и top-5 источников для К01–К08. Локальный privacy audit подтвердил происхождение всех восьми открытых контекстов и исключение закрытой цитаты, без внешних запросов.
-
-Настоящие генерации llm7.io и Ollama CPU выполнены через портал. Итоговый локальный CPU-прогон прошёл все 8 вопросов: latency 25,9–53,6 с, максимальный промпт 972 токена. [Машинный отчёт](verification/lab3-local.json) и [ответы с источниками](media/sources/knowledge-local-controls.json) сохраняют результаты. Облачная Nemo отвечала неполно на части сложных вопросов; этот прогон не считается прошедшим все 8 проверок. Синтетический mock не считается настоящим провайдером.
-
-[Скриншоты и видео портала](../lab3/DEMO.md) получены при реальном локальном запуске. В отдельном Linux Kubernetes на исходном корпусе прошли все восемь CPU-ответов: 36,6–68,8 с, контекст 2048 токенов, пик cgroup-памяти 2,89 ГиБ, OOM отсутствует. После пересоздания Pod SHA-256 весов сохранился, К01 снова прошёл за 46,3 с. [Отчёт ресурсов и перезапуска](verification/lab3-kubernetes-local.json) и [ответы с источниками](media/sources/knowledge-kubernetes-controls.json) относятся к собственному k3d с выделенным томом.
-
-На учебном кластере прошёл server dry-run, создан и подключён PVC 5Gi. Запуск приложений остановился на скачивании GHCR image с TLS handshake timeout. Третий профиль остановлен, прежние replicas Iris и Search восстановлены. [Состояние поставки](verification/current-delivery.json) и [снимок ресурсов](verification/teaching-workloads.json) отделяют эту незавершённую поставку от успешных изолированных проверок.
-
-## Iris Classifier
+[CI третьей работы](https://github.com/Ingaleee/itmo-mlops/actions/runs/43981776796), revision `2e9c53965dbf2685100f7dc2da5f9e68120bb050`, проверяет настоящий MCP-процесс, приватность, отказ и переключение провайдеров, очередь, отмену HTTP-запросов, CPU inference и сохранность модели после пересоздания Pod.
 
 | Проверка | Результат |
 |---|---|
-| Тесты | 18 passed |
-| `/live`, `/health` | Корректные ответы |
-| Предсказания | setosa / versicolor / virginica → 0 / 1 / 2 |
-| Некорректные входы | 5 внешних проверок с ответом 422 |
-| Kubernetes | Deployment доступен, образ закреплён по digest |
-| Credential store | pass init, login, шифрование, pull и cleanup подтверждены |
+| Контракты и интеграция | 62 теста прошли |
+| Исходный корпус, локальный CPU | 8/8 контрольных ответов, 25.9–53.6 с |
+| Исходный корпус, отдельный Linux Kubernetes | 8/8 ответов, 36.6–68.8 с; OOM отсутствует |
+| Чистый Kubernetes в CI | Пустой PVC, загрузка и SHA-256 весов; 8/8 CPU-ответов, 25.1–40.3 с |
+| Пересоздание Pod | Новый UID; прежний SHA-256 весов; следующий контрольный ответ успешен |
+| Очередь и отмена | Активный и ожидающий запросы отменяются; следующий ответ с фильтром прошёл на настоящей модели |
+| Приватность | В CI используется публичный fixture; исходная закрытая карточка и credentials не публикуются |
+| Облачный провайдер | Настоящая генерация подтверждена; часть сложных контрольных ответов неполна |
+| Учебный deployment | Полная проверка третьего профиля на учебном стенде не завершена; replicas остановлены |
 
-[Машинный отчёт](verification/lab1.json) · [Воспроизвести проверки](../lab1/README.md#проверки)
+CPU-стек укладывается в лимиты `2200m` и `3712Mi`, ниже фактической квоты `4G`. Он запускается отдельным профилем: совместный запуск всех трёх работ превышает квоту памяти. Ключ llm7 не установлен в учебный кластер, поэтому облачный маршрут там не подтверждён. На загруженном ноутбуке дополнительный фильтрованный запрос может превышать CPU-бюджет и возвращать `search_only`; этот результат не считается успешной генерацией.
 
-## Runbook Search
+Отчёты: [локальный CPU](verification/lab3-local.json), [Linux Kubernetes и PVC](verification/lab3-kubernetes-local.json), [полный Kubernetes CI](verification/lab3-kubernetes-ci.json). Команды запуска и переключения профилей — в [RUNBOOK](../lab3/RUNBOOK.md).
 
-| Проверка | Результат |
-|---|---|
-| Тесты | 31 passed |
-| Контрольные запросы | 8 в каждом окружении |
-| MRR@3 | 0.9375 при пороге 0.85 |
-| Recall@3 / query hit rate | 1.0 при пороге 0.90 |
-| Macro recall@3 | 0.875 |
-| API-контракт | Search, recommendations, request ID, validation, probes и metrics прошли |
-| Promotion | Digest, build revision, index и artifact SHA-256 двух окружений совпадают |
-| Reverse-кандидат | Readiness успешен, качество 0 / 0, кандидат отклонён |
-| Rollback | Восстановлена рабочая revision; повторная проверка успешна |
-| Итоговое состояние | Оба окружения используют `normal` и один digest |
+## Визуальные материалы
 
-Последовательность production revisions: `normal → reverse → rollback → normal`. История релиза сохранена.
+[Iris](../lab1/DEMO.md), [Search](../lab2/DEMO.md) и [Knowledge Portal](../lab3/DEMO.md) содержат реальные снимки и видеообзоры. Источник и проверяемый выпуск указаны в подписях: сохранённый снимок не является мониторингом кластера. [Манифест](media/manifest.json) содержит SHA-256 медиа.
 
-[Машинный отчёт](verification/lab2.json) · [Воспроизвести проверки](../lab2/README.md#проверки)
-
-## CI и безопасность
-
-Для Iris и Search прошли **49 тестов**, без failures и errors. Аудит их закреплённых runtime-зависимостей: **19 пакетов, 0 известных advisory**. Проверки Knowledge Portal приведены отдельно выше. Gitleaks не обнаружил секретов в проверенной Git-истории.
-
-Проверки относятся к указанным артефактам и запуску. Актуальные результаты новых сборок доступны в [Actions](https://github.com/Ingaleee/itmo-mlops/actions).
-
-- [Pipeline с развёртыванием и rollback](https://github.com/Ingaleee/itmo-mlops/actions/runs/37905104404).
-- [CI: тесты, сборка и интеграция опубликованных образов](https://github.com/Ingaleee/itmo-mlops/actions/runs/38043253544).
-- [Машинный отчёт тестов и аудита](verification/ci.json).
-
-Состав полных artifacts описан в [CI/CD](delivery.md#артефакты).
-
-## Идентификаторы релиза
-
-Build revision: `2a820a01c2148d75e9fbcbc420dd64f2ec114ccc`.
-
-```text
-Iris image
-ghcr.io/ingaleee/esolovev-iris@sha256:bb255540fbd96a75acd40bd0f6c206c114591da75397f74b2359ce4b4b508e6b
-
-Search image
-ghcr.io/ingaleee/esolovev-search@sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75
-
-Search index
-1eed508a1515
-
-Search artifact SHA-256
-3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed
-```
-
-## Чистый Kubernetes в CI
-
-[Изолированный CI](https://github.com/Ingaleee/itmo-mlops/actions/runs/43975343298) подтвердил скачивание 2 497 281 120 байт с правильным SHA-256 и регистрацию модели без рестартов init containers. На процессоре runner выбранный AMX backend превысил 3 ГиБ при загрузке. CPU-образ исключает этот вариант; остальные официальные CPU backend выбираются автоматически. Новый предел модели 3200Mi, всего стека 3712Mi, ниже квоты 4G.
-
-[Повторная проверка](https://github.com/Ingaleee/itmo-mlops/actions/runs/43978470485) успешно прошла полный путь на пустом PVC: загрузку, MCP, восемь CPU-ответов (25,3–40,3 с) и генерацию после пересоздания Pod. OOM отсутствует. [Диагностика](verification/lab3-kubernetes-diagnostic.json) связывает исправления с повторной проверкой.
-
-Дополнительный тест обнаружил потерю сигнала HTTP disconnect при опросе через middleware. Backend теперь ожидает ASGI disconnect после чтения тела. Настоящий TCP-тест подтверждает освобождение активного и ожидающего мест; прежняя реализация этот тест проваливает. [CI с проверкой очереди](https://github.com/Ingaleee/itmo-mlops/actions/runs/43979922465) успешно выполнил отмену активного и ожидающего запросов, отказ третьему и следующий К01 с фильтром по подразделу за 36,0 с. На ноутбуке этот дополнительный запрос превысил CPU-бюджет и корректно перешёл в search_only; такой результат не считается прошедшей генерацией. [Итоговый CI](https://github.com/Ingaleee/itmo-mlops/actions/runs/43981776796), revision `2e9c539`, завершился успешно: 62 теста, сборка обоих образов, все восемь CPU-ответов, очередь/отмена, фильтрованный К01 и генерация после пересоздания Pod. [Полный машинный результат](verification/lab3-kubernetes-ci.json) содержит digest, контрольные ответы, cgroup-замеры и проверку PVC.
+Технические проверки подтверждают указанные ревизии и сценарии. Отметку о приёмке выставляет преподаватель.

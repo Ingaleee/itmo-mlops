@@ -24,10 +24,10 @@
 
 ## Публикуемые образы
 
-| Сервис | Repository | Tags |
-|---|---|---|
-| Iris | `ghcr.io/ingaleee/esolovev-iris` | Commit SHA, дополнительно `v1` |
-| Search | `ghcr.io/ingaleee/esolovev-search` | Commit SHA |
+| Сервис | Исходный repository | Зеркало учебного релиза | Tags |
+|---|---|---|---|
+| Iris | `ghcr.io/ingaleee/esolovev-iris` | `docker.io/inga1e/esolovev-iris` | Commit SHA, дополнительно `v1` |
+| Search | `ghcr.io/ingaleee/esolovev-search` | `docker.io/inga1e/esolovev-search` | Commit SHA |
 
 Tags позволяют найти сборку; Kubernetes получает `repository@sha256:digest`. Artifact `immutable-images` содержит digest каждого образа и build revision. Сборка сохраняет SBOM и provenance; базовый Python image и Actions закреплены неизменяемыми идентификаторами.
 
@@ -56,6 +56,10 @@ kubectl -n itmo-student-01 auth can-i get deployments
 ```
 
 ## Запуск deployment
+
+Для проверенного Docker Hub релиза используйте Actions → **Teaching cluster delivery** → **Run workflow**, ветка `main`. Workflow проверяет зеркала, устанавливает Iris и Search staging, ожидает production approval и выполняет проверку отката. Результаты и точный манифест приведены в [проверках проекта](validation.md). Docker Hub login в Actions не требуется.
+
+Основной workflow также поддерживает поставку непосредственно из GHCR:
 
 1. Открыть Actions → **ITMO MLOps labs** → **Run workflow**.
 2. Выбрать `main` и включить `deploy`.
@@ -117,6 +121,8 @@ Docker может использовать `pass` как credential store: се�
 | `local-kubernetes-integration` | API, Deployment и rollback во временном CI-кластере |
 | `staging-and-iris-evidence` | Deployment и внешние проверки постоянного staging и Iris |
 | `production-promotion-and-rollback` | `/meta`, promotion, Helm history, отказ кандидата и восстановление |
+| `dockerhub-staging-and-iris` | Неизменность Docker Hub зеркал, Iris, Search staging и Gateway API |
+| `dockerhub-production-and-rollback` | Зеркало, promotion, exact rollback, история Helm и production Gateway API |
 | `registry-credential-evidence` | Несекретный отчёт credential store и cleanup в CI |
 
 Полные доказательства остаются в artifacts конкретного запуска. В репозитории публикуются только [краткие результаты](validation.md) без credentials и истории настройки доступа.

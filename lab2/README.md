@@ -4,6 +4,8 @@
 
 Сервис поиска по инженерной базе знаний. Retrieval-модель входит в контейнер, а выпуск в Kubernetes проходит проверки API и качества поиска. Одна сборка продвигается из staging в production; ухудшение ранжирования запускает rollback.
 
+[Production API](http://search.itmo-student-01.mlops.goctf.online/docs) · [Staging API](http://search-staging.itmo-student-01.mlops.goctf.online/docs) · [Проверенный релиз](../docs/verification/lab2.json)
+
 ## Демонстрация
 
 [Галерея скриншотов и видео](DEMO.md) показывает поиск, рекомендации, трассировку и метрики, воспроизводимость индекса, quality gate, совпадение staging/production и проверенный rollback. У снимков доступны исходные данные.
@@ -105,7 +107,7 @@ python scripts/check_chart.py
 
 `recall_at_3` в контракте задания означает долю запросов с релевантным документом в top-3. Отчёт отдельно содержит `hit_rate_at_3` и полноту по каждому запросу, усреднённую как `macro_recall_at_3`.
 
-Подтверждены **31 тест**, восемь контрольных запросов в каждом окружении, совпадение релизов и rollback — [отчёт](../docs/validation.md#runbook-search).
+Подтверждены **37 тестов**, восемь контрольных запросов в каждом окружении, совпадение релизов и rollback — [отчёт](../docs/validation.md#iris-и-runbook-search).
 
 ## Docker
 

@@ -8,6 +8,19 @@ API, тесты и сборка индекса записаны при лока�
 
 Скриншоты сняты в браузере: интерфейсы OpenAPI и GitHub показаны напрямую, остальные результаты — в [просмотрщике](../docs/media/index.html). Видео составлены из последовательности экранов просмотрщика; анимация в Markdown служит предпросмотром MP4. Все отображаемые ответы и метрики получены из реальных запусков.
 
+## Текущий учебный релиз
+
+[Успешная поставка](https://github.com/Ingaleee/itmo-mlops/actions/runs/44913702769) устанавливает один Docker Hub digest в staging и production. [Отчёт](../docs/verification/dockerhub-delivery.json) связывает исходную сборку, идентичность OCI manifests, ответы двух окружений и настоящий rollback. [Открыть production API](http://search.itmo-student-01.mlops.goctf.online/docs).
+
+| Этап | Подтверждение |
+|---|---|
+| Рабочая версия | Revision 5, `normal`, MRR 0.9375 и query hit rate 1.0 |
+| Плохой кандидат | Revision 6, `reverse`, Ready, качество 0/0, отказ `semantic_quality` |
+| Откат | Revision 7 восстанавливает revision 5 и её точный digest |
+| Финальная проверка | Revision 8, `normal`; один image, index и artifact SHA-256 со staging |
+
+Полные `/meta`, quality reports, request IDs, Helm history и логи восстановления находятся в artifacts `dockerhub-production-and-rollback`. Снимки ниже относятся к выпускам, указанным в их источниках.
+
 ## Видео
 
 ### Retrieval: индекс, поиск, рекомендации и метрики

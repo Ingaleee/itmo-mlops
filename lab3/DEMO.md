@@ -46,6 +46,6 @@ SHA-256, размеры изображений, происхождение и с
 
 Отдельный Linux Kubernetes прошёл все восемь контрольных вопросов на CPU. [Ответы с точными источниками](../docs/media/sources/knowledge-kubernetes-controls.json) сохранены из реального API. [Замеры cgroup и проверка перезапуска](../docs/verification/lab3-kubernetes-local.json) показывают предел памяти, фактический пик и разные UID Pod до и после пересоздания. SHA-256 весов совпал, новый Pod снова ответил на К01.
 
-Профиль локального k3d использует отдельный Docker volume. Результат чистого PVC в CI и доступность учебного namespace приводятся [отдельно](../docs/validation.md#чистый-kubernetes-в-ci).
+Профиль локального k3d использует отдельный Docker volume. Результат чистого PVC в CI и доступность учебного namespace приводятся [отдельно](../docs/validation.md#knowledge-portal).
 
 Чистый [CI Kubernetes](https://github.com/Ingaleee/itmo-mlops/actions/runs/43981776796) прошёл с опубликованными images: пустой PVC, все восемь CPU-ответов, пересоздание Pod, ограничение очереди, отмена и фильтрованный К01. [Отчёт CI](../docs/verification/lab3-kubernetes-ci.json) содержит фактические ответы, digest и измерения памяти без секретов и закрытого корпуса.

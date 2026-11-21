@@ -8,6 +8,12 @@ API, тесты и сборка индекса записаны при лока�
 
 Скриншоты сняты в браузере: интерфейсы OpenAPI и GitHub показаны напрямую, остальные результаты — в [просмотрщике](../docs/media/index.html). Видео составлены из последовательности экранов просмотрщика; анимация в Markdown служит предпросмотром MP4. Все отображаемые ответы и метрики получены из реальных запусков.
 
+## Текущий учебный релиз
+
+[Успешная поставка](https://github.com/Ingaleee/itmo-mlops/actions/runs/44913702769) устанавливает Iris из Docker Hub в персональный namespace. [Отчёт API](../docs/verification/lab1.json) содержит три класса и отклонение пяти невалидных входов; [снимок Deployment](../docs/verification/teaching-workloads.json) подтверждает Ready 1/1 и точный image digest. [Открыть работающий API](http://iris.itmo-student-01.mlops.goctf.online/docs).
+
+В artifacts `dockerhub-staging-and-iris` доступны отдельные проверки через port-forward и общий Gateway. Снимки ниже относятся к выпускам, указанным в их источниках.
+
 ## Видео
 
 ### API: readiness, три класса и валидация

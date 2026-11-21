@@ -1,11 +1,14 @@
 {
   "service": "runbook-search-api",
-  "build_revision": "2a820a01c2148d75e9fbcbc420dd64f2ec114ccc",
-  "image": "ghcr.io/ingaleee/esolovev-search@sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+  "build_revision": "c4605187d09092a527499c8f5147c81b7db31f02",
+  "image": "docker.io/inga1e/esolovev-search@sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1",
   "index_version": "1eed508a1515",
   "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+  "source_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44912169197",
+  "delivery_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44913702769",
+  "namespace": "itmo-student-01",
   "tests": {
-    "passed": 31,
+    "passed": 37,
     "failures": 0,
     "errors": 0
   },
@@ -37,30 +40,56 @@
   },
   "rollback": {
     "verified": true,
-    "restored_revision": 1,
-    "restored_digest": "sha256:d6513bd56732c4c17fc68cb00fdc58c5a6ca31069cf1752135572fee13b1ec75",
+    "restored_revision": 5,
+    "restored_digest": "sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1",
     "failure_kind": "semantic_quality",
     "revisions": [
       {
         "revision": 1,
-        "status": "superseded"
+        "status": "superseded",
+        "description": "Install complete"
       },
       {
         "revision": 2,
-        "status": "superseded"
+        "status": "superseded",
+        "description": "Upgrade complete"
       },
       {
         "revision": 3,
         "status": "superseded",
-        "restored_revision": 1
+        "description": "Rollback to 1",
+        "rollback_revision": 1
       },
       {
         "revision": 4,
-        "status": "deployed"
+        "status": "superseded",
+        "description": "Upgrade complete"
+      },
+      {
+        "revision": 5,
+        "status": "superseded",
+        "description": "Upgrade complete"
+      },
+      {
+        "revision": 6,
+        "status": "superseded",
+        "description": "Upgrade complete"
+      },
+      {
+        "revision": 7,
+        "status": "superseded",
+        "description": "Rollback to 5",
+        "rollback_revision": 5
+      },
+      {
+        "revision": 8,
+        "status": "deployed",
+        "description": "Upgrade complete"
       }
     ],
     "negative_control": {
       "ranking_mode": "reverse",
+      "ready": true,
       "mrr_at_3": 0.0,
       "hit_rate_at_3": 0.0
     }

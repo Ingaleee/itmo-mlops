@@ -1,28 +1,23 @@
 {
   "labs_1_2": {
-    "revision": "789b2b1edc4f0a8ede1ac591594535055424e210",
-    "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43422084305",
-    "iris_api": "passed on personal teaching cluster",
-    "search_staging": "blocked: node GHCR DNS/TLS image pull",
-    "production_and_rollback": "not reached on personal cluster",
-    "historical_complete_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/37905104404"
+    "revision": "c4605187d09092a527499c8f5147c81b7db31f02",
+    "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44913702769",
+    "delivery_revision": "f472c9b3b62b8d7aa7be49952ffe4d73623227fe",
+    "source_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44912169197",
+    "registry": "docker.io/inga1e",
+    "iris_api": "passed on personal teaching cluster and Gateway",
+    "search_staging": "passed on personal teaching cluster and Gateway",
+    "production_and_rollback": "passed; exact good revision restored after semantic rejection",
+    "same_digest": true,
+    "report": "dockerhub-delivery.json"
   },
   "lab_3": {
     "revision": "2e9c53965dbf2685100f7dc2da5f9e68120bb050",
     "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43981776796",
     "unit_and_loopback_integration_tests": 62,
     "native_cpu_controls": "8/8 passed",
-    "teaching_manifests": "server dry-run passed; PVC Bound; application startup blocked by GHCR TLS handshake timeout; third-profile replicas set to zero, previous lab replicas restored",
+    "teaching_manifests": "server dry-run passed; PVC Bound; previous startup attempt stopped at GHCR image pull; current third-profile release not verified on the teaching cluster; replicas zero",
     "cloud_full_control_set": "not passed; real cloud generation confirmed, some complex answers incomplete",
-    "previous_cpu_kubernetes_run": {
-      "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43975343298",
-      "revision": "3c56acc8d0dadee02667fc70f9a54eaaf8bc7260",
-      "weight_download": "verified 2497281120 bytes and SHA-256; init completed without restart",
-      "registration": "completed without restart",
-      "model": "AMX CPU backend repacks weights; OOMKilled at 3Gi before ready",
-      "correction": "exclude AMX backend from official CPU image; model limit 3200Mi, total stack 3712Mi < 4G",
-      "recheck": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43978470485"
-    },
     "cloud_credential_on_teaching_cluster": "not installed; cloud path not verified in teaching namespace",
     "pipeline_status": "success",
     "local_linux_kubernetes": "8/8 CPU controls passed; new Pod UID, unchanged weights SHA-256, K01 after restart passed",

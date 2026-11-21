@@ -1,24 +1,27 @@
 {
+  "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44912169197",
+  "build_revision": "c4605187d09092a527499c8f5147c81b7db31f02",
   "tests": [
     {
       "file": "lab1/evidence/tests.xml",
       "tests": 18,
-      "failures": 0,
-      "errors": 0
+      "errors": 0,
+      "failures": 0
     },
     {
       "file": "lab2/evidence/tests.xml",
-      "tests": 31,
-      "failures": 0,
-      "errors": 0
+      "tests": 37,
+      "errors": 0,
+      "failures": 0
     }
   ],
-  "total_tests": 49,
+  "total_tests": 55,
   "audit": [
     {
       "file": "lab2/evidence/dependency-audit.json",
       "packages": 19,
-      "known_advisories": 0
+      "known_advisories": 0,
+      "opentelemetry_api": "1.45.2"
     }
   ]
 }
