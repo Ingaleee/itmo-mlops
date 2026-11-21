@@ -36,8 +36,21 @@ def get_json(base, path):
         return json.load(response)
 
 
+def verify_request_id(supplied, body, header, policy):
+    require(body == header and bool(header), "request ID response correlation failed")
+    if policy == "preserve":
+        require(body == supplied, "request ID propagation failed")
+    elif policy == "gateway":
+        try:
+            require(str(uuid.UUID(body)) == body, "Gateway request ID is not a canonical UUID")
+        except (ValueError, TypeError, AttributeError):
+            raise VerificationError("Gateway request ID is not a canonical UUID") from None
+    else:
+        raise VerificationError("unknown request ID policy")
+
+
 def verify(base, output, expected_digest=None, expected_environment=None, expected_revision=None,
-           expected_index=None, forward=None):
+           expected_index=None, forward=None, request_id_policy="preserve"):
     for _ in range(40):
         if forward is not None and forward.poll() is not None:
             raise VerificationError("port-forward exited; see port-forward.log", "transport")
@@ -63,6 +76,7 @@ def verify(base, output, expected_digest=None, expected_environment=None, expect
 
     cases = json.loads(Path(__file__).resolve().parents[1].joinpath("data/eval.json").read_text(encoding="utf-8"))
     results = []
+    correlations = []
     for case in cases:
         request_id = "acceptance-" + uuid.uuid4().hex
         request = urllib.request.Request(base + "/v1/search",
@@ -72,7 +86,10 @@ def verify(base, output, expected_digest=None, expected_environment=None, expect
             result = json.load(response)
             echoed_id = response.headers["X-Request-ID"]
         results.append(result)
-        require(result["request_id"] == request_id == echoed_id, "request ID propagation failed")
+        correlations.append({"supplied": request_id, "body": result.get("request_id"), "header": echoed_id,
+                             "policy": request_id_policy})
+        save(output / "request-ids.json", correlations)
+        verify_request_id(request_id, result.get("request_id"), echoed_id, request_id_policy)
         require(result["index_version"] == meta["index_version"], "search and metadata disagree")
         require(0 < len(result["results"]) <= 3, "invalid result count")
         require(all(0 <= item["score"] <= 1 for item in result["results"]), "score is not cosine similarity")
@@ -130,7 +147,11 @@ def main():
     parser.add_argument("--expected-environment")
     parser.add_argument("--expected-build-revision")
     parser.add_argument("--expected-index")
+    parser.add_argument("--request-id-policy", choices=("preserve", "gateway"), default="preserve",
+                        help="gateway validates the shared Envoy UUID; direct checks always preserve client IDs")
     args = parser.parse_args()
+    if args.release and args.request_id_policy != "preserve":
+        parser.error("direct Kubernetes checks must preserve the client request ID")
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / "failure.json").unlink(missing_ok=True)
     process = None
@@ -145,7 +166,8 @@ def main():
                 process = subprocess.Popen(["kubectl", "-n", args.namespace, "port-forward", "--address=127.0.0.1",
                     f"service/{args.release}-mlops-search", f"{args.port}:80"], stdout=log, stderr=subprocess.STDOUT)
         verify(args.base_url.rstrip("/") if args.base_url else f"http://127.0.0.1:{args.port}", args.output,
-               args.expected_digest, args.expected_environment, args.expected_build_revision, args.expected_index, process)
+               args.expected_digest, args.expected_environment, args.expected_build_revision, args.expected_index,
+               process, args.request_id_policy)
     except Exception as error:
         save(args.output / "failure.json", {"kind": getattr(error, "kind", "transport"), "message": str(error)})
         raise

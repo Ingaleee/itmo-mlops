@@ -46,7 +46,7 @@ jobs:
         run: |
           python scripts/deploy_teaching_routes.py staging
           python lab1/scripts/check_api.py --base-url http://iris.itmo-student-01.mlops.goctf.online --output lab1/evidence/gateway-api.json
-          python lab2/scripts/verify_release.py --base-url http://search-staging.itmo-student-01.mlops.goctf.online --expected-digest "$SEARCH_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment staging --output lab2/evidence/gateway-staging
+          python lab2/scripts/verify_release.py --request-id-policy gateway --base-url http://search-staging.itmo-student-01.mlops.goctf.online --expected-digest "$SEARCH_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment staging --output lab2/evidence/gateway-staging
       - name: Capture own deployment diagnostics
         if: always()
         run: bash scripts/capture_diagnostics.sh
@@ -91,7 +91,7 @@ jobs:
       - name: Publish and verify production Gateway route
         run: |
           python scripts/deploy_teaching_routes.py production
-          python lab2/scripts/verify_release.py --base-url http://search.itmo-student-01.mlops.goctf.online --expected-digest "$SEARCH_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment production --output lab2/evidence/gateway-production
+          python lab2/scripts/verify_release.py --request-id-policy gateway --base-url http://search.itmo-student-01.mlops.goctf.online --expected-digest "$SEARCH_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment production --output lab2/evidence/gateway-production
       - name: Capture own deployment diagnostics
         if: always()
         run: bash scripts/capture_diagnostics.sh

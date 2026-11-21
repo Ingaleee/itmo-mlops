@@ -87,13 +87,17 @@ Staging и production проходят Helm test и внешний API-check. Se
 Выполните `docker login` на машине публикации и скопируйте каждый исходный OCI index:
 
 ```bash
-docker buildx imagetools create --tag docker.io/inga1e/esolovev-search:BUILD_REVISION \
-  ghcr.io/ingaleee/esolovev-search@sha256:FULL_DIGEST
+docker pull ghcr.io/ingaleee/esolovev-search@sha256:FULL_DIGEST
+docker tag ghcr.io/ingaleee/esolovev-search@sha256:FULL_DIGEST \
+  docker.io/inga1e/esolovev-search:BUILD_REVISION
+docker push docker.io/inga1e/esolovev-search:BUILD_REVISION
 ```
 
 Повторите для Iris, затем запустите workflow. Проверка сравнивает SHA-256 исходного и зеркального manifest без нормализации JSON; несовпадение останавливает deployment. Staging и production используют один Docker Hub digest. Между ними сохраняется environment approval, production проходит тот же semantic rollback и внешние API-проверки. Артефакты `dockerhub-staging-and-iris` и `dockerhub-production-and-rollback` содержат результаты поставки.
 
 Токен Docker Hub остаётся в локальном credential store: workflow скачивает публичные образы и не получает этот токен. Доступ к Kubernetes использует существующий KUBE_CONFIG_B64. Ошибка загрузки registry и исходящий доступ из Pod к внешнему LLM API проверяются отдельно.
+
+Прямые проверки через Kubernetes port-forward требуют точного сохранения клиентского `X-Request-ID`. Общий Envoy Gateway назначает внешний UUID заново — это [штатная политика edge request](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/headers). Только проверки через этот Gateway используют `--request-id-policy gateway`: UUID обязан совпадать в HTTP-заголовке и JSON-ответе. Исходный и итоговый идентификаторы сохраняются в `request-ids.json`; остальные проверки API и качества остаются одинаковыми. Настройки общего Gateway не изменяются.
 
 Docker может использовать `pass` как credential store: секрет хранится через GPG, а Docker config содержит `credsStore=pass` без embedded auth.
 
