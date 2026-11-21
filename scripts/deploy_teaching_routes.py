@@ -21,7 +21,7 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     for host_prefix, service in services:
         name = "esolovev-" + host_prefix
-        hostname = host_prefix + ".itmo-student-01.37.18.117.114.sslip.io"
+        hostname = host_prefix + ".itmo-student-01.mlops.goctf.online"
         route = {"apiVersion": "gateway.networking.k8s.io/v1", "kind": "HTTPRoute",
                  "metadata": {"name": name, "namespace": namespace,
                               "labels": {"app.kubernetes.io/managed-by": "itmo-mlops"}},

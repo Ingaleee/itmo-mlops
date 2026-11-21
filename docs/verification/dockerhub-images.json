@@ -1,0 +1,16 @@
+{
+  "source_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43422084305",
+  "build_revision": "789b2b1edc4f0a8ede1ac591594535055424e210",
+  "index_version": "1eed508a1515",
+  "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+  "iris": {
+    "source_repository": "ghcr.io/ingaleee/esolovev-iris",
+    "repository": "docker.io/inga1e/esolovev-iris",
+    "digest": "sha256:bb277f41820422e73cf96f41a50d2fb60df8b342901b0fcd836830337cfa8614"
+  },
+  "search": {
+    "source_repository": "ghcr.io/ingaleee/esolovev-search",
+    "repository": "docker.io/inga1e/esolovev-search",
+    "digest": "sha256:0224da03fdc96944210fe960aaecac479f5f479dd1df6e7c6f39c2ce2bd00bd0"
+  }
+}

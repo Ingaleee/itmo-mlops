@@ -245,9 +245,9 @@ jobs:
           INDEX_VERSION: ${{ needs.build-images.outputs.index_version }}
         run: |
           python scripts/deploy_teaching_routes.py staging
-          python lab1/scripts/check_api.py --base-url http://iris.itmo-student-01.37.18.117.114.sslip.io --output lab1/evidence/gateway-api.json
+          python lab1/scripts/check_api.py --base-url http://iris.itmo-student-01.mlops.goctf.online --output lab1/evidence/gateway-api.json
           cd lab2
-          python scripts/verify_release.py --base-url http://search-staging.itmo-student-01.37.18.117.114.sslip.io --expected-digest "$IMAGE_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment staging --output evidence/gateway-staging
+          python scripts/verify_release.py --base-url http://search-staging.itmo-student-01.mlops.goctf.online --expected-digest "$IMAGE_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment staging --output evidence/gateway-staging
       - name: Capture own deployment diagnostics
         if: always()
         run: bash scripts/capture_diagnostics.sh
@@ -317,7 +317,7 @@ jobs:
         run: |
           python scripts/deploy_teaching_routes.py production
           cd lab2
-          python scripts/verify_release.py --base-url http://search.itmo-student-01.37.18.117.114.sslip.io --expected-digest "$IMAGE_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment production --output evidence/gateway-production
+          python scripts/verify_release.py --base-url http://search.itmo-student-01.mlops.goctf.online --expected-digest "$IMAGE_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment production --output evidence/gateway-production
       - name: Capture own deployment diagnostics
         if: always()
         run: bash scripts/capture_diagnostics.sh

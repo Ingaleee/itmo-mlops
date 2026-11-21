@@ -80,6 +80,21 @@ Staging и production проходят Helm test и внешний API-check. Se
 
 ## Registry credentials
 
+### Docker Hub для учебного стенда
+
+[Teaching cluster delivery](../.github/workflows/teaching-deploy.yml) повторно устанавливает уже собранный релиз из Docker Hub. Это отдельная поставка существующих images: модель и индекс не пересобираются. [Манифест релиза](verification/dockerhub-images.json) связывает исходный pipeline, build revision, index version и оба repository с digest.
+
+Выполните `docker login` на машине публикации и скопируйте каждый исходный OCI index:
+
+```bash
+docker buildx imagetools create --tag docker.io/inga1e/esolovev-search:BUILD_REVISION \
+  ghcr.io/ingaleee/esolovev-search@sha256:FULL_DIGEST
+```
+
+Повторите для Iris, затем запустите workflow. Проверка сравнивает SHA-256 исходного и зеркального manifest без нормализации JSON; несовпадение останавливает deployment. Staging и production используют один Docker Hub digest. Между ними сохраняется environment approval, production проходит тот же semantic rollback и внешние API-проверки. Артефакты `dockerhub-staging-and-iris` и `dockerhub-production-and-rollback` содержат результаты поставки.
+
+Токен Docker Hub остаётся в локальном credential store: workflow скачивает публичные образы и не получает этот токен. Доступ к Kubernetes использует существующий KUBE_CONFIG_B64. Ошибка загрузки registry и исходящий доступ из Pod к внешнему LLM API проверяются отдельно.
+
 Docker может использовать `pass` как credential store: секрет хранится через GPG, а Docker config содержит `credsStore=pass` без embedded auth.
 
 | Workflow | Назначение |

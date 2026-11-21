@@ -5,11 +5,11 @@ set -euo pipefail
 [[ "$IRIS_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || exit 2
 namespace=${KUBE_NAMESPACE:-mlops-students}
 python - <<'PY'
-import os
+import os, re
 from pathlib import Path
 text = Path('lab1/k8s/app.yaml').read_text()
 placeholder = 'ghcr.io/ingaleee/esolovev-iris:v1'
-if text.count(placeholder) != 1 or os.environ['IRIS_IMAGE'] != 'ghcr.io/ingaleee/esolovev-iris':
+if text.count(placeholder) != 1 or not re.fullmatch(r'(?:ghcr\.io/ingaleee|docker\.io/inga1e)/esolovev-iris', os.environ['IRIS_IMAGE']):
     raise RuntimeError('unexpected Iris manifest or repository')
 text = text.replace(placeholder, os.environ['IRIS_IMAGE'] + '@' + os.environ['IRIS_DIGEST'])
 Path(os.environ['RUNNER_TEMP'], 'iris.yaml').write_text(text)

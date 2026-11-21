@@ -1,0 +1,109 @@
+name: Teaching cluster delivery
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: teaching-mirrored-release
+  cancel-in-progress: false
+
+env:
+  HELM_DRIVER: configmap
+  KUBE_NAMESPACE: itmo-student-01
+  RELEASE_PREFIX: esolovev
+  PYTHONUTF8: '1'
+
+jobs:
+  staging:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: staging
+    concurrency:
+      group: esolovev-teaching-cluster-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with: {python-version: '3.12.15'}
+      - run: bash scripts/install_ci_tools.sh
+      - name: Verify immutable mirror against the tested source release
+        run: python scripts/check_delivery_images.py docs/verification/dockerhub-images.json --env-file "$GITHUB_ENV"
+      - name: Load masked kubeconfig
+        env: {KUBE_CONFIG_B64: '${{ secrets.KUBE_CONFIG_B64 }}'}
+        run: bash scripts/prepare_kubeconfig.sh
+      - name: Deploy Iris from Docker Hub and verify API
+        run: bash scripts/deploy_iris.sh
+      - name: Deploy and verify Search staging
+        working-directory: lab2
+        run: |
+          export IMAGE_REPOSITORY="$SEARCH_IMAGE" IMAGE_DIGEST="$SEARCH_DIGEST"
+          bash scripts/deploy_release.sh esolovev-search-staging staging normal
+      - name: Publish assigned Gateway routes and verify external APIs
+        run: |
+          python scripts/deploy_teaching_routes.py staging
+          python lab1/scripts/check_api.py --base-url http://iris.itmo-student-01.mlops.goctf.online --output lab1/evidence/gateway-api.json
+          python lab2/scripts/verify_release.py --base-url http://search-staging.itmo-student-01.mlops.goctf.online --expected-digest "$SEARCH_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment staging --output lab2/evidence/gateway-staging
+      - name: Capture own deployment diagnostics
+        if: always()
+        run: bash scripts/capture_diagnostics.sh
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: dockerhub-staging-and-iris
+          path: |
+            lab1/evidence/
+            lab2/evidence/
+      - name: Remove temporary kubeconfig
+        if: always()
+        run: rm -f "$RUNNER_TEMP/teaching.kubeconfig" "$RUNNER_TEMP/kubeconfig-validation.json"
+
+  production:
+    needs: staging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: production
+    concurrency:
+      group: esolovev-teaching-cluster-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with: {python-version: '3.12.15'}
+      - run: bash scripts/install_ci_tools.sh
+      - name: Verify the same immutable images without rebuilding
+        run: python scripts/check_delivery_images.py docs/verification/dockerhub-images.json --env-file "$GITHUB_ENV"
+      - name: Load masked kubeconfig
+        env: {KUBE_CONFIG_B64: '${{ secrets.KUBE_CONFIG_B64 }}'}
+        run: bash scripts/prepare_kubeconfig.sh
+      - name: Promote, reject reverse ranking and verify rollback
+        working-directory: lab2
+        run: |
+          export IMAGE_REPOSITORY="$SEARCH_IMAGE" IMAGE_DIGEST="$SEARCH_DIGEST"
+          bash scripts/deploy_release.sh esolovev-search-prod production normal
+          bash scripts/demonstrate_rollback.sh esolovev-search-prod production
+          python scripts/verify_release.py --release esolovev-search-staging --expected-digest "$IMAGE_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment staging --output evidence/esolovev-search-staging/normal/candidate
+          python scripts/check_promotion.py --digest "$IMAGE_DIGEST"
+      - name: Publish and verify production Gateway route
+        run: |
+          python scripts/deploy_teaching_routes.py production
+          python lab2/scripts/verify_release.py --base-url http://search.itmo-student-01.mlops.goctf.online --expected-digest "$SEARCH_DIGEST" --expected-build-revision "$BUILD_REVISION" --expected-index "$INDEX_VERSION" --expected-environment production --output lab2/evidence/gateway-production
+      - name: Capture own deployment diagnostics
+        if: always()
+        run: bash scripts/capture_diagnostics.sh
+      - name: Summarize verified promotion and rollback
+        if: always()
+        working-directory: lab2
+        run: python scripts/write_summary.py
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: dockerhub-production-and-rollback
+          path: lab2/evidence/
+      - name: Remove temporary kubeconfig
+        if: always()
+        run: rm -f "$RUNNER_TEMP/teaching.kubeconfig" "$RUNNER_TEMP/kubeconfig-validation.json"

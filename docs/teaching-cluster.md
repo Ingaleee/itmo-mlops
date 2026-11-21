@@ -12,7 +12,7 @@
 | NodePort / LoadBalancer | Запрещены |
 | HTTP Gateway | envoy-gateway-system/itmo-shared, listener http-student-01 |
 | Gateway address | 37.18.117.114, порт 80 |
-| Hostname | `<app>.itmo-student-01.37.18.117.114.sslip.io` |
+| Hostname | `<app>.itmo-student-01.mlops.goctf.online` |
 
 Конфигурация TLS использует выданный CA. Передавайте kubeconfig явно или через окружение конкретного процесса. Файл и токен не входят в Git, образы и отчёты. Actions восстанавливает конфигурацию из KUBE_CONFIG_B64 во временный файл.
 
@@ -31,9 +31,9 @@ Storage/PVC не ограничены ключами namespace ResourceQuota. Э
 
 ## Маршруты первых двух работ
 
-- Iris: iris.itmo-student-01.37.18.117.114.sslip.io.
-- Search staging: search-staging.itmo-student-01.37.18.117.114.sslip.io.
-- Search production: search.itmo-student-01.37.18.117.114.sslip.io.
+- Iris: iris.itmo-student-01.mlops.goctf.online.
+- Search staging: search-staging.itmo-student-01.mlops.goctf.online.
+- Search production: search.itmo-student-01.mlops.goctf.online.
 
 Workflow создаёт HTTPRoute после проверки Deployment и ждёт Accepted/ResolvedRefs. Наличие hostname не означает доступность приложения. Фактическое состояние и конкретный pipeline приведены в [результатах](validation.md).
 
