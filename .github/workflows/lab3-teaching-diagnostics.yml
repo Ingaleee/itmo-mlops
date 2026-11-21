@@ -1,0 +1,31 @@
+name: Knowledge teaching diagnostics
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  KUBE_NAMESPACE: itmo-student-01
+
+jobs:
+  read-own-profile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: staging
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - run: bash scripts/install_ci_tools.sh
+      - name: Load existing teaching access
+        env: {KUBE_CONFIG_B64: '${{ secrets.KUBE_CONFIG_B64 }}'}
+        run: bash scripts/prepare_kubeconfig.sh
+      - name: Read only this student's profile
+        run: |
+          kubectl --request-timeout=15s -n itmo-student-01 get deployments esolovev-iris esolovev-search-staging-mlops-search esolovev-search-prod-mlops-search kb-mcp knowledge-portal llm-local
+          kubectl --request-timeout=15s -n itmo-student-01 get pods -l app.kubernetes.io/part-of=esolovev-knowledge -o 'custom-columns=NAME:.metadata.name,PHASE:.status.phase,READY:.status.containerStatuses[*].ready,RESTARTS:.status.containerStatuses[*].restartCount,LAST_EXIT:.status.containerStatuses[*].lastState.terminated.reason'
+          kubectl --request-timeout=15s -n itmo-student-01 exec deployment/llm-local -- sh -c 'cat /sys/fs/cgroup/memory.current /sys/fs/cgroup/memory.events /sys/fs/cgroup/cpu.stat'
+      - name: Remove temporary kubeconfig
+        if: always()
+        run: rm -f "$RUNNER_TEMP/teaching.kubeconfig" "$RUNNER_TEMP/kubeconfig-validation.json"
