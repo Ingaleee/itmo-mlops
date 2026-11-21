@@ -106,6 +106,48 @@ def test_provider_failure_one_attempt_same_context(
     run(scenario())
 
 
+def test_teaching_profile_recognizes_observed_llm7_quota(monkeypatch):
+    from scripts.deploy import resources
+
+    profile = next(
+        doc for doc in resources("app", "ollama")
+        if doc["kind"] == "Deployment" and doc["metadata"]["name"] == "knowledge-portal"
+    )
+    environment = profile["spec"]["template"]["spec"]["containers"][0]["env"]
+    quota_codes = next(item["value"] for item in environment if item["name"] == "CLOUD_QUOTA_CODES")
+    monkeypatch.setenv("CLOUD_QUOTA_CODES", quota_codes)
+    actual_client = httpx.AsyncClient
+    calls = []
+
+    def handle(request):
+        calls.append(request)
+        return httpx.Response(
+            429,
+            json={"error": {"type": "insufficient_quota", "code": "quota_exceeded"}},
+            headers={"Retry-After": "26"},
+        )
+
+    monkeypatch.setattr(
+        httpx, "AsyncClient",
+        lambda **kwargs: actual_client(transport=httpx.MockTransport(handle), **kwargs),
+    )
+
+    async def scenario():
+        gateway = ModelGateway()
+        gateway.cloud_key = "mock-key-not-secret"
+
+        async def local(messages):
+            assert messages is MESSAGES
+            return "Synthetic public fixture [1]"
+
+        gateway.local = local
+        result = await gateway.answer(MESSAGES, SOURCES)
+        assert result[1:] == ("local", "cloud_quota")
+        assert len(calls) == 1 and gateway.circuit.until > 0
+
+    run(scenario())
+
+
 def test_private_never_calls_cloud(monkeypatch):
     async def scenario():
         g = ModelGateway()

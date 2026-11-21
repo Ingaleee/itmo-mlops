@@ -29,7 +29,8 @@ CPU-контейнер переносит бинарный файл и библ�
 | PORTAL_ACCESS_TOKEN | Вход пользователя |
 | MCP_URL | Например http://127.0.0.1:18080/mcp |
 | LLM7_API_KEY | Бесплатный API token, только backend |
-| CLOUD_MODEL | Default mistral-Nemo-Instruct-2407 |
+| CLOUD_MODEL | Учебный профиль: gemma-3-27b; для локального запуска задайте ту же модель явно |
+| CLOUD_QUOTA_CODES | Учебный профиль: quota_exceeded, подтверждённый ответом llm7.io |
 | LOCAL_BASE_URL | Например http://127.0.0.1:11440/v1 |
 | LOCAL_MODEL | line-local |
 | LOCAL_BUDGET_SECONDS | CPU-вызов вместе с очередью: 105 с, допустимо 15–180 с |
@@ -101,4 +102,4 @@ kubectl --kubeconfig /private/student.kubeconfig -n itmo-student-01 \
 | Rate limit | Одна попытка, пауза Retry-After, затем одна проба |
 | Медленный CPU | Фактические RAM, CPU, prompt tokens и latency |
 
-Fault-provider `testing/cloud_mock.py` запускается только изолированно с mock-key-not-secret. Настоящий API token ему не передаётся. Синтетическая quota не объявляется реальной ошибкой llm7 без подтверждённого provider code.
+Fault-provider `testing/cloud_mock.py` запускается только изолированно с mock-key-not-secret. Настоящий API token ему не передаётся. У llm7.io подтверждён HTTP 429 с `error.type=insufficient_quota`, `error.code=quota_exceeded` и `Retry-After`. Профиль явно задаёт этот код через `CLOUD_QUOTA_CODES`; неизвестный 429 остаётся ограничением частоты. Пауза берётся из заголовка, без него quota использует 30 минут. Не расходуйте бесплатный бюджет намеренно и не подключайте платный тариф ради теста.

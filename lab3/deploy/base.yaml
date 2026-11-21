@@ -134,7 +134,8 @@ spec:
             - { name: MCP_URL, value: "http://kb-mcp:8000/mcp" }
             - { name: LOCAL_BASE_URL, value: "http://llm-local:11434/v1" }
             - { name: LOCAL_MODEL, value: line-local }
-            - { name: CLOUD_MODEL, value: mistral-Nemo-Instruct-2407 }
+            - { name: CLOUD_MODEL, value: gemma-3-27b }
+            - { name: CLOUD_QUOTA_CODES, value: quota_exceeded }
             - {
                 name: MCP_SERVICE_TOKEN,
                 valueFrom:
