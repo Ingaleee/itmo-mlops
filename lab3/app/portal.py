@@ -39,6 +39,14 @@ class Login(Contract):
 
 
 def create_app():
+    # Uvicorn configures its own loggers; the application needs an explicit
+    # JSON sink as well. One named sink avoids duplicate records on app reload.
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter("%(message)s"))
+        logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
     app = FastAPI(
         title="Линия · Knowledge Portal", version="1.0.0", docs_url=None, redoc_url=None
     )
