@@ -1,0 +1,45 @@
+name: Knowledge teaching CPU acceptance
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: esolovev-teaching-cluster-deploy
+  cancel-in-progress: false
+
+env:
+  KUBE_NAMESPACE: itmo-student-01
+  PYTHONUTF8: '1'
+
+jobs:
+  teaching-cpu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    environment: staging
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with: {python-version: '3.12.15'}
+      - run: pip install PyYAML==6.0.3
+      - run: bash scripts/install_ci_tools.sh
+      - name: Load existing masked teaching access
+        env: {KUBE_CONFIG_B64: '${{ secrets.KUBE_CONFIG_B64 }}'}
+        run: bash scripts/prepare_kubeconfig.sh
+      - name: Verify original-corpus CPU flow and restore labs 1/2
+        run: python -u lab3/scripts/teaching_integration.py
+      - name: Recover saved replicas if the verification step was interrupted
+        if: always()
+        run: python -u lab3/scripts/teaching_integration.py --restore-only
+      - name: Preserve teaching evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: knowledge-teaching-cpu
+          path: lab3/evidence/teaching/
+      - name: Remove temporary kubeconfig
+        if: always()
+        run: rm -f "$RUNNER_TEMP/teaching.kubeconfig" "$RUNNER_TEMP/kubeconfig-validation.json"
