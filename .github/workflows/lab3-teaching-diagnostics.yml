@@ -1,4 +1,4 @@
-name: Knowledge teaching diagnostics
+name: "Диагностика — ЛР3: ресурсы стенда"
 
 on:
   workflow_dispatch:

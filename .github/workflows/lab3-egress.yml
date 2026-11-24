@@ -1,4 +1,4 @@
-name: Knowledge cloud network probe
+name: "Диагностика — ЛР3: HTTPS к llm7"
 
 on:
   workflow_dispatch:
@@ -78,10 +78,25 @@ jobs:
           kubectl -n itmo-student-01 logs job/esolovev-knowledge-egress > lab3/evidence/egress/public-tls.json
           cat lab3/evidence/egress/public-tls.json
           python - <<'PY'
-          import json
+          import json,os
           from pathlib import Path
           report=json.loads(Path('lab3/evidence/egress/public-tls.json').read_text())
-          assert report['checks'][0].get('http_status') == 200, 'Teaching HTTPS to llm7 is unavailable; no credential was sent'
+          target=next(row for row in report['checks'] if row['url']=='https://api.llm7.io/v1/models')
+          available=target.get('http_status')==200
+          lines=['# Диагностика HTTPS учебного стенда', '',
+                 '**HTTPS к llm7 доступен.**' if available else '**Облачный контур заблокирован: проверка HTTPS к llm7 не прошла.**', '',
+                 'Проверка выполняется во временном Job без API-ключей и документов.', '',
+                 '| Адрес | Результат | Время |', '|---|---|---:|']
+          for row in report['checks']:
+              result='HTTP '+str(row['http_status']) if 'http_status' in row else row.get('error_type','нет результата')
+              lines.append(f"| {row['url']} | {result} | {row['latency_ms']/1000:.3f} с |")
+          lines += ['', 'Статус относится к исходящему HTTPS. Генерация, квота и качество ответов проверяются отдельно.', '',
+                    '[CPU-приёмка ЛР3 — отдельный workflow](https://github.com/Ingaleee/itmo-mlops/actions/workflows/lab3-teaching.yml)']
+          with Path(os.environ['GITHUB_STEP_SUMMARY']).open('a',encoding='utf-8') as summary:
+              summary.write('\n'.join(lines)+'\n')
+          if not available:
+              print('::error title=ЛР3 — HTTPS к llm7 недоступен::Облачный маршрут не готов. Результат и контрольный адрес записаны в Summary; ключи не передавались.')
+              raise SystemExit(1)
           PY
       - name: Preserve credential-free network evidence
         if: always()

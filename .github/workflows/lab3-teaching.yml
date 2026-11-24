@@ -1,4 +1,4 @@
-name: Knowledge teaching CPU acceptance
+name: "ЛР3 — CPU-приёмка на стенде"
 
 on:
   workflow_dispatch:
