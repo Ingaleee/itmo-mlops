@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="296" viewBox="0 0 1200 296" role="img" aria-labelledby="title description">
+  <title id="title">MLOps Labs</title>
+  <desc id="description">Эксплуатация систем машинного обучения: Iris Classifier, Runbook Search и Knowledge Portal. Python, Docker, Helm, Kubernetes, MCP и Ollama.</desc>
+  <rect width="1200" height="296" rx="18" fill="#0d1523"/>
+  <rect x="1" y="1" width="1198" height="294" rx="17" fill="none" stroke="#26374b"/>
+  <path d="M56 53h36" stroke="#5eead4" stroke-width="4" stroke-linecap="round"/>
+  <text x="106" y="59" font-family="ui-monospace,Consolas,monospace" font-size="14" letter-spacing="2.5" fill="#a8bdcf">ITMO / ENGINEERING LABS</text>
+  <text x="52" y="135" font-family="Segoe UI,Arial,sans-serif" font-weight="700" font-size="64" letter-spacing="-2" fill="#f3f7fb">MLOps Labs</text>
+  <text x="56" y="174" font-family="Segoe UI,Arial,sans-serif" font-size="20" fill="#b4c4d4">Эксплуатация систем машинного обучения</text>
+  <text x="56" y="209" font-family="Segoe UI,Arial,sans-serif" font-size="16" fill="#7f98af">Модели, сервисы и проверяемая доставка в Kubernetes</text>
+  <path d="M56 241h1088" stroke="#26374b"/>
+  <text x="56" y="271" font-family="ui-monospace,Consolas,monospace" font-size="14" fill="#a8bdcf">PYTHON  /  DOCKER  /  HELM  /  KUBERNETES  /  MCP  /  OLLAMA</text>
+  <g fill="none" stroke="#47627d" stroke-width="2">
+    <path d="M804 143h29m-7-6 7 6-7 6"/>
+    <path d="M978 143h29m-7-6 7 6-7 6"/>
+  </g>
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <rect x="656" y="88" width="148" height="112" rx="12" fill="#142437" stroke="#30475f"/>
+    <text x="674" y="115" font-family="ui-monospace,Consolas,monospace" font-size="12" fill="#5eead4">01 / CLASSIFY</text>
+    <text x="674" y="153" font-size="26" font-weight="600" fill="#f3f7fb">Iris</text>
+    <text x="674" y="178" font-size="13" fill="#9fb3c7">Модель и API</text>
+    <rect x="830" y="88" width="148" height="112" rx="12" fill="#142437" stroke="#30475f"/>
+    <text x="848" y="115" font-family="ui-monospace,Consolas,monospace" font-size="12" fill="#5eead4">02 / DELIVER</text>
+    <text x="848" y="153" font-size="26" font-weight="600" fill="#f3f7fb">Search</text>
+    <text x="848" y="178" font-size="13" fill="#9fb3c7">Качество и релиз</text>
+    <rect x="1004" y="88" width="148" height="112" rx="12" fill="#142437" stroke="#30475f"/>
+    <text x="1022" y="115" font-family="ui-monospace,Consolas,monospace" font-size="12" fill="#5eead4">03 / GROUND</text>
+    <text x="1022" y="153" font-size="26" font-weight="600" fill="#f3f7fb">RAG</text>
+    <text x="1022" y="178" font-size="13" fill="#9fb3c7">Источники и CPU</text>
+  </g>
+</svg>

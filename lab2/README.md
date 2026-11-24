@@ -1,10 +1,12 @@
 # Лабораторная 2 — Runbook Search
 
-[Каталог проектов](../README.md) · [Окружение](../docs/development.md) · [CI/CD](../docs/delivery.md)
+[Каталог](../README.md) · [Условия](ASSIGNMENT.md) · [Демонстрация](DEMO.md) · [Проверки](../docs/validation.md#iris-и-runbook-search) · [Окружение](../docs/development.md) · [CI/CD](../docs/delivery.md)
 
 Сервис поиска по инженерной базе знаний. Retrieval-модель входит в контейнер, а выпуск в Kubernetes проходит проверки API и качества поиска. Одна сборка продвигается из staging в production; ухудшение ранжирования запускает rollback.
 
 [Production API](http://search.itmo-student-01.mlops.goctf.online/docs) · [Staging API](http://search-staging.itmo-student-01.mlops.goctf.online/docs) · [Проверенный релиз](../docs/verification/lab2.json)
+
+**Подтверждено:** 37 тестов, MRR@3 = 0.9375, одинаковый digest в staging/production и откат после настоящего отказа качества. [Pipeline поставки](https://github.com/Ingaleee/itmo-mlops/actions/runs/44913702769) сохраняет ответы API, quality reports и историю Helm.
 
 ## Демонстрация
 
@@ -31,12 +33,15 @@
 
 ## Архитектура
 
-```text
-documents.json → word/char TF-IDF → search-index.joblib + metadata.json
-                                  ↓
-                    Docker image → API → staging → production
-                                         ↑           ↓
-                                  quality gate    rollback
+```mermaid
+flowchart LR
+    Corpus["documents.json → TF-IDF"] --> Image["Индекс + API image"]
+    Image --> Staging["Staging"]
+    Staging -->|один digest| Production["Production"]
+    Evaluation["eval.json"] -->|semantic smoke| Staging
+    Evaluation -->|semantic smoke| Production
+    Production -->|отказ качества| Rollback["Helm rollback"]
+    Rollback -->|рабочая revision| Production
 ```
 
 Word- и char-векторы объединяются и нормируются; документы ранжируются по cosine similarity с устойчивым разрешением ties. Версия индекса зависит от корпуса, параметров модели и библиотек. Загрузка проверяет metadata, SHA-256 артефакта, размерности и нормировку векторов. Повторная сборка должна давать одинаковые metadata и checksum.

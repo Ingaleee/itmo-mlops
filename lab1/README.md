@@ -1,10 +1,12 @@
 # Лабораторная 1 — Iris Classifier
 
-[Каталог проектов](../README.md) · [Окружение](../docs/development.md) · [CI/CD](../docs/delivery.md)
+[Каталог](../README.md) · [Условия](ASSIGNMENT.md) · [Демонстрация](DEMO.md) · [Проверки](../docs/validation.md#iris-и-runbook-search) · [Окружение](../docs/development.md) · [CI/CD](../docs/delivery.md)
 
 HTTP-сервис классификации Iris. Модель обучается на четырёх признаках цветка, сохраняется в артефакт и доставляется вместе с API в Docker-образе.
 
 [API на учебном стенде](http://iris.itmo-student-01.mlops.goctf.online/docs) · [Проверенный релиз](../docs/verification/lab1.json)
+
+**Подтверждено:** 18 тестов, корректные ответы трёх классов и развёртывание на учебном Kubernetes. [Pipeline поставки](https://github.com/Ingaleee/itmo-mlops/actions/runs/44913702769) связывает проверенный образ с установленным сервисом.
 
 ## Демонстрация
 
@@ -29,8 +31,12 @@ HTTP-сервис классификации Iris. Модель обучаетс
 
 ## Архитектура
 
-```text
-Iris dataset → RandomForest → model.joblib → Docker image → FastAPI → Kubernetes
+```mermaid
+flowchart LR
+    Dataset["Iris dataset"] --> Train["RandomForest"]
+    Train --> Artifact["model.joblib"]
+    Artifact --> API["FastAPI · Docker image"]
+    API --> Cluster["Kubernetes"]
 ```
 
 `train.py` обучает `RandomForestClassifier(n_estimators=50, random_state=42)` на встроенном наборе Iris. API загружает модель при старте; readiness подтверждает её доступность. Multi-stage Docker-сборка выполняет обучение и тесты, затем переносит модель и runtime-зависимости в финальный образ.

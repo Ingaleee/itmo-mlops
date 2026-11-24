@@ -1,59 +1,75 @@
-# MLOps Labs
+# Эксплуатация систем машинного обучения
 
-[![CI](https://github.com/Ingaleee/itmo-mlops/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Ingaleee/itmo-mlops/actions/workflows/ci-cd.yml)
+![MLOps Labs — классификация, поиск и RAG](docs/assets/cover.svg)
+
+[![Iris & Search CI](https://github.com/Ingaleee/itmo-mlops/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Ingaleee/itmo-mlops/actions/workflows/ci-cd.yml)
 [![Teaching delivery](https://github.com/Ingaleee/itmo-mlops/actions/workflows/teaching-deploy.yml/badge.svg)](https://github.com/Ingaleee/itmo-mlops/actions/workflows/teaching-deploy.yml)
-[![Knowledge Portal](https://github.com/Ingaleee/itmo-mlops/actions/workflows/lab3.yml/badge.svg)](https://github.com/Ingaleee/itmo-mlops/actions/workflows/lab3.yml)
-
+[![Knowledge Portal CI](https://github.com/Ingaleee/itmo-mlops/actions/workflows/lab3.yml/badge.svg)](https://github.com/Ingaleee/itmo-mlops/actions/workflows/lab3.yml)
 [![Knowledge teaching CPU](https://github.com/Ingaleee/itmo-mlops/actions/workflows/lab3-teaching.yml/badge.svg)](https://github.com/Ingaleee/itmo-mlops/actions/workflows/lab3-teaching.yml)
 
-Практические проекты по эксплуатации систем машинного обучения. Каждый проект содержит отдельный сервис, модель, контейнер и проверки. Общий CI/CD связывает обучение, контроль качества, публикацию образов и развёртывание в Kubernetes.
+Практические проекты MLOps: классификация Iris, поиск по инженерной базе знаний и RAG-портал с MCP и CPU-моделью. В каждом проекте есть приложение, воспроизводимая сборка, Kubernetes-профиль и доказательства работы.
+
+**[Лабораторные](#лабораторные)** · **[Результаты проверок](docs/validation.md)** · **[Запуск](docs/development.md)** · **[CI/CD](docs/delivery.md)** · **[Скриншоты и видео](docs/media/README.md)**
 
 ## Лабораторные
 
-| № | Проект | Задача | Технологии | Демонстрация |
-|---|---|---|---|---|
-| 1 | [Iris Classifier](lab1/README.md) | Обучение классификатора и доставка API в Kubernetes | scikit-learn, FastAPI, Docker, Kubernetes | [Скриншоты и видео](lab1/DEMO.md) |
-| 2 | [Runbook Search](lab2/README.md) | Поиск по базе знаний с проверкой качества, promotion и rollback | TF-IDF, FastAPI, Docker Compose, Helm, GitHub Actions | [Скриншоты и видео](lab2/DEMO.md) |
-| 3 | [Knowledge Portal](lab3/README.md) | Версионный поиск и RAG, облачная и CPU-модель | MCP SDK, SQLite FTS5, Ollama, llm7.io, Kubernetes | [Скриншоты и видео](lab3/DEMO.md) |
+| № | Проект | Что проверено | Материалы |
+|:--:|---|---|---|
+| **01** | **[Iris Classifier](lab1/README.md)**<br>Модель → HTTP API → Kubernetes | 18 тестов, три класса, валидация ввода и учебный deployment | [Условия](lab1/ASSIGNMENT.md) · [Галерея](lab1/DEMO.md) · [Отчёт](docs/verification/lab1.json) |
+| **02** | **[Runbook Search](lab2/README.md)**<br>Retrieval → quality gate → promotion | 37 тестов, MRR@3 = 0.9375, один digest в staging/production и настоящий rollback | [Условия](lab2/ASSIGNMENT.md) · [Галерея](lab2/DEMO.md) · [Отчёт](docs/verification/lab2.json) |
+| **03** | **[Knowledge Portal](lab3/README.md)**<br>MCP → RAG → Ollama CPU / llm7 | 64 теста, 8/8 CPU-ответов на учебном стенде, очередь, отмена и пересоздание Pod | [Условия](lab3/ASSIGNMENT.md) · [Галерея](lab3/DEMO.md) · [Отчёт](docs/verification/lab3-teaching.json) |
 
-## С чего начать
+> **Статус ЛР3:** CPU-профиль проверен в учебном Kubernetes. Полный облачный прогон остаётся открытым: исходящий HTTPS к llm7 недоступен, бюджет аккаунта исчерпан, текущая облачная модель не прошла все контрольные условия. Подробности — в [результатах](docs/validation.md#knowledge-portal).
 
-1. [Подготовить окружение](docs/development.md). Для каждой лабораторной используется отдельное Python-окружение.
-2. Открыть README выбранного проекта: там приведены команды запуска, API и проверки.
-3. Для развёртывания использовать [инструкцию CI/CD](docs/delivery.md).
+## Посмотреть реализацию
 
-Подтверждённые результаты и ссылки на CI собраны в [проверках проекта](docs/validation.md).
+| Iris Classifier | Runbook Search | Knowledge Portal |
+|:--:|:--:|:--:|
+| [![Iris: ответ API](docs/media/lab1/setosa.jpg)](lab1/DEMO.md) | [![Search: проверка качества](docs/media/lab2/quality-normal.jpg)](lab2/DEMO.md) | [![RAG: ответ CPU-модели](docs/media/lab3/local-answer.jpg)](lab3/DEMO.md) |
+| [API, модель и доставка](lab1/DEMO.md) | [Поиск, promotion и rollback](lab2/DEMO.md) | [Портал, источники и CPU](lab3/DEMO.md) |
 
-Каждая лабораторная содержит галерею с фактическими ответами API, проверками и видеообзорами. [Медиа и исходные данные](docs/media/README.md) организованы по проектам; рядом с каждым снимком указано, что он подтверждает.
+Галереи содержат **37 реальных скриншотов и 5 видеообзоров**. У каждого материала указаны источник и проверяемый результат; SHA-256 сохранены в [манифесте](docs/media/manifest.json).
 
-## Структура репозитория
+## Проверить результат
+
+| Проверка | Доказательство |
+|---|---|
+| Iris и Search на учебном стенде | [Pipeline поставки](https://github.com/Ingaleee/itmo-mlops/actions/runs/44913702769) · [Отчёт о deployment и rollback](docs/verification/dockerhub-delivery.json) |
+| Knowledge Portal на CPU, исходный корпус | [Pipeline приёмки](https://github.com/Ingaleee/itmo-mlops/actions/runs/45368980625) · [Ответы, ресурсы и сохранность весов](docs/verification/lab3-teaching.json) |
+| Все подтверждённые результаты | [Проверки проекта](docs/validation.md) · [Машинный статус](docs/verification/current-delivery.json) |
+
+Первые две работы имеют [Iris API](http://iris.itmo-student-01.mlops.goctf.online/docs), [Search staging](http://search-staging.itmo-student-01.mlops.goctf.online/docs) и [Search production](http://search.itmo-student-01.mlops.goctf.online/docs). Третий профиль запускается отдельно из-за общей квоты памяти; доступ к закрытому порталу — через localhost port-forward.
+
+## Запустить и разобраться
+
+1. **Подготовить окружение:** [Python, Docker и инструменты](docs/development.md). Каждая лабораторная использует отдельное Python-окружение.
+2. **Запустить проект:** команды находятся в README выбранной лабораторной; у [Knowledge Portal есть отдельный runbook](lab3/RUNBOOK.md).
+3. **Повторить поставку:** [образы, registry, Kubernetes и rollback](docs/delivery.md), [ресурсы и профили учебного кластера](docs/teaching-cluster.md).
+
+## Устройство репозитория
 
 ```text
-.github/workflows/       # CI/CD и проверки registry
-lab1/                    # Iris: приложение, модель, тесты, Dockerfile, Kubernetes
-lab2/                    # Search: приложение, данные, тесты, Dockerfile, Helm
-lab3/                    # Knowledge Portal: MCP, RAG, UI, CPU-модель, тесты и Kubernetes
-scripts/                 # инструменты CI и развёртывания
+lab1/                   Iris: модель, API, тесты, Docker и Kubernetes
+lab2/                   Search: индекс, API, quality gate и Helm
+lab3/                   Knowledge Portal: MCP, RAG, Ollama, UI и Kubernetes
+.github/workflows/      Сборка, проверки и доставка
+scripts/                Общие инструменты CI/CD
 docs/
-  development.md         # окружение и общие правила разработки
-  delivery.md            # сборка, registry, Kubernetes и rollback
-  validation.md          # результаты и воспроизводимые проверки
-  lab-template.md        # шаблон документации новой лабораторной
-  verification/          # краткие машинные отчёты
-  media/                 # снимки, видео и проверяемые источники по labN
+  development.md        Подготовка окружения
+  delivery.md           Поставка и восстановление
+  validation.md         Подтверждённые результаты
+  verification/         Краткие машинные отчёты
+  media/                Снимки, видео и их источники
+  lab-template.md       Шаблон следующей лабораторной
 ```
 
-В каждом `labN/` README описывает готовую реализацию; `ASSIGNMENT.md` сохраняет исходные условия. Данные моделей и временные отчёты создаются при запуске и исключены из Git.
+Каждый `labN/` — самостоятельный проект: **README** описывает реализацию, **ASSIGNMENT** сохраняет условия, **DEMO** показывает результаты. Новая работа добавляется по [единому шаблону](docs/lab-template.md); общая навигация остаётся компактной.
 
-## Принципы реализации
+## Инженерные решения
 
-- Версии моделей и индексов фиксируются; крупные веса и закрытые данные доставляются отдельно от публичного кода.
-- В кластер продвигается образ по digest; staging и production получают одну сборку.
-- Тесты API, качество модели и работа опубликованного образа проверяются отдельно.
-- Production требует подтверждения; ошибка качества приводит к проверенному откату.
-- В Kubernetes контейнеры работают без root, с ограничением ресурсов и read-only filesystem.
-- Зависимости, базовые образы и Actions закреплены; credentials хранятся вне репозитория.
-
-## Добавление лабораторной
-
-Новый проект размещается в `labN/` и получает README по [единому шаблону](docs/lab-template.md). В корневой каталог добавляется одна строка; специфичные API, команды и решения остаются внутри проекта. Общие инструменты добавляются в `scripts/`, общие инструкции — в `docs/`.
+- Модели, индексы и образы идентифицируются по версии и SHA-256; между staging и production продвигается одна сборка.
+- Контракт API, качество модели и работоспособность установленного релиза проверяются отдельно.
+- Production имеет подтверждение; отказ качества вызывает проверенный rollback.
+- Контейнеры работают без root, с лимитами ресурсов и read-only filesystem.
+- Закрытый корпус, крупные веса и credentials доставляются отдельно от публичного кода и образов.
+- Версии зависимостей, базовых образов и GitHub Actions закреплены; результаты связаны с конкретными pipeline.
