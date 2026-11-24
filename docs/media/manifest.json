@@ -407,6 +407,17 @@
         "sources/knowledge-privacy.json"
       ],
       "sha256": "1a993b5b97eed0994f8b63be5e51acf05b3b9276618c6850aae47508f6a04eb1"
+    },
+    {
+      "file": "lab3/teaching-cpu-actions.jpg",
+      "title": "Успешная CPU-приёмка на персональном учебном Kubernetes",
+      "width": 644,
+      "height": 1253,
+      "origin": "GitHub Actions · actual browser screenshot · run45368980625",
+      "sources": [
+        "../verification/lab3-teaching.json"
+      ],
+      "sha256": "24cb5d8ff3fad6fc9de0a4a0510fb0c1f05238d1e545ab0153e21df79d25674d"
     }
   ],
   "videos": [

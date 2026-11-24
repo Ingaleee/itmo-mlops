@@ -4,7 +4,8 @@
   "model": "gemma-3-27b",
   "free_catalog_profile": {
     "json_mode": true,
-    "usage_based_only": false
+    "usage_based_only": false,
+    "scope": "catalog at the time of the recorded Gemma run; see current_catalog_change"
   },
   "runtime_code_revision": "2e9c53965dbf2685100f7dc2da5f9e68120bb050",
   "controls": [
@@ -149,5 +150,45 @@
     "target": "llm7",
     "tls": "verified",
     "http_status": 200
+  },
+  "current_catalog_change": {
+    "source": "https://api.llm7.io/v1/models",
+    "documentation": "https://docs.llm7.io/guides/models-api",
+    "previous_model": {
+      "id": "gemma-3-27b",
+      "tier": "pro",
+      "usage_based_only": true,
+      "json_mode": true
+    },
+    "configured_model": {
+      "id": "codestral-latest",
+      "tier": "turbo",
+      "usage_based_only": false,
+      "json_mode": true
+    },
+    "paid_model_not_used_after_detection": true
+  },
+  "current_profile_probe": {
+    "model": "codestral-latest",
+    "case": "K06",
+    "status": "failed",
+    "mode": "cloud",
+    "reason": "cloud_available",
+    "answer": "Удвоение скачиваний при неизменных ставке, хранении и поддержке стоит 2 160 ₽ [1].",
+    "missing_facts": [
+      "4320"
+    ],
+    "latency_ms": 1560,
+    "context_sha256": "ddba080f946384598b3244e48dad1753b74e7d2a35a9ba7bf54f917988169304",
+    "all_context_cloud_ok": true,
+    "full_control_set_passed": false
+  },
+  "latest_observed_account_quota": {
+    "http_status": 429,
+    "type": "insufficient_quota",
+    "code": "quota_exceeded",
+    "retry_after_seconds": 87872,
+    "further_generation_attempts_stopped": true,
+    "paid_topup_enabled": false
   }
 }

@@ -12,23 +12,30 @@
     "report": "dockerhub-delivery.json"
   },
   "lab_3": {
-    "revision": "2e9c53965dbf2685100f7dc2da5f9e68120bb050",
-    "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43981776796",
-    "unit_and_loopback_integration_tests": 62,
+    "revision": "2ffd239ecf0c14a1abd41d843909a2e626f9cdba",
+    "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44960841161",
+    "unit_and_loopback_integration_tests": 64,
     "native_cpu_controls": "8/8 passed",
-    "teaching_manifests": "server dry-run passed; PVC Bound; previous startup attempt stopped at GHCR image pull; current third-profile release not verified on the teaching cluster; replicas zero",
-    "cloud_full_control_set": "not passed; real cloud generation confirmed, some complex answers incomplete",
+    "teaching_manifests": "8/8 CPU answers, MCP, privacy, queue, cancellation and Pod recreation passed on the personal teaching cluster; replicas zero after acceptance to restore labs 1/2",
+    "cloud_full_control_set": "not passed; historical Gemma K01–K05 passed, model became paid-only; current Codestral K06 incomplete; free account quota_exceeded",
     "cloud_credential_on_teaching_cluster": "not installed; cloud path not verified in teaching namespace",
     "pipeline_status": "success",
     "local_linux_kubernetes": "8/8 CPU controls passed; new Pod UID, unchanged weights SHA-256, K01 after restart passed",
     "local_linux_report": "lab3-kubernetes-local.json",
     "local_filtered_runtime_check": "CPU budget exceeded on the workstation, safely returned search_only; full cancellation/filter flow passed in clean CI",
     "images": {
-      "revision": "2e9c53965dbf2685100f7dc2da5f9e68120bb050",
-      "app": "ghcr.io/ingaleee/esolovev-knowledge@sha256:35798606e7d00d5818b56c7e0a1e42902cece411533155fff3ad16f41daf7943",
-      "ollama": "ghcr.io/ingaleee/esolovev-ollama-cpu@sha256:01cbe54ced5ed14fb5c0677155100f808e093518f5a726c8b1157553f32409e4"
+      "revision": "2ffd239ecf0c14a1abd41d843909a2e626f9cdba",
+      "app": "ghcr.io/ingaleee/esolovev-knowledge@sha256:0cb569d6fb1ef129b409302d37df426405ad6ed2c37be87ae2c689dbee79c83d",
+      "ollama": "ghcr.io/ingaleee/esolovev-ollama-cpu@sha256:85eab8757d5002f264f230ae6139fec8adfcb1621b595030d9a814b40e70ddbc"
     },
     "clean_ci_report": "lab3-kubernetes-ci.json",
-    "cpu_admission_cancellation_and_filtered_K01": "passed with real model in clean CI"
+    "cpu_admission_cancellation_and_filtered_K01": "passed with the real model in clean CI and personal teaching namespace",
+    "cloud_model": "codestral-latest",
+    "cloud_report": "lab3-cloud.json",
+    "teaching_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/45368980625",
+    "privacy_report": "lab3-privacy.json",
+    "teaching_delivery_revision": "94c3d41f22146c980732de9a8865cb0a59960b5d",
+    "teaching_cpu_report": "lab3-teaching.json",
+    "labs_1_2_after_cpu_acceptance": "restored 1/1 with unchanged Pod templates; public Iris health and both Search metadata passed"
   }
 }

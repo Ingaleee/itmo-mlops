@@ -13,6 +13,8 @@ python scripts/inspect_corpus.py /private/corpus.json
 python scripts/check_privacy.py /private/corpus.json
 ```
 
+Перед E2E пересчитывайте `evidence/privacy.json` этим же выпуском кода: один и тот же снимок контекста после изменения инструкции может иметь другое число токенов. Учебная приёмка использует [актуальный аудит](../docs/verification/lab3-privacy.json); отчёты рядом с медиа относятся к сохранённым демонстрациям.
+
 GGUF требует около 2,5 ГБ свободного места без runtime. Файл сохраняется под content-addressed именем; повторный запуск сверяет SHA-256 и использует существующие веса. Не включайте их в публичный build context. Fingerprints — в [runtime.json](model/runtime.json).
 
 CPU-контейнер переносит бинарный файл и библиотеки из закреплённого официального Ollama, исключая GPU payload и AMX backend. На CPU с AMX этот backend перепаковывает веса и превысил лимит 3 ГиБ в чистом CI. Остальные официальные CPU-варианты сохраняют автоматический выбор инструкций. Веса и корпус доставляются отдельно.
@@ -29,7 +31,7 @@ CPU-контейнер переносит бинарный файл и библ�
 | PORTAL_ACCESS_TOKEN | Вход пользователя |
 | MCP_URL | Например http://127.0.0.1:18080/mcp |
 | LLM7_API_KEY | Бесплатный API token, только backend |
-| CLOUD_MODEL | Учебный профиль: gemma-3-27b; для локального запуска задайте ту же модель явно |
+| CLOUD_MODEL | Учебный профиль: codestral-latest; для локального запуска задайте ту же модель явно |
 | CLOUD_QUOTA_CODES | Учебный профиль: quota_exceeded, подтверждённый ответом llm7.io |
 | LOCAL_BASE_URL | Например http://127.0.0.1:11440/v1 |
 | LOCAL_MODEL | line-local |
@@ -48,6 +50,10 @@ python -m uvicorn app.portal:create_app --factory --host 127.0.0.1 --port 18081 
 
 Профиль — itmo-student-01. Kubeconfig указывается явно; глобальный context не меняется.
 
+Для CPU-приёмки установленного профиля доступен ручной workflow [Knowledge teaching CPU acceptance](../.github/workflows/lab3-teaching.yml). Он использует уже настроенный `KUBE_CONFIG_B64`, проверяет Docker Hub mirrors по точным SHA-256, временно останавливает только собственные Iris/Search и запускает HTTP-проверки внутри Pod портала. Затем проверяет восемь ответов, очередь, отмену и сохранность весов после пересоздания Pod; восстанавливает прежние replicas и сохраняет `knowledge-teaching-cpu` artifact.
+
+Закрытый корпус и сервисные токены уже находятся в namespace. Workflow не считывает их в runner: тест входит в портал с токеном из существующего окружения того же Pod. Наружу сохраняются только результаты открытых контрольных вопросов и диагностика ресурсов. Облачный ключ этому workflow не передаётся. Общая concurrency group сериализует его с поставкой первых двух работ.
+
 | Deployment | CPU requests / limits | Memory requests / limits |
 |---|---|---|
 | llm-local | 1000m / 1800m | 2560Mi / 3200Mi |
@@ -57,21 +63,25 @@ python -m uvicorn app.portal:create_app --factory --host 127.0.0.1 --port 18081 
 
 Сумма ниже quota 2600m / 4G. Полные профили всех лабораторных одновременно не помещаются в память квоты. Перед третьей сохраните доказательства первых работ и уменьшите только их собственные replicas до 0; Helm history сохраняется. После демонстрации остановите третий профиль и восстановите прежние replicas. Namespace, квота и чужие ресурсы не удаляются.
 
-1. Получите knowledge-images.json из workflow **Knowledge Portal**. Адреса должны содержать digest.
+1. Получите knowledge-images.json из workflow **Knowledge Portal**. Адреса должны содержать digest. На учебном стенде используется Docker Hub mirror: перед установкой сверяются исходный и зеркальный OCI manifest. Конкретные проверенные ссылки — в [отчёте CI](../docs/verification/lab3-kubernetes-ci.json).
 2. Установите корпус и credentials напрямую с локального компьютера:
 
 ```bash
 python scripts/prepare_secrets.py --kubeconfig /private/student.kubeconfig \
   --corpus /private/corpus.json --mcp-token /private/mcp.token \
-  --portal-token /private/portal.token --cloud-key /private/llm7.token
+  --portal-token /private/portal.token
 ```
+
+Перед облачным запуском проверьте [живой каталог](https://api.llm7.io/v1/models): конкретная модель должна поддерживать JSON и не иметь `usage_based_only: true`. Ранее проверенная Gemma стала paid-only; старый успешный ответ не подтверждает её текущую бесплатную доступность.
+
+Для облачного профиля после разрешения на передачу ключа добавьте `--cloud-key /private/llm7.token`. CPU-профиль работает без него. Наличие credentials не заменяет доступность HTTPS до llm7 из Pod и доступный бюджет аккаунта.
 
 3. Проверьте admission, затем повторите с `--apply` для установки:
 
 ```bash
 python scripts/deploy.py --kubeconfig /private/student.kubeconfig \
-  --app-image ghcr.io/ingaleee/esolovev-knowledge@sha256:FULL_DIGEST \
-  --ollama-image ghcr.io/ingaleee/esolovev-ollama-cpu@sha256:FULL_DIGEST
+  --app-image docker.io/inga1e/esolovev-knowledge@sha256:FULL_DIGEST \
+  --ollama-image docker.io/inga1e/esolovev-ollama-cpu@sha256:FULL_DIGEST
 ```
 
 PVC knowledge-models хранит веса и manifest Ollama. Init containers проверяют SHA, регистрируют модель и проверяют её чтение до read-only монтажа в основном контейнере. OLLAMA_NOPRUNE предотвращает удаление ещё не зарегистрированного GGUF при первом старте. MCP получает корпус из Secret и строит индекс. Recreate не требует дополнительного Pod.

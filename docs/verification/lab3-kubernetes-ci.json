@@ -1,15 +1,15 @@
 {
   "status": "passed",
   "environment": "clean isolated Linux Kubernetes in GitHub Actions, published immutable images, real Ollama CPU",
-  "revision": "2e9c53965dbf2685100f7dc2da5f9e68120bb050",
-  "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/43981776796",
+  "revision": "2ffd239ecf0c14a1abd41d843909a2e626f9cdba",
+  "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44960841161",
   "images": {
-    "revision": "2e9c53965dbf2685100f7dc2da5f9e68120bb050",
-    "app": "ghcr.io/ingaleee/esolovev-knowledge@sha256:35798606e7d00d5818b56c7e0a1e42902cece411533155fff3ad16f41daf7943",
-    "ollama": "ghcr.io/ingaleee/esolovev-ollama-cpu@sha256:01cbe54ced5ed14fb5c0677155100f808e093518f5a726c8b1157553f32409e4"
+    "revision": "2ffd239ecf0c14a1abd41d843909a2e626f9cdba",
+    "app": "ghcr.io/ingaleee/esolovev-knowledge@sha256:0cb569d6fb1ef129b409302d37df426405ad6ed2c37be87ae2c689dbee79c83d",
+    "ollama": "ghcr.io/ingaleee/esolovev-ollama-cpu@sha256:85eab8757d5002f264f230ae6139fec8adfcb1621b595030d9a814b40e70ddbc"
   },
   "unit_and_loopback_integration_tests": {
-    "tests": 62,
+    "tests": 64,
     "failures": 0,
     "errors": 0
   },
@@ -21,15 +21,15 @@
   "control_answers": {
     "passed": 8,
     "latency_ms": {
-      "min": 25107,
-      "median": 33504.0,
-      "max": 40300
+      "min": 18167,
+      "median": 23511.0,
+      "max": 28121
     },
     "cases": [
       {
         "id": "K01",
         "answer": "Закрытый канал вмещает до 5 000 активных подписчиков [4]. Непринятые приглашения не занимают места [1][2]. Если интерфейс показывает свободное место, но сервер отклоняет — это ошибка, требующая проверки [1].",
-        "latency_ms": 30243,
+        "latency_ms": 21909,
         "sources": [
           "B-01@1.2#s01",
           "M-05@2.0#s05",
@@ -40,7 +40,7 @@
       {
         "id": "K02",
         "answer": "Архивная редакция:\nВ сентябрьской репетиции действовал предел 1 000 активных подписчиков на закрытый канал [1]. Документ применим до 20 октября 2026 года [2].",
-        "latency_ms": 25107,
+        "latency_ms": 18218,
         "sources": [
           "M-05@1.1#s01",
           "M-05@1.1#s04",
@@ -50,7 +50,7 @@
       {
         "id": "K03",
         "answer": "Черновик:\nПубличные каналы не запущены, остаются в стадии обсуждения [2]. Число 20 000 взято как гипотеза нагрузки для оценки эксперимента [1]. Нет подтверждённых данных о запуске или подтверждённой выборке. Условия запуска не выполнены [3].",
-        "latency_ms": 36765,
+        "latency_ms": 25910,
         "sources": [
           "P-05@0.8#s02",
           "P-01@1.4#s04",
@@ -61,7 +61,7 @@
       {
         "id": "K04",
         "answer": "Активация = 86/120 = 71,7% > 70%; удержание = 39/86 = 45,3% < 50%. Отсутствует SEV-1. Условие удержания не выполнено [3]. Решение отложено по критерию удержания [2].",
-        "latency_ms": 40300,
+        "latency_ms": 28121,
         "sources": [
           "B-06@1.0#s01",
           "P-02@1.2#s03",
@@ -72,7 +72,7 @@
       {
         "id": "K05",
         "answer": "Расход 18 000 ₽ из резерва требует подписи финансового менеджера и руководителя продукта [1][3]. Сумма 18 000 ₽ превышает 20 000 ₽? Нет. Сумма ≤20 000 ₽ — согласуется финансовым менеджером, но из резерва — две подписи [1][3].",
-        "latency_ms": 40234,
+        "latency_ms": 26702,
         "sources": [
           "P-03@1.3#s02",
           "B-05@1.2#s03",
@@ -83,7 +83,7 @@
       {
         "id": "K06",
         "answer": "При удвоении скачиваний трафик составляет 720 ГБ, стоимость — 4 320 ₽, разница — 2 160 ₽ [1]. Условие не нарушено, поддержка не увеличена. Стоимость не изменяется при неизменных ставке, хранении и поддержке [1].",
-        "latency_ms": 36861,
+        "latency_ms": 25113,
         "sources": [
           "B-05@1.2#s02",
           "P-03@1.3#s03",
@@ -94,7 +94,7 @@
       {
         "id": "K07",
         "answer": "iOS не поддерживается на приёмке пилота, Firefox — да, в двух последних стабильных версиях. Поддержка Firefox указана в [3], iOS — в [1].",
-        "latency_ms": 29440,
+        "latency_ms": 21429,
         "sources": [
           "P-04@1.1#s01",
           "P-01@1.4#s02",
@@ -105,7 +105,7 @@
       {
         "id": "K08",
         "answer": "В справочных материалах не указано, до какого числа запланировано добавление групповых видеозвонок. Нет конкретных данных о датах или лимитах. [1][3][4]",
-        "latency_ms": 25529,
+        "latency_ms": 18167,
         "sources": [
           "B-04@1.1#s05",
           "P-01@1.4#s02",
@@ -121,8 +121,8 @@
     "stack_limits_bytes": 3892314112,
     "namespace_quota_bytes": 4000000000,
     "idle_loaded": {
-      "memory_current_bytes": 3347476480,
-      "memory_peak_bytes": 3354632192,
+      "memory_current_bytes": 3348299776,
+      "memory_peak_bytes": 3355213824,
       "low": 0,
       "high": 0,
       "max": 0,
@@ -130,20 +130,20 @@
       "oom_kill": 0,
       "oom_group_kill": 0,
       "sock_throttled": 0,
-      "usage_usec": 3455964,
-      "user_usec": 2002006,
-      "system_usec": 1453957,
+      "usage_usec": 3512404,
+      "user_usec": 1845674,
+      "system_usec": 1666730,
       "nice_usec": 0,
       "core_sched.force_idle_usec": 0,
-      "nr_periods": 47,
-      "nr_throttled": 4,
-      "throttled_usec": 10764,
+      "nr_periods": 67,
+      "nr_throttled": 2,
+      "throttled_usec": 60472,
       "nr_bursts": 0,
       "burst_usec": 0
     },
     "after_control_series": {
-      "memory_current_bytes": 3347750912,
-      "memory_peak_bytes": 3355348992,
+      "memory_current_bytes": 3348017152,
+      "memory_peak_bytes": 3355332608,
       "low": 0,
       "high": 0,
       "max": 0,
@@ -151,25 +151,25 @@
       "oom_kill": 0,
       "oom_group_kill": 0,
       "sock_throttled": 0,
-      "usage_usec": 558706681,
-      "user_usec": 556725438,
-      "system_usec": 1981243,
+      "usage_usec": 397152763,
+      "user_usec": 394522526,
+      "system_usec": 2630237,
       "nice_usec": 0,
       "core_sched.force_idle_usec": 0,
-      "nr_periods": 3154,
-      "nr_throttled": 3020,
-      "throttled_usec": 9658493,
+      "nr_periods": 2274,
+      "nr_throttled": 1997,
+      "throttled_usec": 30861743,
       "nr_bursts": 0,
       "burst_usec": 0
     }
   },
   "persistence": {
     "storage": "Bound PVC knowledge-models, 5Gi",
-    "pod_uid_before": "2a5791e5-e272-442b-940f-f8945f9dcc0a",
-    "pod_uid_after": "24a05a7e-0757-49df-9892-9c1d3c6d8b7a",
+    "pod_uid_before": "383f6863-8535-4eb5-ae5d-433d53f2bade",
+    "pod_uid_after": "f7eadcc8-a001-4f5b-aeff-4cccaf7d0b61",
     "new_pod_ready": true,
     "control_after_restart": "passed",
-    "after_restart_latency_ms": 30531,
+    "after_restart_latency_ms": 21779,
     "unexpected_container_restarts": 0
   },
   "cpu_admission_cancellation_and_filtered_K01": {
@@ -179,13 +179,13 @@
     "third_request": {
       "mode": "search_only",
       "reason": "private_context:local_capacity",
-      "latency_ms": 2
+      "latency_ms": 3
     },
     "cancelled_positions": [
       "active",
       "waiting"
     ],
-    "client_cancel_ms": 1,
+    "client_cancel_ms": 3,
     "next_filtered_K01": {
       "path": [
         "Чаты и каналы",
@@ -194,8 +194,8 @@
       "answer": "Закрытый канал вмещает до 5 000 активных подписчиков [2]. Непринятые приглашения не расходуют лимит [2]. При 4 999 подписчиках и 30 приглашениях свободно одно место [1]. Если два человека принимают одновременно — вступает только один [2].",
       "mode": "local",
       "reason": "private_context",
-      "latency_ms": 38574,
-      "request_id": "b7f94bfa164a45f5b9ca84af8aeba453",
+      "latency_ms": 27146,
+      "request_id": "45258a45404d48ecb0f45499bfdff664",
       "context_sha256": "210901e094b37866fc1891715581bfe46301eab21791be6900334f9a68f32a88",
       "sources": [
         "M-05@2.0#s05",

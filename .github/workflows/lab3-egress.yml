@@ -1,0 +1,96 @@
+name: Knowledge cloud network probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: esolovev-knowledge-egress
+  cancel-in-progress: false
+
+env:
+  KUBE_NAMESPACE: itmo-student-01
+
+jobs:
+  public-tls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: staging
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: {persist-credentials: false}
+      - run: bash scripts/install_ci_tools.sh
+      - name: Load existing masked teaching access
+        env: {KUBE_CONFIG_B64: '${{ secrets.KUBE_CONFIG_B64 }}'}
+        run: bash scripts/prepare_kubeconfig.sh
+      - name: Probe verified HTTPS without account keys or document mounts
+        run: |
+          mkdir -p lab3/evidence/egress
+          kubectl -n itmo-student-01 create -f - <<'YAML'
+          apiVersion: batch/v1
+          kind: Job
+          metadata:
+            name: esolovev-knowledge-egress
+            labels: {app.kubernetes.io/part-of: esolovev-knowledge}
+          spec:
+            ttlSecondsAfterFinished: 300
+            activeDeadlineSeconds: 60
+            backoffLimit: 0
+            template:
+              metadata:
+                labels: {app.kubernetes.io/part-of: esolovev-knowledge}
+              spec:
+                restartPolicy: Never
+                automountServiceAccountToken: false
+                securityContext:
+                  runAsNonRoot: true
+                  runAsUser: 10001
+                  runAsGroup: 10001
+                  seccompProfile: {type: RuntimeDefault}
+                containers:
+                  - name: public-tls
+                    image: docker.io/inga1e/esolovev-knowledge@sha256:0cb569d6fb1ef129b409302d37df426405ad6ed2c37be87ae2c689dbee79c83d
+                    command: [python, -c]
+                    args:
+                      - |
+                        import json,time,urllib.request
+                        checks=[]
+                        for url in ('https://api.llm7.io/v1/models','https://ya.ru'):
+                            started=time.monotonic()
+                            try:
+                                with urllib.request.urlopen(url,timeout=5) as response: code=response.status
+                                checks.append({'url':url,'http_status':code,'tls':'verified','latency_ms':round((time.monotonic()-started)*1000)})
+                            except Exception as error:
+                                checks.append({'url':url,'error_type':type(error).__name__,'latency_ms':round((time.monotonic()-started)*1000)})
+                        print(json.dumps({'environment':'personal teaching namespace','credentials_supplied':False,'knowledge_mounted':False,'response_bodies_exported':False,'checks':checks}))
+                    resources:
+                      requests: {cpu: 100m, memory: 64Mi}
+                      limits: {cpu: 100m, memory: 64Mi}
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      readOnlyRootFilesystem: true
+                      capabilities: {drop: [ALL]}
+          YAML
+          touch "$RUNNER_TEMP/knowledge-egress-created"
+          kubectl -n itmo-student-01 wait --for=condition=complete job/esolovev-knowledge-egress --timeout=90s
+          kubectl -n itmo-student-01 logs job/esolovev-knowledge-egress > lab3/evidence/egress/public-tls.json
+          cat lab3/evidence/egress/public-tls.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('lab3/evidence/egress/public-tls.json').read_text())
+          assert report['checks'][0].get('http_status') == 200, 'Teaching HTTPS to llm7 is unavailable; no credential was sent'
+          PY
+      - name: Preserve credential-free network evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with: {name: knowledge-public-egress, path: lab3/evidence/egress/}
+      - name: Remove only the probe created by this run
+        if: always()
+        run: |
+          if test -f "$RUNNER_TEMP/knowledge-egress-created"; then
+            kubectl -n itmo-student-01 delete job/esolovev-knowledge-egress --ignore-not-found
+          fi
+          rm -f "$RUNNER_TEMP/teaching.kubeconfig" "$RUNNER_TEMP/kubeconfig-validation.json" "$RUNNER_TEMP/knowledge-egress-created"

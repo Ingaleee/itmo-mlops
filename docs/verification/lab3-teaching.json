@@ -1,0 +1,425 @@
+{
+  "status": "passed",
+  "environment": "personal teaching Kubernetes",
+  "app": "docker.io/inga1e/esolovev-knowledge@sha256:0cb569d6fb1ef129b409302d37df426405ad6ed2c37be87ae2c689dbee79c83d",
+  "ollama": "docker.io/inga1e/esolovev-ollama-cpu@sha256:85eab8757d5002f264f230ae6139fec8adfcb1621b595030d9a814b40e70ddbc",
+  "revision": "2ffd239ecf0c14a1abd41d843909a2e626f9cdba",
+  "cpu_control_answers": 8,
+  "mcp": "passed",
+  "privacy": {
+    "original_corpus_used_only_in_own_namespace": true,
+    "external_requests": 0,
+    "closed_quote_excluded": true,
+    "control_contexts": 8
+  },
+  "queue_and_cancellation": {
+    "status": "passed",
+    "active_limit": 1,
+    "waiting_limit": 1,
+    "third_request": {
+      "mode": "search_only",
+      "reason": "private_context:local_capacity",
+      "latency_ms": 49
+    },
+    "cancelled_positions": [
+      "active",
+      "waiting"
+    ],
+    "client_cancel_ms": 2,
+    "next_filtered_K01": {
+      "path": [
+        "Чаты и каналы",
+        "Группы и каналы"
+      ],
+      "answer": "Закрытый канал вмещает до 5 000 активных подписчиков [2]. Непринятые приглашения не расходуют лимит [2]. При 4 999 подписчиках и 30 приглашениях свободно одно место [1]. Если два человека принимают одновременно — вступает только один [2].",
+      "mode": "local",
+      "reason": "private_context",
+      "latency_ms": 70844,
+      "request_id": "f3696be2f78a49858c1e4916e02f7e83",
+      "context_sha256": "210901e094b37866fc1891715581bfe46301eab21791be6900334f9a68f32a88",
+      "sources": [
+        "M-05@2.0#s05",
+        "M-05@2.0#s01",
+        "M-05@2.0#s04"
+      ],
+      "missing_facts": []
+    },
+    "measurement": "real HTTP disconnect followed by real CPU generation; server admission release also checked over TCP in regression tests"
+  },
+  "pod_uid_before": "82169187-d32b-4f03-8269-5495f0010c1b",
+  "pod_uid_after": "ba84c9cb-66ed-4c91-8b76-18ad12bed311",
+  "weights_unchanged": true,
+  "cloud": "not configured; separate egress and credential boundary",
+  "namespace": "itmo-student-01",
+  "delivery_configuration_revision": "94c3d41f22146c980732de9a8865cb0a59960b5d",
+  "delivery_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/45368980625",
+  "source_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/44960841161",
+  "manifests_identical": true,
+  "independent_mcp": {
+    "status": "passed",
+    "transport": "streamable-http",
+    "protocol": "2025-11-25",
+    "missing_revision": "tool_error",
+    "controls": [
+      {
+        "id": "K01",
+        "documents": [
+          "B-01@1.2",
+          "M-05@2.0",
+          "B-02@1.2",
+          "A-03@1.1",
+          "P-01@1.4"
+        ],
+        "generation": "bd874cfa72e986c9"
+      },
+      {
+        "id": "K02",
+        "documents": [
+          "M-05@1.1"
+        ],
+        "generation": "bd874cfa72e986c9"
+      },
+      {
+        "id": "K03",
+        "documents": [
+          "P-05@0.8",
+          "M-05@2.0",
+          "S-05@1.2",
+          "P-01@1.4",
+          "O-01@1.2"
+        ],
+        "generation": "bd874cfa72e986c9"
+      },
+      {
+        "id": "K04",
+        "documents": [
+          "B-06@1.0",
+          "P-02@1.2",
+          "P-06@1.1",
+          "B-04@1.1",
+          "P-01@1.4"
+        ],
+        "generation": "bd874cfa72e986c9"
+      },
+      {
+        "id": "K05",
+        "documents": [
+          "P-03@1.3",
+          "B-05@1.2",
+          "P-02@1.2",
+          "B-04@1.1",
+          "B-06@1.0"
+        ],
+        "generation": "bd874cfa72e986c9"
+      },
+      {
+        "id": "K06",
+        "documents": [
+          "B-05@1.2",
+          "A-05@1.2",
+          "P-03@1.3",
+          "B-06@1.0",
+          "O-06@1.1"
+        ],
+        "generation": "bd874cfa72e986c9"
+      },
+      {
+        "id": "K07",
+        "documents": [
+          "P-04@1.1",
+          "P-01@1.4",
+          "P-02@1.2",
+          "B-06@1.0",
+          "B-04@1.1"
+        ],
+        "generation": "bd874cfa72e986c9"
+      },
+      {
+        "id": "K08",
+        "documents": [
+          "B-04@1.1",
+          "P-01@1.4",
+          "P-03@1.3",
+          "M-05@2.0",
+          "M-03@1.0"
+        ],
+        "generation": "bd874cfa72e986c9"
+      }
+    ]
+  },
+  "mcp_tools": [
+    {
+      "name": "list_sections",
+      "required_arguments": [],
+      "has_output_schema": true
+    },
+    {
+      "name": "get_doc",
+      "required_arguments": [
+        "doc_id",
+        "version"
+      ],
+      "has_output_schema": true
+    },
+    {
+      "name": "search_docs",
+      "required_arguments": [
+        "query"
+      ],
+      "has_output_schema": true
+    }
+  ],
+  "control_answers": {
+    "passed": 8,
+    "latency_ms": {
+      "min": 43399,
+      "max": 68043
+    },
+    "answers": [
+      {
+        "id": "K01",
+        "answer": "Закрытый канал вмещает до 5 000 активных подписчиков [4]. Непринятые приглашения не занимают места [1][2]. Если интерфейс показывает свободное место, но сервер отклоняет — это ошибка, требующая проверки [1].",
+        "mode": "local",
+        "latency_ms": 52751,
+        "generation": "bd874cfa72e986c9",
+        "context_sha256": "fbfb3cc1db456bc4826589efe0ae2841176197f047cc423e27d7cbc2450c9841",
+        "source_revisions": [
+          "B-01@1.2#s01",
+          "M-05@2.0#s05",
+          "B-01@1.2#s05",
+          "M-05@2.0#s01"
+        ]
+      },
+      {
+        "id": "K02",
+        "answer": "Архивная редакция:\nВ сентябрьской репетиции действовал предел 1 000 активных подписчиков на закрытый канал [1]. Документ применим до 20 октября 2026 года [2].",
+        "mode": "local",
+        "latency_ms": 44627,
+        "generation": "bd874cfa72e986c9",
+        "context_sha256": "cddeb1d393df8eaea24e9d3d8c2cf0c34b19161c5a8d2189c2b89ab8e7bacff5",
+        "source_revisions": [
+          "M-05@1.1#s01",
+          "M-05@1.1#s04",
+          "M-05@1.1#s03"
+        ]
+      },
+      {
+        "id": "K03",
+        "answer": "Черновик:\nПубличные каналы не запущены, остаются в стадии обсуждения [2]. Число 20 000 взято как гипотеза нагрузки для оценки эксперимента [1]. Нет подтверждённых данных о запуске или подтверждённой выборке. Условия запуска не выполнены [3].",
+        "mode": "local",
+        "latency_ms": 62210,
+        "generation": "bd874cfa72e986c9",
+        "context_sha256": "1c2b2da9b3ef6e772a1596e2bfd891075b6c1ba691f9865338a26929f43015e2",
+        "source_revisions": [
+          "P-05@0.8#s02",
+          "P-01@1.4#s04",
+          "P-05@0.8#s04",
+          "P-01@1.4#s02"
+        ]
+      },
+      {
+        "id": "K04",
+        "answer": "Активация = 86/120 = 71,7% > 70%; удержание = 39/86 = 45,3% < 50%. Отсутствует SEV-1. Условие удержания не выполнено [3]. Решение отложено по критерию удержания [2].",
+        "mode": "local",
+        "latency_ms": 67720,
+        "generation": "bd874cfa72e986c9",
+        "context_sha256": "c5ddd2624262955bde45904d4a8d43f807061d8c1ff85ddd0a8801ccad905cf5",
+        "source_revisions": [
+          "B-06@1.0#s01",
+          "P-02@1.2#s03",
+          "B-06@1.0#s02",
+          "P-02@1.2#s01"
+        ]
+      },
+      {
+        "id": "K05",
+        "answer": "Расход 18 000 ₽ из резерва требует подписи финансового менеджера и руководителя продукта [1][3]. Сумма 18 000 ₽ превышает 20 000 ₽? Нет. Сумма ≤20 000 ₽ — согласуется финансовым менеджером, но из резерва — две подписи [1][3].",
+        "mode": "local",
+        "latency_ms": 68043,
+        "generation": "bd874cfa72e986c9",
+        "context_sha256": "f8b2b3ab3a5b337f5e0fd19d2165c214e96f2885899732e2823680fedc4821c1",
+        "source_revisions": [
+          "P-03@1.3#s02",
+          "B-05@1.2#s03",
+          "P-03@1.3#s04",
+          "B-05@1.2#s01"
+        ]
+      },
+      {
+        "id": "K06",
+        "answer": "При удвоении скачиваний трафик составляет 720 ГБ, стоимость — 4 320 ₽, разница — 2 160 ₽ [1]. Условие не нарушено, поддержка не увеличена. Стоимость не изменяется при неизменных ставке, хранении и поддержке [1].",
+        "mode": "local",
+        "latency_ms": 62364,
+        "generation": "bd874cfa72e986c9",
+        "context_sha256": "ddba080f946384598b3244e48dad1753b74e7d2a35a9ba7bf54f917988169304",
+        "source_revisions": [
+          "B-05@1.2#s02",
+          "P-03@1.3#s03",
+          "B-05@1.2#s05",
+          "P-03@1.3#s04"
+        ]
+      },
+      {
+        "id": "K07",
+        "answer": "iOS не поддерживается на приёмке пилота, Firefox — да, в двух последних стабильных версиях. Поддержка Firefox указана в [3], iOS — в [1].",
+        "mode": "local",
+        "latency_ms": 50362,
+        "generation": "bd874cfa72e986c9",
+        "context_sha256": "c46cf1c553ac6e136df68da04296cfd42f798c074a3e45d236631e10ffef9726",
+        "source_revisions": [
+          "P-04@1.1#s01",
+          "P-01@1.4#s02",
+          "P-04@1.1#s04",
+          "P-01@1.4#s03"
+        ]
+      },
+      {
+        "id": "K08",
+        "answer": "В справочных материалах не указано, до какого числа запланировано добавление групповых видеозвонок. Нет конкретных данных о датах или лимитах. [1][3][4]",
+        "mode": "local",
+        "latency_ms": 43399,
+        "generation": "bd874cfa72e986c9",
+        "context_sha256": "0c4ae691baa535a0e146056b2d02e115fadd434374c93c421bb135a3164fd6ce",
+        "source_revisions": [
+          "B-04@1.1#s05",
+          "P-01@1.4#s02",
+          "B-04@1.1#s02",
+          "B-04@1.1#s04"
+        ]
+      }
+    ]
+  },
+  "weights_sha256": "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597",
+  "resources": {
+    "before": {
+      "memory_current_bytes": 3077742592,
+      "memory_peak_bytes": 3085770752,
+      "events_and_cpu": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "usage_usec": 8901273,
+        "user_usec": 4308991,
+        "system_usec": 4592281,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 333,
+        "nr_throttled": 6,
+        "throttled_usec": 85381,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "after_generation": {
+      "memory_current_bytes": 3077771264,
+      "memory_peak_bytes": 3085901824,
+      "events_and_cpu": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "usage_usec": 968826835,
+        "user_usec": 959677326,
+        "system_usec": 9149508,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 5988,
+        "nr_throttled": 5230,
+        "throttled_usec": 73466909,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "after_restart": {
+      "memory_current_bytes": 2977165312,
+      "memory_peak_bytes": 2984345600,
+      "events_and_cpu": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "usage_usec": 111812553,
+        "user_usec": 105907474,
+        "system_usec": 5905079,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 1046,
+        "nr_throttled": 525,
+        "throttled_usec": 9557247,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      }
+    },
+    "unexpected_restarts": 0,
+    "gpu": false
+  },
+  "after_restart": {
+    "id": "K01",
+    "status": "passed",
+    "mode": "local",
+    "reason": "private_context",
+    "answer": "Закрытый канал вмещает до 5 000 активных подписчиков [4]. Непринятые приглашения не занимают места [1][2]. Если интерфейс показывает свободное место, но сервер отклоняет — это ошибка, требующая проверки [1].",
+    "latency_ms": 52287,
+    "generation": "bd874cfa72e986c9",
+    "context_sha256": "fbfb3cc1db456bc4826589efe0ae2841176197f047cc423e27d7cbc2450c9841",
+    "prompt_tokens": 704
+  },
+  "local_tests": {
+    "tests": 64,
+    "errors": 0,
+    "failures": 0
+  },
+  "after_acceptance": {
+    "lab3_replicas": 0,
+    "labs_1_2": "restored with unchanged images and Pod templates",
+    "model_pvc": "preserved",
+    "helm_history": "preserved",
+    "public_api_checks": [
+      {
+        "service": "iris",
+        "http_status": 200,
+        "response": {
+          "status": "ready",
+          "model_version": "iris-v1"
+        }
+      },
+      {
+        "service": "search-staging",
+        "http_status": 200,
+        "response": {
+          "service": "runbook-search-api",
+          "service_version": "1.2.0",
+          "build_revision": "c4605187d09092a527499c8f5147c81b7db31f02",
+          "image_digest": "sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1",
+          "environment": "staging",
+          "ranking_mode": "normal",
+          "index_version": "1eed508a1515",
+          "model_type": "tfidf-word-char-cosine",
+          "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+          "documents": 12
+        }
+      },
+      {
+        "service": "search",
+        "http_status": 200,
+        "response": {
+          "service": "runbook-search-api",
+          "service_version": "1.2.0",
+          "build_revision": "c4605187d09092a527499c8f5147c81b7db31f02",
+          "image_digest": "sha256:acdae1d4573281058de83eb11c2b98c8e7cc340c13afa2872bf89156732eb5d1",
+          "environment": "production",
+          "ranking_mode": "normal",
+          "index_version": "1eed508a1515",
+          "model_type": "tfidf-word-char-cosine",
+          "artifact_sha256": "3001846126ae94dd2da4d715f40fe8b178b25cf8eb4dfb2c3e40f5cce05063ed",
+          "documents": 12
+        }
+      }
+    ]
+  },
+  "full_cloud_in_teaching_namespace": "not verified; cloud key not installed; earlier unauthenticated egress probe timed out, separate from this CPU acceptance"
+}
