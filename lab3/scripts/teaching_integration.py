@@ -83,7 +83,7 @@ def verify_inside_cluster(after_restart=False):
     payload = {'files': {name: (LAB / 'scripts' / name).read_text(encoding='utf-8')
                          for name in ['verify_portal.py', 'verify_runtime.py']},
                'controls': (LAB / 'control-questions.json').read_text(encoding='utf-8'),
-               'privacy': (ROOT / 'docs/media/sources/knowledge-privacy.json').read_text(encoding='utf-8'),
+               'privacy': (ROOT / 'docs/verification/lab3-privacy.json').read_text(encoding='utf-8'),
                'after_restart': after_restart,
                'guard': """import json,runpy,sys,traceback
 from pathlib import Path
@@ -245,7 +245,7 @@ try:
     capture('ollama-ps.txt', ['exec', 'deployment/llm-local', '--', 'ollama', 'ps'])
     capture('weights-before.txt', ['exec', 'deployment/llm-local', '--', 'sha256sum', WEIGHTS], timeout=100)
     probe_inside_cluster()
-    privacy = json.loads((ROOT / 'docs/media/sources/knowledge-privacy.json').read_text(encoding='utf-8'))
+    privacy = json.loads((ROOT / 'docs/verification/lab3-privacy.json').read_text(encoding='utf-8'))
     assert privacy['status'] == 'passed' and privacy['external_requests'] == 0 and privacy['closed_quote_excluded']
     (OUT / 'privacy.json').write_text(json.dumps(privacy, indent=2) + '\n', encoding='utf-8')
     verify_inside_cluster()
