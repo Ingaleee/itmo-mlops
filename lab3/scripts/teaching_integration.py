@@ -84,7 +84,35 @@ def verify_inside_cluster(after_restart=False):
                          for name in ['verify_portal.py', 'verify_runtime.py']},
                'controls': (LAB / 'control-questions.json').read_text(encoding='utf-8'),
                'privacy': (ROOT / 'docs/media/sources/knowledge-privacy.json').read_text(encoding='utf-8'),
-               'after_restart': after_restart}
+               'after_restart': after_restart,
+               'guard': """import json,runpy,sys,traceback
+from pathlib import Path
+sys.argv=sys.argv[1:]
+try:
+ runpy.run_path(sys.argv[0],run_name='__main__')
+except BaseException as error:
+ report={'exception_type':type(error).__name__,'frames':[{'file':Path(frame.filename).name,'line':frame.lineno,'function':frame.name} for frame in traceback.extract_tb(error.__traceback__) if Path(frame.filename).name in ['verify_portal.py','verify_runtime.py']]}
+ Path('verifier-error.json').write_text(json.dumps(report))
+ raise
+"""}
+
+    payload['worker'] = """import json,subprocess,sys
+from pathlib import Path
+d=Path(__file__).parent
+result={'status':'failed'}
+try:
+ for command in json.loads((d/'commands.json').read_text()):
+  result['check']=Path(command[1]).name
+  subprocess.run([command[0],str(d/'guard.py'),*command[1:]],check=True,timeout=1100)
+ result={'status':'passed'}
+except BaseException as error:
+ result['exception_type']=type(error).__name__
+ if (d/'verifier-error.json').exists(): result['diagnostic']=json.loads((d/'verifier-error.json').read_text())
+ raise
+finally:
+ (d/'portal.token').unlink(missing_ok=True)
+ (d/'runner-result.json').write_text(json.dumps(result))
+"""
     launcher = '''import json,os,subprocess,sys
 from pathlib import Path
 p=json.load(sys.stdin)
@@ -103,19 +131,11 @@ if p['after_restart']: commands[0]+=['--cases','K01']
 else: commands.append([sys.executable,str(d/'scripts/verify_runtime.py'),'--base-url','http://127.0.0.1:8000','--portal-token-file',str(token),'--output',str(d/'queue-and-filter.json')])
 (d/'commands.json').write_text(json.dumps(commands))
 worker=d/'worker.py'
-worker.write_text(''' + '"""' + '''import json,subprocess,sys
-from pathlib import Path
-d=Path(__file__).parent
-result={'status':'failed'}
-try:
- for command in json.loads((d/'commands.json').read_text()):
-  subprocess.run(command,check=True,timeout=1100)
- result={'status':'passed'}
-finally:
- (d/'portal.token').unlink(missing_ok=True)
- (d/'runner-result.json').write_text(json.dumps(result))
-''' + '"""' + ''',encoding='utf-8')
+(d/'guard.py').write_text(p['guard'],encoding='utf-8')
+worker.write_text(p['worker'],encoding='utf-8')
 (d/'runner-result.json').unlink(missing_ok=True)
+(d/'verifier-error.json').unlink(missing_ok=True)
+(d/'verification-stage.json').unlink(missing_ok=True)
 env=os.environ.copy();env['PYTHONPATH']='/app';env['PYTHONUNBUFFERED']='1'
 with (d/'worker.log').open('w') as log:
  child=subprocess.Popen([sys.executable,str(worker)],cwd=d,env=env,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True,close_fds=True)
@@ -155,11 +175,15 @@ print(json.dumps(result))
         time.sleep(10)
     else:
         raise RuntimeError('In-cluster acceptance exceeded bounded wait')
-    for name in (['after-restart.json'] if after_restart else ['control-answers.json', 'queue-and-filter.json']):
-        remote = "import base64,zlib;from pathlib import Path;print(base64.b64encode(zlib.compress(Path('/tmp/teaching-acceptance/" + name + "').read_bytes())).decode())"
+    for name in (['after-restart.json', 'verification-stage.json'] if after_restart else ['control-answers.json', 'queue-and-filter.json', 'verification-stage.json']):
+        remote = "import base64,zlib;from pathlib import Path;p=Path('/tmp/teaching-acceptance/" + name + "');print(base64.b64encode(zlib.compress(p.read_bytes())).decode() if p.exists() else '')"
         raw = subprocess.check_output(K + ['exec', 'deployment/knowledge-portal', '--', 'python', '-c', remote], timeout=60)
-        (OUT / name).write_bytes(zlib.decompress(base64.b64decode(raw)))
-    assert state['status'] == 'passed', 'In-cluster CPU verifier failed; see captured reports'
+        if raw.strip():
+            (OUT / name).write_bytes(zlib.decompress(base64.b64decode(raw)))
+        else:
+            assert state['status'] == 'failed', 'Passed verifier is missing a mandatory report'
+    (OUT / ('runner-after-restart.json' if after_restart else 'runner-result.json')).write_text(json.dumps(state, indent=2) + '\n')
+    assert state['status'] == 'passed', 'In-cluster CPU verifier failed; see safe runner-result diagnostic'
 
 
 def stop_new():

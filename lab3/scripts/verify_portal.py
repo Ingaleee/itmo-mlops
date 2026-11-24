@@ -116,12 +116,26 @@ def main():
             response = http.post(args.base_url + "/api/ask", json=body)
             response.raise_for_status()
             data = response.json()
-            assert data["generation"] == snapshot["generation"]
-            # The CPU path compares the actual response to the independently
-            # audited context, without loading a second model tokenizer in Pod.
+            # Bounded metadata makes a failed comparison diagnosable without
+            # exporting the worker log or an unvalidated document snapshot.
             actual_hash = hashlib.sha256(json.dumps(
                 data["sources"], ensure_ascii=False, sort_keys=True
             ).encode()).hexdigest()
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.with_name("verification-stage.json").write_text(json.dumps({
+                "case": case["id"],
+                "generation_matches": data["generation"] == snapshot["generation"],
+                "source_hash_matches_response": actual_hash == data["context_sha256"],
+                "source_hash_matches_audit": actual_hash == proof["context_sha256"],
+                "all_sources_cloud_ok": all(s["visibility"] == "cloud_ok" for s in data["sources"]),
+                "source_count": len(data["sources"]),
+                "prompt_tokens": data["prompt_tokens"],
+                "audited_prompt_tokens": proof["prompt_tokens"],
+                "route_matches": data["mode"] == args.route,
+            }, indent=2) + "\n", encoding="utf-8")
+            assert data["generation"] == snapshot["generation"]
+            # The CPU path compares the actual response to the independently
+            # audited context, without loading a second model tokenizer in Pod.
             assert actual_hash == data["context_sha256"] == proof["context_sha256"]
             assert all(s["visibility"] == "cloud_ok" for s in data["sources"])
             assert 2 <= len(data["sources"]) <= 4
