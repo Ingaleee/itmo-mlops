@@ -25,7 +25,9 @@ jobs:
         run: |
           kubectl --request-timeout=15s -n itmo-student-01 get deployments esolovev-iris esolovev-search-staging-mlops-search esolovev-search-prod-mlops-search kb-mcp knowledge-portal llm-local
           kubectl --request-timeout=15s -n itmo-student-01 get pods -l app.kubernetes.io/part-of=esolovev-knowledge -o 'custom-columns=NAME:.metadata.name,PHASE:.status.phase,READY:.status.containerStatuses[*].ready,RESTARTS:.status.containerStatuses[*].restartCount,LAST_EXIT:.status.containerStatuses[*].lastState.terminated.reason'
-          kubectl --request-timeout=15s -n itmo-student-01 exec deployment/llm-local -- sh -c 'cat /sys/fs/cgroup/memory.current /sys/fs/cgroup/memory.events /sys/fs/cgroup/cpu.stat'
+          if kubectl --request-timeout=15s -n itmo-student-01 get pods -l app=llm-local -o name | grep -q .; then
+            kubectl --request-timeout=15s -n itmo-student-01 exec deployment/llm-local -- sh -c 'cat /sys/fs/cgroup/memory.current /sys/fs/cgroup/memory.events /sys/fs/cgroup/cpu.stat'
+          fi
       - name: Remove temporary kubeconfig
         if: always()
         run: rm -f "$RUNNER_TEMP/teaching.kubeconfig" "$RUNNER_TEMP/kubeconfig-validation.json"

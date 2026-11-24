@@ -1,6 +1,7 @@
 """Exercise real portal/MCP/model; cloud requests require a local privacy audit."""
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -9,8 +10,6 @@ import sys
 import httpx
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.generation import context, snapshot_hash
-from app.token_budget import Budget
 
 
 def facts(case, text):
@@ -80,7 +79,11 @@ def main():
         and audit["closed_quote_excluded"]
     )
     allowed = {row["id"]: row for row in audit["control_contexts"]}
-    budget = Budget(root / "model/qwen3-tokenizer.json")
+    if args.route == "cloud":
+        # Cloud calls need a local reconstruction before any external request.
+        from app.generation import context, snapshot_hash
+        from app.token_budget import Budget
+        budget = Budget(root / "model/qwen3-tokenizer.json")
     cases = json.loads((root / "control-questions.json").read_text(encoding="utf-8"))
     if args.cases:
         assert set(args.cases) <= {c["id"] for c in cases}
@@ -104,17 +107,25 @@ def main():
             response = http.post(args.base_url + "/api/search", json=body)
             response.raise_for_status()
             snapshot = response.json()
-            sources = context(snapshot, case["question"], budget)
             proof = allowed[case["id"]]
             assert all(c["visibility"] == "cloud_ok" for c in snapshot["cards"])
             assert proof["generation"] == snapshot["generation"]
-            assert proof["context_sha256"] == snapshot_hash(sources)
+            if args.route == "cloud":
+                sources = context(snapshot, case["question"], budget)
+                assert proof["context_sha256"] == snapshot_hash(sources)
             response = http.post(args.base_url + "/api/ask", json=body)
             response.raise_for_status()
             data = response.json()
-            assert data["generation"] == snapshot["generation"] and data[
-                "context_sha256"
-            ] == snapshot_hash(sources)
+            assert data["generation"] == snapshot["generation"]
+            # The CPU path compares the actual response to the independently
+            # audited context, without loading a second model tokenizer in Pod.
+            actual_hash = hashlib.sha256(json.dumps(
+                data["sources"], ensure_ascii=False, sort_keys=True
+            ).encode()).hexdigest()
+            assert actual_hash == data["context_sha256"] == proof["context_sha256"]
+            assert all(s["visibility"] == "cloud_ok" for s in data["sources"])
+            assert 2 <= len(data["sources"]) <= 4
+            assert data["prompt_tokens"] == proof["prompt_tokens"] <= 1500
             missing = facts(case["id"], data.get("answer") or "")
             passed = data["mode"] == args.route and not missing
             # Reports intentionally contain only public control contexts and answers.

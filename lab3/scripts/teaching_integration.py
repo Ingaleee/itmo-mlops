@@ -16,8 +16,8 @@ OUT = ROOT / 'lab3/evidence/teaching'
 OUT.mkdir(parents=True, exist_ok=True)
 CONFIG = os.environ['KUBECONFIG']
 K = ['kubectl', '--kubeconfig', CONFIG, '--request-timeout=20s', '-n', 'itmo-student-01']
-APP_DIGEST = 'sha256:35798606e7d00d5818b56c7e0a1e42902cece411533155fff3ad16f41daf7943'
-CPU_DIGEST = 'sha256:01cbe54ced5ed14fb5c0677155100f808e093518f5a726c8b1157553f32409e4'
+APP_DIGEST = 'sha256:0cb569d6fb1ef129b409302d37df426405ad6ed2c37be87ae2c689dbee79c83d'
+CPU_DIGEST = 'sha256:85eab8757d5002f264f230ae6139fec8adfcb1621b595030d9a814b40e70ddbc'
 APP = 'docker.io/inga1e/esolovev-knowledge@' + APP_DIGEST
 CPU = 'docker.io/inga1e/esolovev-ollama-cpu@' + CPU_DIGEST
 WEIGHTS = '/models/blobs/sha256-3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597'
@@ -119,15 +119,22 @@ finally:
 env=os.environ.copy();env['PYTHONPATH']='/app';env['PYTHONUNBUFFERED']='1'
 with (d/'worker.log').open('w') as log:
  child=subprocess.Popen([sys.executable,str(worker)],cwd=d,env=env,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True,close_fds=True)
-print(json.dumps({'pid':child.pid,'started':True}))
+print(json.dumps({'pid':child.pid,'started':True,'server_start':Path('/proc/1/stat').read_text().split()[21]}))
 '''
-    subprocess.run(K + ['exec', '-i', 'deployment/knowledge-portal', '--', 'python', '-c', launcher],
-                   input=json.dumps(payload).encode('utf-8'), check=True, timeout=60)
+    launched = json.loads(subprocess.check_output(
+        K + ['exec', '-i', 'deployment/knowledge-portal', '--', 'python', '-c', launcher],
+        input=json.dumps(payload).encode('utf-8'), timeout=60))
     probe = '''import json
 from pathlib import Path
 d=Path('/tmp/teaching-acceptance')
 result=json.loads((d/'runner-result.json').read_text()) if (d/'runner-result.json').exists() else {'status':'running'}
-result['tail']=(d/'worker.log').read_text()[-1400:]
+result['server_start']=Path('/proc/1/stat').read_text().split()[21]
+p=d/'control-answers.json'
+if p.exists():
+ try:
+  data=json.loads(p.read_text())
+  result['controls']=[{'id':c['id'],'status':c['status'],'latency_ms':c['latency_ms']} for c in data['cases'] if c['id'] in ['K01','K02','K03','K04','K05','K06','K07','K08'] and c['status'] in ['passed','failed'] and isinstance(c['latency_ms'],int)]
+ except ValueError: pass
 print(json.dumps(result))
 '''
     previous = ''
@@ -137,9 +144,12 @@ print(json.dumps(result))
         except (subprocess.SubprocessError, json.JSONDecodeError):
             time.sleep(10)
             continue
-        if state['tail'] != previous:
-            print(state['tail'], flush=True)
-            previous = state['tail']
+        if state['server_start'] != launched['server_start']:
+            raise RuntimeError('Portal container restarted during acceptance; inspect Pod termination reason')
+        progress = json.dumps(state)
+        if progress != previous:
+            print(progress, flush=True)
+            previous = progress
         if state['status'] != 'running':
             break
         time.sleep(10)
@@ -230,7 +240,7 @@ try:
     assert (OUT / 'weights-before.txt').read_bytes() == (OUT / 'weights-after.txt').read_bytes()
     capture('resources-after-restart.txt', metric)
     report = {'status': 'passed', 'environment': 'personal teaching Kubernetes',
-              'app': APP, 'ollama': CPU, 'revision': '2e9c53965dbf2685100f7dc2da5f9e68120bb050',
+              'app': APP, 'ollama': CPU, 'revision': '2ffd239ecf0c14a1abd41d843909a2e626f9cdba',
               'cpu_control_answers': 8, 'mcp': 'passed', 'privacy': 'passed', 'queue_and_cancellation': 'passed',
               'pod_uid_before': old_uid, 'pod_uid_after': after[0]['metadata']['uid'], 'weights_unchanged': True,
               'cloud': 'not configured; separate egress and credential boundary'}
