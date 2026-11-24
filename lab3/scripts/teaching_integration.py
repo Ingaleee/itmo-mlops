@@ -88,6 +88,7 @@ def verify_inside_cluster(after_restart=False):
                'guard': """import json,runpy,sys,traceback
 from pathlib import Path
 sys.argv=sys.argv[1:]
+sys.path.insert(0,str(Path(sys.argv[0]).resolve().parent))
 try:
  runpy.run_path(sys.argv[0],run_name='__main__')
 except BaseException as error:
