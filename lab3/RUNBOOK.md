@@ -113,3 +113,5 @@ kubectl --kubeconfig /private/student.kubeconfig -n itmo-student-01 \
 | Медленный CPU | Фактические RAM, CPU, prompt tokens и latency |
 
 Fault-provider `testing/cloud_mock.py` запускается только изолированно с mock-key-not-secret. Настоящий API token ему не передаётся. У llm7.io подтверждён HTTP 429 с `error.type=insufficient_quota`, `error.code=quota_exceeded` и `Retry-After`. Профиль явно задаёт этот код через `CLOUD_QUOTA_CODES`; неизвестный 429 остаётся ограничением частоты. Пауза берётся из заголовка, без него quota использует 30 минут. Не расходуйте бесплатный бюджет намеренно и не подключайте платный тариф ради теста.
+
+Публичный HTTPS можно проверить отдельным workflow [Knowledge cloud network probe](../.github/workflows/lab3-egress.yml). Он запускает временный Job с лимитом 100m/64Mi без ключей, документов и ServiceAccount token; сохраняет только статус, класс ошибки и latency, затем удаляет Job. Отрицательный результат подтверждает сетевое ограничение и не изменяет принятую CPU-проверку.

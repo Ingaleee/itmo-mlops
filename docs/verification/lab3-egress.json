@@ -1,0 +1,27 @@
+{
+  "status": "blocked",
+  "namespace": "itmo-student-01",
+  "pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/45373583562",
+  "revision": "dff9f6144d9ec9de3041627394ea3343279641da",
+  "method": "unauthenticated verified-TLS GET from a temporary non-root Job, without credentials or knowledge volumes",
+  "environment": "personal teaching namespace",
+  "credentials_supplied": false,
+  "knowledge_mounted": false,
+  "response_bodies_exported": false,
+  "checks": [
+    {
+      "url": "https://api.llm7.io/v1/models",
+      "error_type": "URLError",
+      "latency_ms": 5258
+    },
+    {
+      "url": "https://ya.ru",
+      "http_status": 200,
+      "tls": "verified",
+      "latency_ms": 258
+    }
+  ],
+  "probe_job_deleted": true,
+  "deployment_mutations_requested": false,
+  "scope": "network reachability, separate from model quality, account quota and the passed CPU acceptance"
+}

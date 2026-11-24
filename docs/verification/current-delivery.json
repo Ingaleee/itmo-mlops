@@ -36,6 +36,8 @@
     "privacy_report": "lab3-privacy.json",
     "teaching_delivery_revision": "94c3d41f22146c980732de9a8865cb0a59960b5d",
     "teaching_cpu_report": "lab3-teaching.json",
-    "labs_1_2_after_cpu_acceptance": "restored 1/1 with unchanged Pod templates; public Iris health and both Search metadata passed"
+    "labs_1_2_after_cpu_acceptance": "restored 1/1 with unchanged Pod templates; public Iris health and both Search metadata passed",
+    "cloud_teaching_network": "credential-free HTTPS request to api.llm7.io failed after 5.3s; ya.ru returned verified TLS HTTP 200",
+    "cloud_network_report": "lab3-egress.json"
   }
 }

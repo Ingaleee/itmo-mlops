@@ -125,24 +125,21 @@
       "type": "insufficient_quota",
       "code": "quota_exceeded",
       "message": "Your free token allowance has been reached. Please retry in 26 seconds. To continue with pay-as-you-go, add funds to your account and use your API key: https://dash.llm7.io/#/billing"
-    }
+    },
+    "scope": "historical Gemma control run"
   },
   "cloud_key_transferred_to_teaching_cluster": false,
   "teaching_egress": [
     {
-      "target": "llm7",
+      "url": "https://api.llm7.io/v1/models",
       "error_type": "URLError",
-      "message": "<urlopen error _ssl.c:993: The handshake operation timed out>"
+      "latency_ms": 5258
     },
     {
-      "target": "ya",
+      "url": "https://ya.ru",
+      "http_status": 200,
       "tls": "verified",
-      "http_status": 200
-    },
-    {
-      "target": "huggingface",
-      "tls": "verified",
-      "http_status": 200
+      "latency_ms": 258
     }
   ],
   "workstation_egress": {
@@ -190,5 +187,7 @@
     "retry_after_seconds": 87872,
     "further_generation_attempts_stopped": true,
     "paid_topup_enabled": false
-  }
+  },
+  "teaching_egress_report": "lab3-egress.json",
+  "teaching_egress_pipeline": "https://github.com/Ingaleee/itmo-mlops/actions/runs/45373583562"
 }
